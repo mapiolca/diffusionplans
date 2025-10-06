@@ -254,22 +254,35 @@ if (empty($reshook)) {
 if ($action == 'addcontact' && $permissiontoadd) {
 	$contactid = (GETPOST('userid') ? GETPOSTINT('userid') : GETPOSTINT('contactid'));
 	$typeid = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
-	$result = $object->add_contact($contactid, $typeid, GETPOST("source", 'aZ09'));
-	if ($result >= 0) {
-		$diffusioncontactstatic = new DiffusionContact($db);
+        $contactSource = GETPOST('source', 'aZ09');
+        $result = $object->add_contact($contactid, $typeid, $contactSource);
+        if ($result >= 0) {
+                $diffusioncontactstatic = new DiffusionContact($db);
+                // FR: Synchronise la table dédiée afin d'offrir au PDF toutes les métadonnées nécessaires.
+                // EN: Synchronise the dedicated table so the PDF gets all required metadata.
+                $syncResult = $diffusioncontactstatic->syncLink($object->id, $contactid, $contactSource);
 
-		$resql = $diffusioncontactstatic->create($object->id, $contactid, GETPOST("source", 'aZ09'));
-		//var_dump("Contact ID : ".$result);
-		header("Location: ".$_SERVER['PHP_SELF']."?id=".$object->id);
-		exit;
-	} else {
-		if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-			$langs->load("errors");
-			setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
-		} else {
-			setEventMessages($object->error, $object->errors, 'errors');
-		}
-	}
+                if ($syncResult < 0) {
+                        setEventMessages($diffusioncontactstatic->error, $diffusioncontactstatic->errors, 'errors');
+                } else {
+                        header('Location: '.$_SERVER['PHP_SELF'].'?id='.$object->id);
+                        exit;
+                }
+        } else {
+                if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                        $langs->load('errors');
+                        // FR: Même en cas de doublon sur le lien Dolibarr, on s'assure que la table diffusion soit cohérente.
+                        // EN: Even when Dolibarr reports a duplicate link, keep the diffusion table consistent.
+                        $diffusioncontactstatic = new DiffusionContact($db);
+                        $syncResult = $diffusioncontactstatic->syncLink($object->id, $contactid, $contactSource);
+                        if ($syncResult < 0) {
+                                setEventMessages($diffusioncontactstatic->error, $diffusioncontactstatic->errors, 'errors');
+                        }
+                        setEventMessages($langs->trans('ErrorThisContactIsAlreadyDefinedAsThisType'), null, 'errors');
+                } else {
+                        setEventMessages($object->error, $object->errors, 'errors');
+                }
+        }
 } elseif ($action == 'swapstatut' && $permissiontoadd) {
 	// Toggle the status of a contact
 	$result = $object->swapContactStatus(GETPOSTINT('ligne'));
@@ -277,19 +290,24 @@ if ($action == 'addcontact' && $permissiontoadd) {
 	// Deletes a contact
 	$contactid = (GETPOST('userid') ? GETPOSTINT('userid') : GETPOSTINT('contactid'));
 	$typeid = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
-	$result = $object->delete_contact($lineid);
+        $contactSource = GETPOST('source', 'aZ09');
+        $result = $object->delete_contact($lineid);
 
-	if ($result >= 0) {
+        if ($result >= 0) {
+                $diffusioncontactstatic = new DiffusionContact($db);
+                // FR: Nettoie également la table spécifique pour éviter des reliquats côté génération PDF.
+                // EN: Also clean the specific table to avoid leftovers when generating the PDF.
+                $removeResult = $diffusioncontactstatic->removeLink($object->id, $contactid, $contactSource);
 
-		$diffusioncontactstatic = new DiffusionContact($db);
-
-		$deletediffusioncontact = $diffusioncontactstatic->deleteLine($object->id, $contactid, GETPOST("source", 'aZ09'));
-
-		header("Location: ".$_SERVER['PHP_SELF']."?id=".$object->id);
-		exit;
-	} else {
-		dol_print_error($db);
-	}
+                if ($removeResult < 0) {
+                        setEventMessages($diffusioncontactstatic->error, $diffusioncontactstatic->errors, 'errors');
+                } else {
+                        header('Location: '.$_SERVER['PHP_SELF'].'?id='.$object->id);
+                        exit;
+                }
+        } else {
+                dol_print_error($db);
+        }
 } elseif ($action == 'add' && $usercancreate) {
 	//$db->begin();
 	$object->ref = GETPOST('ref');

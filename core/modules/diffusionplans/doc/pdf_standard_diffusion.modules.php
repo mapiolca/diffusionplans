@@ -878,16 +878,18 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
                // FR: Déclaration des colonnes, de leur libellé traduit et du formatage associé.
                // EN: Declare columns with their translated labels and formatting metadata.
+               // FR: Largeurs harmonisées pour équilibrer noms, emails et indicateurs.
+               // EN: Balanced widths to harmonise names, emails and delivery flags.
                $columns = array(
-                       array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.18, 'align' => 'L'),
-                       array('key' => 'contact_name', 'label' => 'Contact', 'width' => $width * 0.22, 'align' => 'L'),
-                       array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.14, 'align' => 'L'),
-			array('key' => 'email', 'label' => 'Email', 'width' => $width * 0.22, 'align' => 'L'),
-			array('key' => 'phone', 'label' => 'Phone', 'width' => $width * 0.12, 'align' => 'L'),
-			array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
-			array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
-			array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
-		);
+                       array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.20, 'align' => 'L'),
+                       array('key' => 'contact_name', 'label' => 'Contact', 'width' => $width * 0.20, 'align' => 'L'),
+                       array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.12, 'align' => 'L'),
+                        array('key' => 'email', 'label' => 'Email', 'width' => $width * 0.26, 'align' => 'L'),
+                        array('key' => 'phone', 'label' => 'Phone', 'width' => $width * 0.10, 'align' => 'L'),
+                        array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
+                        array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
+                        array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
+                );
 
                $pdf->SetFont('', 'B', $defaultFontSize - 1);
                $x = $this->marge_gauche;
