@@ -1,46 +1,147 @@
 # Translation file
 
-#
-# Generic
-#
-
-# Module label 'ModuleDiffusionPlansName'
-ModuleDiffusionPlansName = DiffusionPlans
-# Module description 'ModuleDiffusionPlansDesc'
-ModuleDiffusionPlansDesc = DiffusionPlans description
-
-#
-# Admin page
-#
-DiffusionPlansSetup = DiffusionPlans setup
-Settings = Settings
-DiffusionPlansSetupPage = DiffusionPlans setup page
-NewSection=New section
-DIFFUSIONPLANS_MYPARAM1 = My param 1
-DIFFUSIONPLANS_MYPARAM1Tooltip = My param 1 tooltip
-DIFFUSIONPLANS_MYPARAM2=My param 2
-DIFFUSIONPLANS_MYPARAM2Tooltip=My param 2 tooltip
-
-
-#
-# About page
-#
 About = About
-DiffusionPlansAbout = About DiffusionPlans
-DiffusionPlansAboutPage = DiffusionPlans about page
-
-#
-# Sample page
-#
-DiffusionPlansArea = Home DiffusionPlans
-MyPageName = My page name
-
-#
-# Sample widget
-#
-MyWidget = My widget
-MyWidgetDescription = My widget description
-
-methodMail = Send by email
-methodLetter = Send by mail
+Actions = Actions
+Activated = Activated
+Add = Add
+AddAnAction = Add an action
+AddProject = Add project
+Agenda = Agenda
+AmountInCurrency = Amount in %s
+AnotherField = Another field
+BackToList = Back to list
+BackToModuleList = Back to module list
+BillFrom = Bill from
+BoxTitleLatestModifiedMyObjects = Latest modified items
+ClassNotFound = Class not found
+CloneMainAttributes = Clone main attributes
+ConfirmClone = Confirm cloning
+ContactType = Contact type
+Contacts = Contacts
+CopyOf = Copy of
+Currency = Currency
+CustomerAccountancyCode = Customer accountancy code
+CustomerCode = Customer code
+DIRECTION = DIRECTION
+Date = Date
+DateModificationShort = Modified
+Default = Default
+Delete = Delete
+Description = Description
+Diffusion = Diffusion
+DiffusionAttachmentLine = %s (%s)
+DiffusionAttachmentsTitle = Attached documents
+DiffusionContact = Diffusion contact
+DiffusionContacts = Diffusion contacts
+DiffusionContactsTitle = Diffusion contacts
+DiffusionNoContacts = No contact is linked to this diffusion.
+DiffusionNoDocuments = No document is attached to this diffusion.
+DiffusionPlansArea = DiffusionPlans area
+DiffusionPlansSetup = DiffusionPlans setup
+DiffusionPlansSetupPage = DiffusionPlans setup page
+Diffusions = Diffusions
+Disable = Disable
+Disabled = Disabled
+DocumentModelOdt = OpenDocument templates
+DocumentModules = Document models
+Draft = Draft
+DraftMyObjects = My drafts
+Enabled = Enabled
+Error = Error
+ErrorAddAtLeastOneLineFirst = Add at least one line before validating.
+ErrorCanNotCreateDir = Cannot create directory %s
+ErrorConstantNotDefined = Constant %s is not defined
+ErrorDirNotFound = Directory %s not found
+ErrorFailedToWriteInTempDirectory = Failed to write into temporary directory
+ErrorGoToGlobalSetup = Check the global setup.
+ErrorLogoFileNotFound = Logo file %s not found
+ErrorModuleNotFound = Module not found
+ErrorNumberingModuleNotSetup = Numbering module is not configured.
+ErrorThisContactIsAlreadyDefinedAsThisType = This contact is already linked with this type.
+Events = Events
+Example = Example
+ExampleOfDirectoriesForModelGen = Example of directories for models
+ExtraFields = Extra fields
+FeaturesSupported = Supported features
+FieldEdition = Field edition
+Files = Files
+FilterOnInto = Filter on
+FollowingSubstitutionKeysCanBeUsed = You can use the following substitution keys:
+FullListOnOnlineDocumentation = See the online documentation for the complete list.
+GenericMaskCodes = Generic mask codes: {yyyy}, {yy}, {mm}, {dd}, {0000}, {@}, {cccc}, {tt}, ...
+GenericMaskCodes2 = Example: {yyyy}{mm}-{0000} gives 202501-0001.
+GenericMaskCodes3 = Counter length is the number of zeros. {0000@99} starts at 0100.
+GenericMaskCodes4a = Use a mask compatible with %s numbering to keep existing %s references.
+GenericMaskCodes5 = Use {cccc} for third party code, {ss} for supplier code.
+GenericMaskCodes5b = See online documentation for other placeholders.
+Height = Height
+Id = Id
+Link = Link
+ListOfDirectories = List of directories
+ListOfDirectoriesForModelGenODT = List of directories for ODT models
+Logo = Logo
+Mask = Mask
+Modify = Modify
+ModuleDiffusionPlansDesc = Module to create plan or document diffusions.
+ModuleDiffusionPlansName = Diffusion plans
+MultiLanguage = Multi-language
+MyOwnFamily = My own family
+Name = Name
+NatureOfContact = Nature of contact
+NbOfAttachedFiles = Number of attached files
+NewAttribute = New attribute
+NewDiffusion = New diffusion
+NewObject = New object
+NextValue = Next value
+NoOrder = No order
+NoRecordFound = No record found
+NoSpecificContactAddress = No dedicated contact address
+NoSpecificContactAddressBis = No dedicated address
+None = None
+NotAvailable = Not available
+NotValidated = Not validated
+NothingToSetup = Nothing to configure
+NumberOfModelFilesFound = Number of model files found
+NumberingModules = Numbering modules
+OtherOrders = Other orders
+PDFMerge = Merge PDF
+Path = Path
+PdfTitle = Diffusion
+Preview = Preview
+PreviewNotAvailable = Preview not available
+Project = Project
+PuttingPricesUpToDate = Update prices
+ReGeneratePDF = Regenerate PDF
+Ref = Ref
+RefCustomer = Customer ref
+RefProject = Project ref
+SalesRepresentative = Sales representative
+SelectWarehouseForStockDecrease = Select warehouse for stock decrease
+SendByMail = Send by email
+Settings = Settings
+SetupSaved = Setup saved
+ShortInfo = Short information
+ShowDiffusion = Show diffusion
+ShowDiffusionContact = Show diffusion contact
+SimpleNumRefModelDesc = Simple automatic numbering
+Status = Status
+ThirdParty = Third party
+ThirdPartyContact = Third party contact
+To = To
+Total = Total
+TotalSizeOfAttachedFiles = Total size of attached files
+Type = Type
+Unknown = Unknown
+Unlink = Unlink
+Upload = Upload
+UploadNewTemplate = Upload a new template
+User = User
+Users = Users
+Validate = Validate
+Version = Version
+Width = Width
+bytes = bytes
 methodHand = Hand delivered
+methodLetter = Send by letter
+methodMail = Send by email
+or = or

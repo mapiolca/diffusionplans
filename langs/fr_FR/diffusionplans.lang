@@ -1,47 +1,147 @@
 # Translation file
 
-#
-# Generic
-#
-
-# Module label 'ModuleDiffusionPlansName'
-ModuleDiffusionPlansName = Diffusion de Plans
-# Module description 'ModuleDiffusionPlansDesc'
-ModuleDiffusionPlansDesc = Module permettant de créer des courriers de diffusions de plans ou de documents.
-
-#
-# Admin page
-#
-DiffusionPlansSetup = DiffusionPlans setup
-Settings = Settings
-DiffusionPlansSetupPage = DiffusionPlans setup page
-NewSection=New section
-DIFFUSIONPLANS_MYPARAM1 = My param 1
-DIFFUSIONPLANS_MYPARAM1Tooltip = My param 1 tooltip
-DIFFUSIONPLANS_MYPARAM2=My param 2
-DIFFUSIONPLANS_MYPARAM2Tooltip=My param 2 tooltip
-
-
-#
-# About page
-#
-About = About
-DiffusionPlansAbout = About DiffusionPlans
-DiffusionPlansAboutPage = DiffusionPlans about page
-
-#
-# Sample page
-#
-DiffusionPlansArea = Home DiffusionPlans
-MyPageName = My page name
-
-#
-# Sample widget
-#
-MyWidget = My widget
-MyWidgetDescription = My widget description
-
-
-methodMail = Envoyer par e-mail
-methodLetter = Envoyer par courrier
+About = À propos
+Actions = Actions
+Activated = Activé
+Add = Ajouter
+AddAnAction = Ajouter une action
+AddProject = Ajouter un projet
+Agenda = Agenda
+AmountInCurrency = Montant en %s
+AnotherField = Autre champ
+BackToList = Retour à la liste
+BackToModuleList = Retour à la liste des modules
+BillFrom = Facturer depuis
+BoxTitleLatestModifiedMyObjects = Derniers éléments modifiés
+ClassNotFound = Classe introuvable
+CloneMainAttributes = Cloner les attributs principaux
+ConfirmClone = Confirmer le clonage
+ContactType = Type de contact
+Contacts = Contacts
+CopyOf = Copie de
+Currency = Devise
+CustomerAccountancyCode = Code comptable client
+CustomerCode = Code client
+DIRECTION = DIRECTION
+Date = Date
+DateModificationShort = Modifié
+Default = Par défaut
+Delete = Supprimer
+Description = Description
+Diffusion = Diffusion
+DiffusionAttachmentLine = %s (%s)
+DiffusionAttachmentsTitle = Documents joints
+DiffusionContact = Contact de diffusion
+DiffusionContacts = Contacts de diffusion
+DiffusionContactsTitle = Contacts de la diffusion
+DiffusionNoContacts = Aucun contact n'est lié à cette diffusion.
+DiffusionNoDocuments = Aucun document n'est joint à cette diffusion.
+DiffusionPlansArea = Accueil DiffusionPlans
+DiffusionPlansSetup = Configuration DiffusionPlans
+DiffusionPlansSetupPage = Page de configuration DiffusionPlans
+Diffusions = Diffusions
+Disable = Désactiver
+Disabled = Désactivé
+DocumentModelOdt = Modèles OpenDocument
+DocumentModules = Modèles de documents
+Draft = Brouillon
+DraftMyObjects = Mes brouillons
+Enabled = Activé
+Error = Erreur
+ErrorAddAtLeastOneLineFirst = Ajoutez au moins une ligne avant de valider.
+ErrorCanNotCreateDir = Impossible de créer le répertoire %s
+ErrorConstantNotDefined = La constante %s n'est pas définie
+ErrorDirNotFound = Répertoire %s introuvable
+ErrorFailedToWriteInTempDirectory = Impossible d'écrire dans le répertoire temporaire
+ErrorGoToGlobalSetup = Vérifiez la configuration globale.
+ErrorLogoFileNotFound = Fichier logo %s introuvable
+ErrorModuleNotFound = Module introuvable
+ErrorNumberingModuleNotSetup = Le module de numérotation n'est pas configuré.
+ErrorThisContactIsAlreadyDefinedAsThisType = Ce contact est déjà lié avec ce type.
+Events = Événements
+Example = Exemple
+ExampleOfDirectoriesForModelGen = Exemple de répertoires pour les modèles
+ExtraFields = Champs supplémentaires
+FeaturesSupported = Fonctionnalités prises en charge
+FieldEdition = Édition du champ
+Files = Fichiers
+FilterOnInto = Filtrer sur
+FollowingSubstitutionKeysCanBeUsed = Vous pouvez utiliser les clés de substitution suivantes :
+FullListOnOnlineDocumentation = Voir la documentation en ligne pour la liste complète.
+GenericMaskCodes = Codes génériques : {yyyy}, {yy}, {mm}, {dd}, {0000}, {@}, {cccc}, {tt}, ...
+GenericMaskCodes2 = Exemple : {yyyy}{mm}-{0000} donne 202501-0001.
+GenericMaskCodes3 = La longueur du compteur correspond au nombre de zéros. {0000@99} démarre à 0100.
+GenericMaskCodes4a = Utilisez un masque compatible avec la numérotation %s pour conserver les références %s existantes.
+GenericMaskCodes5 = Utilisez {cccc} pour le code tiers, {ss} pour le code fournisseur.
+GenericMaskCodes5b = Consultez la documentation en ligne pour d'autres paramètres.
+Height = Hauteur
+Id = Id
+Link = Lien
+ListOfDirectories = Liste des répertoires
+ListOfDirectoriesForModelGenODT = Liste des répertoires pour les modèles ODT
+Logo = Logo
+Mask = Masque
+Modify = Modifier
+ModuleDiffusionPlansDesc = Module permettant de créer des diffusions de plans ou de documents.
+ModuleDiffusionPlansName = Diffusion de plans
+MultiLanguage = Multilingue
+MyOwnFamily = Ma propre famille
+Name = Nom
+NatureOfContact = Nature du contact
+NbOfAttachedFiles = Nombre de fichiers joints
+NewAttribute = Nouvel attribut
+NewDiffusion = Nouvelle diffusion
+NewObject = Nouvel objet
+NextValue = Valeur suivante
+NoOrder = Sans ordre
+NoRecordFound = Aucun enregistrement trouvé
+NoSpecificContactAddress = Pas d'adresse de contact dédiée
+NoSpecificContactAddressBis = Aucune adresse dédiée
+None = Aucun
+NotAvailable = Non disponible
+NotValidated = Non validé
+NothingToSetup = Aucun paramètre à configurer
+NumberOfModelFilesFound = Nombre de fichiers modèles trouvés
+NumberingModules = Modules de numérotation
+OtherOrders = Autres commandes
+PDFMerge = Fusionner le PDF
+Path = Chemin
+PdfTitle = Diffusion
+Preview = Prévisualisation
+PreviewNotAvailable = Prévisualisation indisponible
+Project = Projet
+PuttingPricesUpToDate = Mise à jour des prix
+ReGeneratePDF = Régénérer le PDF
+Ref = Réf
+RefCustomer = Réf client
+RefProject = Réf projet
+SalesRepresentative = Représentant commercial
+SelectWarehouseForStockDecrease = Sélectionnez l'entrepôt pour la sortie de stock
+SendByMail = Envoyer par mail
+Settings = Paramètres
+SetupSaved = Configuration enregistrée
+ShortInfo = Information courte
+ShowDiffusion = Afficher la diffusion
+ShowDiffusionContact = Afficher le contact de diffusion
+SimpleNumRefModelDesc = Numérotation automatique simple
+Status = Statut
+ThirdParty = Tiers
+ThirdPartyContact = Contact tiers
+To = À
+Total = Total
+TotalSizeOfAttachedFiles = Taille totale des fichiers joints
+Type = Type
+Unknown = Inconnu
+Unlink = Dissocier
+Upload = Téléverser
+UploadNewTemplate = Téléverser un nouveau modèle
+User = Utilisateur
+Users = Utilisateurs
+Validate = Valider
+Version = Version
+Width = Largeur
+bytes = octets
 methodHand = Remis en main propre
+methodLetter = Envoyer par courrier
+methodMail = Envoyer par e-mail
+or = ou
