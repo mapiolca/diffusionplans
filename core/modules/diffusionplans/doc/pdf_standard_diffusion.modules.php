@@ -36,8 +36,12 @@
 
 dol_include_once('/diffusionplans/core/modules/diffusionplans/modules_diffusion.php');
 require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
 
 
@@ -183,8 +187,9 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		}
 
 		// Load translation files required by the page
-		$langfiles = array("main", "bills", "products", "dict", "companies", "compta");
-		$outputlangs->loadLangs($langfiles);
+               $langfiles = array("main", "bills", "products", "dict", "companies", "compta");
+               $outputlangs->loadLangs($langfiles);
+               $outputlangs->loadLangs(array('diffusionplans@diffusionplans'));
 
 		// Show Draft Watermark
 		if (getDolGlobalString('DIFFUSION_DRAFT_WATERMARK') && $object->status == $object::STATUS_DRAFT) {
@@ -262,32 +267,36 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		}
 		*/
 
-		//if (count($realpatharray) == 0) $this->posxpicture=$this->posxtva;
+               //if (count($realpatharray) == 0) $this->posxpicture=$this->posxtva;
 
-		if (getMultidirOutput($object)) {
+               $contactSummaries = array();
+               $attachmentSummaries = array();
+               $objectref = '';
+               $currentPdfName = '';
+
+               if (getMultidirOutput($object)) {
 			$object->fetch_thirdparty();
 
-			$dir = null;
-			// Definition of $dir and $file
-			if ($object->specimen) {
-				$dir = getMultidirOutput($object);
-				$file = $dir."/SPECIMEN.pdf";
-			} else {
-				$objectref = dol_sanitizeFileName($object->ref);
-				$dir = getMultidirOutput($object)."/".$objectref; //$conf->diffusion->dir_output; //
-				$file = $dir."/".$objectref.".pdf";
-			}
-			if ($dir === null) {
-				return 0;
-			}
-			if (!file_exists($dir)) {
-				if (dol_mkdir($dir) < 0) {
-					$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
-					return 0;
-				}
-			}
+                       $paths = $this->prepareDocumentPaths($object);
+                       if ($paths === null) {
+                               $this->error = $langs->transnoentities("ErrorConstantNotDefined", "FAC_OUTPUTDIR");
+                               return 0;
+                       }
+                       $dir = $paths['dir'];
+                       $file = $paths['file'];
+                       $objectref = $paths['ref'];
+                       $currentPdfName = basename($file);
 
-			if (file_exists($dir)) {
+                       if (!file_exists($dir)) {
+                               if (dol_mkdir($dir) < 0) {
+                                       $this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
+                                       return 0;
+                               }
+                       }
+
+                       if (file_exists($dir)) {
+                               $contactSummaries = $this->loadDiffusionContacts($object, $outputlangs);
+                               $attachmentSummaries = $this->loadDiffusionAttachments($dir, $currentPdfName);
 				// Add pdfgeneration hook
 				if (!is_object($hookmanager)) {
 					include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
@@ -307,7 +316,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$default_font_size = pdf_getPDFFontSize($outputlangs); // Must be after pdf_getInstance
 				$pdf->SetAutoPageBreak(1, 0);
 
-				$heightforinfotot = 50; // Height reserved to output the info and total part and payment part
+                               $heightforinfotot = $this->estimateSummaryHeight($contactSummaries, $attachmentSummaries);
 				$heightforfreetext = getDolGlobalInt('MAIN_PDF_FREETEXT_HEIGHT', 5); // Height reserved to output the free text on last page
 				$heightforfooter = $this->marge_basse + (getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 12 : 22); // Height reserved to output the footer (value include bottom margin)
 
@@ -786,11 +795,11 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				}
 				$bottomlasttab = $this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;
 
-				// Display infos area
-				//$posy = $this->drawInfoTable($pdf, $object, $bottomlasttab, $outputlangs);
-
-				// Display total zone
-				//$posy = $this->drawTotalTable($pdf, $object, $deja_regle, $bottomlasttab, $outputlangs);
+                               // Display diffusion contacts and attachments summary
+                               $summaryStartY = max($pdf->GetY(), $bottomlasttab + 2);
+                               $availableWidth = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
+                               $afterContactsY = $this->renderContactsSection($pdf, $object, $contactSummaries, $outputlangs, $summaryStartY, $availableWidth);
+                               $this->renderAttachmentsSection($pdf, $attachmentSummaries, $outputlangs, $afterContactsY + 4, $availableWidth);
 
 				// Display payment area
 				/*
@@ -848,6 +857,373 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		// phpcs:enable
 		return parent::liste_modeles($db, $maxfilenamelength); // TODO: Change the autogenerated stub
 	}
+
+
+	/**
+	 * Prepare directory and file paths for the generated document.
+	 *
+	 * @param Diffusion $object Diffusion object
+	 * @return array<string,string>|null
+	 */
+	protected function prepareDocumentPaths($object)
+	{
+		$multidir = getMultidirOutput($object);
+		if (empty($multidir)) {
+			return null;
+		}
+
+		if (!empty($object->specimen)) {
+			return array(
+				'dir' => $multidir,
+				'file' => $multidir.'/SPECIMEN.pdf',
+				'ref' => 'SPECIMEN',
+			);
+		}
+
+		$objectref = dol_sanitizeFileName($object->ref);
+		if ($objectref === '') {
+			return null;
+		}
+
+		$dir = $multidir.'/'.$objectref;
+
+		return array(
+			'dir' => $dir,
+			'file' => $dir.'/'.$objectref.'.pdf',
+			'ref' => $objectref,
+		);
+	}
+
+	/**
+	 * Load contacts linked to the diffusion.
+	 *
+	 * @param Diffusion $object Diffusion object
+	 * @param Translate $outputlangs Output language handler
+	 * @return array<int,array<string,mixed>>
+	 */
+	protected function loadDiffusionContacts($object, $outputlangs)
+	{
+		global $mysoc;
+
+		$result = array();
+
+		if (empty($object->id)) {
+			return $result;
+		}
+
+		$statusMap = $this->fetchDiffusionContactStatuses($object);
+
+		$companystatic = new Societe($this->db);
+		$contactstatic = new Contact($this->db);
+		$userstatic = new User($this->db);
+
+		foreach (array('internal', 'external') as $source) {
+			$contactlist = $object->liste_contact(-1, $source);
+			if (empty($contactlist)) {
+				continue;
+			}
+
+			foreach ($contactlist as $contact) {
+				if (empty($contact['id'])) {
+					continue;
+				}
+
+				$contactId = (int) $contact['id'];
+				$key = $source.'-'.$contactId;
+				$status = isset($statusMap[$key]) ? $statusMap[$key] : array('mail_status' => 0, 'letter_status' => 0, 'hand_status' => 0);
+
+				$thirdpartyName = '';
+				$contactName = '';
+				$email = '';
+				$phone = '';
+				$mobile = '';
+
+				if ($source === 'internal') {
+					if ($userstatic->fetch($contactId) > 0) {
+						$contactName = $userstatic->getFullName($outputlangs);
+						$email = $userstatic->email;
+						$phone = $userstatic->office_phone;
+						$mobile = $userstatic->user_mobile;
+					}
+					if (!empty($mysoc->name)) {
+						$thirdpartyName = $mysoc->name;
+					}
+				} else {
+					if ($contactstatic->fetch($contactId) > 0) {
+						$contactName = $contactstatic->getFullName($outputlangs);
+						$email = $contactstatic->email;
+						$phone = $contactstatic->phone_pro;
+						if (empty($phone) && !empty($contactstatic->phone_perso)) {
+							$phone = $contactstatic->phone_perso;
+						}
+						$mobile = $contactstatic->phone_mobile;
+
+						if (!empty($contactstatic->socid) && $contactstatic->socid > 0) {
+							if ($companystatic->fetch($contactstatic->socid) > 0) {
+								$thirdpartyName = $companystatic->name;
+							}
+						}
+					}
+
+					if (empty($thirdpartyName) && !empty($contact['socid']) && (int) $contact['socid'] < 0 && !empty($mysoc->name)) {
+						$thirdpartyName = $mysoc->name;
+					}
+				}
+
+				if (empty($thirdpartyName) && !empty($contact['socid']) && (int) $contact['socid'] > 0) {
+					if ($companystatic->fetch((int) $contact['socid']) > 0) {
+						$thirdpartyName = $companystatic->name;
+					}
+				}
+
+				if (empty($phone) && !empty($mobile)) {
+					$phone = $mobile;
+				}
+
+				$result[] = array(
+					'id' => $contactId,
+					'source' => $source,
+					'type_label' => isset($contact['libelle']) ? $contact['libelle'] : '',
+					'thirdparty_name' => $thirdpartyName,
+					'contact_name' => $contactName,
+					'email' => $email,
+					'phone' => $phone,
+					'mobile' => $mobile,
+					'mail_status' => (int) (!empty($status['mail_status']) ? $status['mail_status'] : 0),
+					'letter_status' => (int) (!empty($status['letter_status']) ? $status['letter_status'] : 0),
+					'hand_status' => (int) (!empty($status['hand_status']) ? $status['hand_status'] : 0),
+				);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get statuses for diffusion contacts.
+	 *
+	 * @param Diffusion $object Diffusion object
+	 * @return array<string,array<string,int>>
+	 */
+	protected function fetchDiffusionContactStatuses($object)
+	{
+		$statuses = array();
+
+		if (empty($object->id)) {
+			return $statuses;
+		}
+
+		$sql = 'SELECT fk_contact, contact_source, mail_status, letter_status, hand_status';
+		$sql .= ' FROM '.MAIN_DB_PREFIX."diffusionplans_diffusioncontact";
+		$sql .= ' WHERE fk_diffusion = '.((int) $object->id);
+
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			while ($obj = $this->db->fetch_object($resql)) {
+				$key = $obj->contact_source.'-'.((int) $obj->fk_contact);
+				$statuses[$key] = array(
+					'mail_status' => (int) $obj->mail_status,
+					'letter_status' => (int) $obj->letter_status,
+					'hand_status' => (int) $obj->hand_status,
+				);
+			}
+			$this->db->free($resql);
+		} else {
+			dol_syslog(__METHOD__.' sql='.$sql.' '.$this->db->lasterror(), LOG_ERR);
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * List attachments stored in the diffusion directory.
+	 *
+	 * @param string $dir Absolute directory path
+	 * @param string $currentPdfName Generated PDF file name
+	 * @return array<int,array<string,mixed>>
+	 */
+	protected function loadDiffusionAttachments($dir, $currentPdfName)
+	{
+		$attachments = array();
+
+		if (empty($dir)) {
+			return $attachments;
+		}
+
+		$fileList = dol_dir_list($dir, 'files', 0, '', '(\\.meta$|\\.tmp$|\\.preview\\.png$)', 'name', SORT_ASC, 1);
+		foreach ($fileList as $fileinfo) {
+			if (!empty($currentPdfName) && dol_strtolower($fileinfo['name']) == dol_strtolower($currentPdfName)) {
+				continue;
+			}
+			$attachments[] = $fileinfo;
+		}
+
+		return $attachments;
+	}
+
+	/**
+	 * Estimate height reserved to contacts and attachments blocks.
+	 *
+	 * @param array<int,array<string,mixed>> $contacts
+	 * @param array<int,array<string,mixed>> $attachments
+	 * @return int
+	 */
+	protected function estimateSummaryHeight(array $contacts, array $attachments)
+	{
+		$lineHeight = 5;
+		$headerHeight = 6;
+		$padding = 8;
+
+		$contactRows = count($contacts);
+		if ($contactRows === 0) {
+			$contactRows = 1;
+		}
+		$contactsHeight = $headerHeight + ($contactRows * $lineHeight) + 4;
+
+		$attachmentRows = count($attachments);
+		if ($attachmentRows === 0) {
+			$attachmentRows = 1;
+		}
+		$attachmentsHeight = $headerHeight + ($attachmentRows * $lineHeight);
+
+		return max(50, $contactsHeight + $attachmentsHeight + $padding);
+	}
+
+	/**
+	 * Render the contacts table for the diffusion.
+	 *
+	 * @param TCPDF|TCPDI $pdf PDF handler
+	 * @param Diffusion $object Diffusion object
+	 * @param array<int,array<string,mixed>> $contacts Contacts data
+	 * @param Translate $outputlangs Output language handler
+	 * @param float $startY Initial vertical position
+	 * @param float $width Available width
+	 * @return float
+	 */
+	protected function renderContactsSection(&$pdf, $object, array $contacts, $outputlangs, $startY, $width)
+	{
+		unset($object);
+		$defaultFontSize = pdf_getPDFFontSize($outputlangs);
+
+		$pdf->SetFont('', 'B', $defaultFontSize);
+		$pdf->SetXY($this->marge_gauche, $startY);
+		$pdf->MultiCell($width, 6, $outputlangs->transnoentities('DiffusionContactsTitle'), 0, 'L');
+		$y = $pdf->GetY() + 1;
+
+		$columns = array(
+			array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.18, 'align' => 'L'),
+			array('key' => 'contact_name', 'label' => 'Contact', 'width' => $width * 0.22, 'align' => 'L'),
+			array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.14, 'align' => 'L'),
+			array('key' => 'email', 'label' => 'Email', 'width' => $width * 0.22, 'align' => 'L'),
+			array('key' => 'phone', 'label' => 'Phone', 'width' => $width * 0.12, 'align' => 'L'),
+			array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
+			array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
+			array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
+		);
+
+		$pdf->SetFont('', 'B', $defaultFontSize - 1);
+		$x = $this->marge_gauche;
+		for ($i = 0; $i < count($columns); $i++) {
+			$column = $columns[$i];
+			$pdf->SetXY($x, $y);
+			$pdf->MultiCell($column['width'], 5, $outputlangs->transnoentities($column['label']), 0, $column['align'], 0, 0);
+			$x += $column['width'];
+		}
+		$y += 5;
+		$pdf->SetDrawColor(200, 200, 200);
+		$pdf->line($this->marge_gauche, $y, $this->marge_gauche + $width, $y);
+		$y += 1;
+		$pdf->SetFont('', '', $defaultFontSize - 1);
+
+		if (empty($contacts)) {
+			$pdf->SetXY($this->marge_gauche, $y);
+			$pdf->MultiCell($width, 5, $outputlangs->transnoentities('DiffusionNoContacts'), 0, 'L');
+			return $pdf->GetY();
+		}
+
+		for ($i = 0; $i < count($contacts); $i++) {
+			$contact = $contacts[$i];
+			$rowHeight = 5;
+			for ($j = 0; $j < count($columns); $j++) {
+				$column = $columns[$j];
+				$text = $this->formatContactColumnValue($contact, $column, $outputlangs);
+				$numLines = $pdf->getNumLines($outputlangs->convToOutputCharset($text), $column['width']);
+				$rowHeight = max($rowHeight, $numLines * 4.5);
+			}
+
+			$x = $this->marge_gauche;
+			for ($j = 0; $j < count($columns); $j++) {
+				$column = $columns[$j];
+				$text = $this->formatContactColumnValue($contact, $column, $outputlangs);
+				$pdf->SetXY($x, $y);
+				$pdf->MultiCell($column['width'], $rowHeight, $outputlangs->convToOutputCharset($text), 0, $column['align'], 0, 0);
+				$x += $column['width'];
+			}
+			$y += $rowHeight;
+			$pdf->line($this->marge_gauche, $y, $this->marge_gauche + $width, $y);
+			$y += 0.5;
+		}
+
+		return $y;
+	}
+
+	/**
+	 * Format value displayed in the contacts table.
+	 *
+	 * @param array<string,mixed> $contact Contact data
+	 * @param array<string,mixed> $column Column definition
+	 * @param Translate $outputlangs Output language handler
+	 * @return string
+	 */
+	protected function formatContactColumnValue(array $contact, array $column, $outputlangs)
+	{
+		$key = $column['key'];
+		if (!empty($column['status'])) {
+			return !empty($contact[$key]) ? $outputlangs->transnoentities('Yes') : $outputlangs->transnoentities('No');
+		}
+
+		return isset($contact[$key]) ? (string) $contact[$key] : '';
+	}
+
+	/**
+	 * Render the attachments list.
+	 *
+	 * @param TCPDF|TCPDI $pdf PDF handler
+	 * @param array<int,array<string,mixed>> $attachments Attachments data
+	 * @param Translate $outputlangs Output language handler
+	 * @param float $startY Initial vertical position
+	 * @param float $width Available width
+	 * @return float
+	 */
+	protected function renderAttachmentsSection(&$pdf, array $attachments, $outputlangs, $startY, $width)
+	{
+		$defaultFontSize = pdf_getPDFFontSize($outputlangs);
+
+		$pdf->SetFont('', 'B', $defaultFontSize);
+		$pdf->SetXY($this->marge_gauche, $startY);
+		$pdf->MultiCell($width, 6, $outputlangs->transnoentities('DiffusionAttachmentsTitle'), 0, 'L');
+		$y = $pdf->GetY() + 1;
+
+		$pdf->SetFont('', '', $defaultFontSize - 1);
+
+		if (empty($attachments)) {
+			$pdf->SetXY($this->marge_gauche, $y);
+			$pdf->MultiCell($width, 5, $outputlangs->transnoentities('DiffusionNoDocuments'), 0, 'L');
+			return $pdf->GetY();
+		}
+
+		for ($i = 0; $i < count($attachments); $i++) {
+			$fileinfo = $attachments[$i];
+			$sizeLabel = dol_print_size(isset($fileinfo['size']) ? $fileinfo['size'] : 0, 1, 1, 0, $outputlangs);
+			$lineLabel = $outputlangs->transnoentities('DiffusionAttachmentLine', $fileinfo['name'], $sizeLabel);
+			$pdf->SetXY($this->marge_gauche, $y);
+			$pdf->MultiCell($width, 5, '- '.$outputlangs->convToOutputCharset($lineLabel), 0, 'L');
+			$y = $pdf->GetY();
+		}
+
+		return $y;
+	}
+
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
