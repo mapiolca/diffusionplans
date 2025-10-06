@@ -665,129 +665,107 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			return $result;
 		}
 
-		$statusMap = $this->fetchDiffusionContactStatuses($object);
+               $companystatic = new Societe($this->db);
+               $contactstatic = new Contact($this->db);
+               $userstatic = new User($this->db);
 
-		$companystatic = new Societe($this->db);
-		$contactstatic = new Contact($this->db);
-		$userstatic = new User($this->db);
+               // FR: Récupère les contacts depuis la table llx_diffusionplans_diffusioncontact pour refléter exactement les liens enregistrés.
+               // EN: Retrieve contacts directly from llx_diffusionplans_diffusioncontact to mirror the stored links.
+               $sql = 'SELECT dc.fk_contact, dc.contact_source, dc.mail_status, dc.letter_status, dc.hand_status,';
+               $sql .= ' ec.fk_c_type_contact, ctc.libelle as type_label';
+               $sql .= ' FROM '.MAIN_DB_PREFIX."diffusionplans_diffusioncontact as dc";
+               $sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."element_contact as ec ON ec.fk_element = dc.fk_diffusion";
+               $sql .= " AND ec.element = 'diffusion'";
+               $sql .= ' AND ec.source = dc.contact_source';
+               $sql .= " AND ((dc.contact_source = 'internal' AND ec.fk_user = dc.fk_contact)";
+               $sql .= " OR (dc.contact_source = 'external' AND ec.fk_socpeople = dc.fk_contact))";
+               $sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."c_type_contact as ctc ON ec.fk_c_type_contact = ctc.rowid";
+               $sql .= ' WHERE dc.fk_diffusion = '.((int) $object->id);
+               $sql .= ' ORDER BY ec.position, dc.rowid';
 
-		foreach (array('internal', 'external') as $source) {
-			$contactlist = $object->liste_contact(-1, $source);
-			if (empty($contactlist)) {
-				continue;
-			}
+               $resql = $this->db->query($sql);
+               if (!$resql) {
+                       dol_syslog(__METHOD__.' sql='.$sql.' '.$this->db->lasterror(), LOG_ERR);
 
-			foreach ($contactlist as $contact) {
-				if (empty($contact['id'])) {
-					continue;
-				}
+                       return $result;
+               }
 
-				$contactId = (int) $contact['id'];
-				$key = $source.'-'.$contactId;
-				$status = isset($statusMap[$key]) ? $statusMap[$key] : array('mail_status' => 0, 'letter_status' => 0, 'hand_status' => 0);
+               while ($contactRow = $this->db->fetch_object($resql)) {
+                       $source = (string) $contactRow->contact_source;
+                       $contactId = (int) $contactRow->fk_contact;
 
-				$thirdpartyName = '';
-				$contactName = '';
-				$email = '';
-				$phone = '';
-				$mobile = '';
+                       $thirdpartyName = '';
+                       $contactName = '';
+                       $email = '';
+                       $phone = '';
+                       $mobile = '';
 
-				if ($source === 'internal') {
-					if ($userstatic->fetch($contactId) > 0) {
-						$contactName = $userstatic->getFullName($outputlangs);
-						$email = $userstatic->email;
-						$phone = $userstatic->office_phone;
-						$mobile = $userstatic->user_mobile;
-					}
-					if (!empty($mysoc->name)) {
-						$thirdpartyName = $mysoc->name;
-					}
-				} else {
-					if ($contactstatic->fetch($contactId) > 0) {
-						$contactName = $contactstatic->getFullName($outputlangs);
-						$email = $contactstatic->email;
-						$phone = $contactstatic->phone_pro;
-						if (empty($phone) && !empty($contactstatic->phone_perso)) {
-							$phone = $contactstatic->phone_perso;
-						}
-						$mobile = $contactstatic->phone_mobile;
+                       if ($source === 'internal') {
+                               if ($userstatic->fetch($contactId) > 0) {
+                                       $contactName = $userstatic->getFullName($outputlangs);
+                                       $email = $userstatic->email;
+                                       $phone = $userstatic->office_phone;
+                                       $mobile = $userstatic->user_mobile;
+                               }
+                               if (!empty($mysoc->name)) {
+                                       $thirdpartyName = $mysoc->name;
+                               }
+                       } else {
+                               $externalContactFetched = $contactstatic->fetch($contactId) > 0;
+                               if ($externalContactFetched) {
+                                       $contactName = $contactstatic->getFullName($outputlangs);
+                                       $email = $contactstatic->email;
+                                       $phone = $contactstatic->phone_pro;
+                                       if (empty($phone) && !empty($contactstatic->phone_perso)) {
+                                               $phone = $contactstatic->phone_perso;
+                                       }
+                                       $mobile = $contactstatic->phone_mobile;
 
-						if (!empty($contactstatic->socid) && $contactstatic->socid > 0) {
-							if ($companystatic->fetch($contactstatic->socid) > 0) {
-								$thirdpartyName = $companystatic->name;
-							}
-						}
-					}
+                                       if (!empty($contactstatic->socid) && $contactstatic->socid > 0) {
+                                               if ($companystatic->fetch($contactstatic->socid) > 0) {
+                                                       $thirdpartyName = $companystatic->name;
+                                               }
+                                       }
+                               }
 
-					if (empty($thirdpartyName) && !empty($contact['socid']) && (int) $contact['socid'] < 0 && !empty($mysoc->name)) {
-						$thirdpartyName = $mysoc->name;
-					}
-				}
+                               if (empty($thirdpartyName) && $externalContactFetched && (int) $contactstatic->socid < 0 && !empty($mysoc->name)) {
+                                       $thirdpartyName = $mysoc->name;
+                               }
+                       }
 
-				if (empty($thirdpartyName) && !empty($contact['socid']) && (int) $contact['socid'] > 0) {
-					if ($companystatic->fetch((int) $contact['socid']) > 0) {
-						$thirdpartyName = $companystatic->name;
-					}
-				}
+                       if (empty($thirdpartyName) && !empty($mysoc->name) && $source === 'internal') {
+                               $thirdpartyName = $mysoc->name;
+                       }
 
-				if (empty($phone) && !empty($mobile)) {
-					$phone = $mobile;
-				}
+                       if (empty($phone) && !empty($mobile)) {
+                               $phone = $mobile;
+                       }
 
-				$result[] = array(
-					'id' => $contactId,
-					'source' => $source,
-					'type_label' => isset($contact['libelle']) ? $contact['libelle'] : '',
-					'thirdparty_name' => $thirdpartyName,
-					'contact_name' => $contactName,
-					'email' => $email,
-					'phone' => $phone,
-					'mobile' => $mobile,
-					'mail_status' => (int) (!empty($status['mail_status']) ? $status['mail_status'] : 0),
-					'letter_status' => (int) (!empty($status['letter_status']) ? $status['letter_status'] : 0),
-					'hand_status' => (int) (!empty($status['hand_status']) ? $status['hand_status'] : 0),
-				);
-			}
-		}
+                       $typeLabel = '';
+                       if (!empty($contactRow->type_label)) {
+                               $translated = $outputlangs->transnoentitiesnoconv($contactRow->type_label);
+                               $typeLabel = !empty($translated) ? (string) $translated : (string) $contactRow->type_label;
+                       }
 
-		return $result;
-	}
+                       $result[] = array(
+                               'id' => $contactId,
+                               'source' => $source,
+                               'type_label' => $typeLabel,
+                               'thirdparty_name' => $thirdpartyName,
+                               'contact_name' => $contactName,
+                               'email' => $email,
+                               'phone' => $phone,
+                               'mobile' => $mobile,
+                               'mail_status' => (int) $contactRow->mail_status,
+                               'letter_status' => (int) $contactRow->letter_status,
+                               'hand_status' => (int) $contactRow->hand_status,
+                       );
+               }
 
-	/**
-	 * Get statuses for diffusion contacts.
-	 *
-	 * @param Diffusion $object Diffusion object
-	 * @return array<string,array<string,int>>
-	 */
-	protected function fetchDiffusionContactStatuses($object)
-	{
-		$statuses = array();
+               $this->db->free($resql);
 
-		if (empty($object->id)) {
-			return $statuses;
-		}
-
-		$sql = 'SELECT fk_contact, contact_source, mail_status, letter_status, hand_status';
-		$sql .= ' FROM '.MAIN_DB_PREFIX."diffusionplans_diffusioncontact";
-		$sql .= ' WHERE fk_diffusion = '.((int) $object->id);
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			while ($obj = $this->db->fetch_object($resql)) {
-				$key = $obj->contact_source.'-'.((int) $obj->fk_contact);
-				$statuses[$key] = array(
-					'mail_status' => (int) $obj->mail_status,
-					'letter_status' => (int) $obj->letter_status,
-					'hand_status' => (int) $obj->hand_status,
-				);
-			}
-			$this->db->free($resql);
-		} else {
-			dol_syslog(__METHOD__.' sql='.$sql.' '.$this->db->lasterror(), LOG_ERR);
-		}
-
-		return $statuses;
-	}
+               return $result;
+       }
 
 	/**
 	 * List attachments stored in the diffusion directory.
