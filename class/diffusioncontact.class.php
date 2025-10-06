@@ -25,6 +25,7 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
@@ -171,16 +172,41 @@ class DiffusionContact extends CommonObject
 	 *
 	 * @param	DoliDB $db Database handler
 	 */
-	public function __construct(DoliDB $db)
-	{
-		global $langs;
+        public function __construct(DoliDB $db)
+        {
+                global $conf, $langs;
 
-		$this->db = $db;
-		$this->ismultientitymanaged = 0;
-		$this->isextrafieldmanaged = 1;
+                $this->db = $db;
+                $this->ismultientitymanaged = 0;
+                $this->isextrafieldmanaged = 1;
 
-		if (!getDolGlobalInt('MAIN_SHOW_TECHNICAL_ID') && isset($this->fields['rowid']) && !empty($this->fields['ref'])) {
-			$this->fields['rowid']['visible'] = 0;
+                $entity = !empty($conf->entity) ? (int) $conf->entity : 1;
+
+                if (!isset($conf->diffusionplans) || !is_object($conf->diffusionplans)) {
+                        $conf->diffusionplans = new stdClass();
+                }
+
+                if (empty($conf->diffusionplans->dir_output)) {
+                        $conf->diffusionplans->dir_output = DOL_DATA_ROOT.($entity > 1 ? '/'.$entity : '').'/diffusionplans';
+                }
+
+                if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
+                        $conf->diffusionplans->multidir_output = array();
+                }
+
+                if (empty($conf->diffusionplans->multidir_output[$entity])) {
+                        $conf->diffusionplans->multidir_output[$entity] = $conf->diffusionplans->dir_output;
+                }
+
+                $this->modulepart = 'diffusioncontact';
+                $this->dir_output = $conf->diffusionplans->dir_output.'/diffusioncontact';
+
+                if (!empty($this->dir_output)) {
+                        dol_mkdir($this->dir_output);
+                }
+
+                if (!getDolGlobalInt('MAIN_SHOW_TECHNICAL_ID') && isset($this->fields['rowid']) && !empty($this->fields['ref'])) {
+                        $this->fields['rowid']['visible'] = 0;
 		}
 		if (!isModEnabled('multicompany') && isset($this->fields['entity'])) {
 			$this->fields['entity']['enabled'] = 0;
