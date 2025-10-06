@@ -83,8 +83,25 @@ class modDiffusionPlans extends DolibarrModules
 		// Key used in llx_const table to save module status enabled/disabled (where DIFFUSIONPLANS is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 
-		$conf->diffusionplans = new stdClass();
-    	$conf->diffusionplans->dir_output = './diffusionplans';
+                if (!isset($conf->diffusionplans) || !is_object($conf->diffusionplans)) {
+                        $conf->diffusionplans = new stdClass();
+                }
+
+                $entity = !empty($conf->entity) ? (int) $conf->entity : 1;
+                $defaultDir = DOL_DATA_ROOT.($entity > 1 ? '/'.$entity : '').'/diffusionplans';
+
+                if (empty($conf->diffusionplans->dir_output)) {
+                        $conf->diffusionplans->dir_output = $defaultDir;
+                }
+                if (empty($conf->diffusionplans->dir_temp)) {
+                        $conf->diffusionplans->dir_temp = $conf->diffusionplans->dir_output.'/temp';
+                }
+                if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
+                        $conf->diffusionplans->multidir_output = array();
+                }
+                if (empty($conf->diffusionplans->multidir_output[$entity])) {
+                        $conf->diffusionplans->multidir_output[$entity] = $defaultDir;
+                }
 
 		// Name of image file used for this module.
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
