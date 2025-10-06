@@ -90,18 +90,46 @@ class modDiffusionPlans extends DolibarrModules
                 $entity = !empty($conf->entity) ? (int) $conf->entity : 1;
                 $defaultDir = DOL_DATA_ROOT.($entity > 1 ? '/'.$entity : '').'/diffusionplans';
 
-                if (empty($conf->diffusionplans->dir_output)) {
-                        $conf->diffusionplans->dir_output = $defaultDir;
-                }
-                if (empty($conf->diffusionplans->dir_temp)) {
-                        $conf->diffusionplans->dir_temp = $conf->diffusionplans->dir_output.'/temp';
-                }
-                if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
-                        $conf->diffusionplans->multidir_output = array();
-                }
-                if (empty($conf->diffusionplans->multidir_output[$entity])) {
-                        $conf->diffusionplans->multidir_output[$entity] = $defaultDir;
-                }
+               if (empty($conf->diffusionplans->dir_output)) {
+                       $conf->diffusionplans->dir_output = $defaultDir;
+               }
+               if (empty($conf->diffusionplans->dir_temp)) {
+                       $conf->diffusionplans->dir_temp = $conf->diffusionplans->dir_output.'/temp';
+               }
+               if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
+                       $conf->diffusionplans->multidir_output = array();
+               }
+               if (empty($conf->diffusionplans->multidir_output[$entity])) {
+                       $conf->diffusionplans->multidir_output[$entity] = $defaultDir;
+               }
+
+               $diffusionDir = $conf->diffusionplans->dir_output.'/diffusion';
+               if (!isset($conf->diffusion) || !is_object($conf->diffusion)) {
+                       $conf->diffusion = new stdClass();
+               }
+               if (empty($conf->diffusion->dir_output)) {
+                       $conf->diffusion->dir_output = $diffusionDir;
+               }
+               if (empty($conf->diffusion->multidir_output) || !is_array($conf->diffusion->multidir_output)) {
+                       $conf->diffusion->multidir_output = array();
+               }
+               if (empty($conf->diffusion->multidir_output[$entity])) {
+                       $conf->diffusion->multidir_output[$entity] = $diffusionDir;
+               }
+
+               $diffusionContactDir = $conf->diffusionplans->dir_output.'/diffusioncontact';
+               if (!isset($conf->diffusioncontact) || !is_object($conf->diffusioncontact)) {
+                       $conf->diffusioncontact = new stdClass();
+               }
+               if (empty($conf->diffusioncontact->dir_output)) {
+                       $conf->diffusioncontact->dir_output = $diffusionContactDir;
+               }
+               if (empty($conf->diffusioncontact->multidir_output) || !is_array($conf->diffusioncontact->multidir_output)) {
+                       $conf->diffusioncontact->multidir_output = array();
+               }
+               if (empty($conf->diffusioncontact->multidir_output[$entity])) {
+                       $conf->diffusioncontact->multidir_output[$entity] = $diffusionContactDir;
+               }
 
 		// Name of image file used for this module.
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'

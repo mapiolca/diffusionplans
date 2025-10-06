@@ -186,24 +186,40 @@ class DiffusionContact extends CommonObject
                         $conf->diffusionplans = new stdClass();
                 }
 
-                if (empty($conf->diffusionplans->dir_output)) {
-                        $conf->diffusionplans->dir_output = DOL_DATA_ROOT.($entity > 1 ? '/'.$entity : '').'/diffusionplans';
-                }
+               if (empty($conf->diffusionplans->dir_output)) {
+                       $conf->diffusionplans->dir_output = DOL_DATA_ROOT.($entity > 1 ? '/'.$entity : '').'/diffusionplans';
+               }
 
-                if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
-                        $conf->diffusionplans->multidir_output = array();
-                }
+               if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
+                       $conf->diffusionplans->multidir_output = array();
+               }
 
-                if (empty($conf->diffusionplans->multidir_output[$entity])) {
-                        $conf->diffusionplans->multidir_output[$entity] = $conf->diffusionplans->dir_output;
-                }
+               if (empty($conf->diffusionplans->multidir_output[$entity])) {
+                       $conf->diffusionplans->multidir_output[$entity] = $conf->diffusionplans->dir_output;
+               }
 
-                $this->modulepart = 'diffusioncontact';
-                $this->dir_output = $conf->diffusionplans->dir_output.'/diffusioncontact';
+               if (!isset($conf->diffusioncontact) || !is_object($conf->diffusioncontact)) {
+                       $conf->diffusioncontact = new stdClass();
+               }
 
-                if (!empty($this->dir_output)) {
-                        dol_mkdir($this->dir_output);
-                }
+               if (empty($conf->diffusioncontact->dir_output)) {
+                       $conf->diffusioncontact->dir_output = $conf->diffusionplans->dir_output.'/diffusioncontact';
+               }
+
+               if (empty($conf->diffusioncontact->multidir_output) || !is_array($conf->diffusioncontact->multidir_output)) {
+                       $conf->diffusioncontact->multidir_output = array();
+               }
+
+               if (empty($conf->diffusioncontact->multidir_output[$entity])) {
+                       $conf->diffusioncontact->multidir_output[$entity] = $conf->diffusioncontact->dir_output;
+               }
+
+               $this->modulepart = 'diffusioncontact';
+               $this->dir_output = $conf->diffusioncontact->multidir_output[$entity];
+
+               if (!empty($this->dir_output)) {
+                       dol_mkdir($this->dir_output);
+               }
 
                 if (!getDolGlobalInt('MAIN_SHOW_TECHNICAL_ID') && isset($this->fields['rowid']) && !empty($this->fields['ref'])) {
                         $this->fields['rowid']['visible'] = 0;

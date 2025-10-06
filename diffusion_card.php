@@ -553,15 +553,55 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<div class="underbanner clearboth"></div>';
-	print '<table class="border centpercent tableforfield">'."\n";
+        print '<table class="border centpercent tableforfield">'."\n";
 
-	// Common attributes
+        $fieldsBackup = $object->fields;
+        $labelFieldDef = isset($object->fields['label']) ? $object->fields['label'] : null;
+        $descriptionFieldDef = isset($object->fields['description']) ? $object->fields['description'] : null;
+        if ($labelFieldDef !== null) {
+                unset($object->fields['label']);
+        }
+        if ($descriptionFieldDef !== null) {
+                unset($object->fields['description']);
+        }
+
+        $inlineEditable = ($permissiontoadd && $object->status == $object::STATUS_DRAFT);
+
+        if ($labelFieldDef !== null) {
+                $valueClasses = array('valuefield');
+                if (!empty($labelFieldDef['cssview'])) {
+                        $valueClasses[] = $labelFieldDef['cssview'];
+                }
+                $valueClassAttr = implode(' ', array_unique(array_filter($valueClasses)));
+
+                print '<tr>'; // Label row
+                print '<td class="titlefield">'.$form->editfieldkey($labelFieldDef['label'], 'label', '', $object, $inlineEditable, 'string').'</td>';
+                print '<td class="'.$valueClassAttr.'">'.$form->editfieldval($labelFieldDef['label'], 'label', $object->label, $object, $inlineEditable, 'string', '', null, null, '', 1).'</td>';
+                print '</tr>';
+        }
+
+        if ($descriptionFieldDef !== null) {
+                $descValueClasses = array('valuefield', 'wordbreak');
+                if (!empty($descriptionFieldDef['cssview'])) {
+                        $descValueClasses[] = $descriptionFieldDef['cssview'];
+                }
+                $descValueClassAttr = implode(' ', array_unique(array_filter($descValueClasses)));
+
+                print '<tr>';
+                print '<td class="titlefield tdtop">'.$form->editfieldkey($descriptionFieldDef['label'], 'description', '', $object, $inlineEditable, 'textarea').'</td>';
+                print '<td class="'.$descValueClassAttr.'">'.$form->editfieldval($descriptionFieldDef['label'], 'description', $object->description, $object, $inlineEditable, 'textarea:100:6', '', null, null, '', 1).'</td>';
+                print '</tr>';
+        }
+
+        // Common attributes
 	//$keyforbreak='fieldkeytoswitchonsecondcolumn';	// We change column just before this field
 	//unset($object->fields['fk_project']);				// Hide field already shown in banner
 	//unset($object->fields['fk_soc']);					// Hide field already shown in banner
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
+        include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
-	// Other attributes. Fields from hook formObjectOptions and Extrafields.
+        $object->fields = $fieldsBackup;
+
+        // Other attributes. Fields from hook formObjectOptions and Extrafields.
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
 
 	print '</table>';
