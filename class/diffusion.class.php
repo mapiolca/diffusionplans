@@ -198,40 +198,24 @@ class Diffusion extends CommonObject
                         $conf->diffusionplans = new stdClass();
                 }
 
-               if (empty($conf->diffusionplans->dir_output)) {
-                       $conf->diffusionplans->dir_output = DOL_DATA_ROOT.($entity > 1 ? '/'.$entity : '').'/diffusionplans';
-               }
+                if (empty($conf->diffusionplans->dir_output)) {
+                        $conf->diffusionplans->dir_output = DOL_DATA_ROOT.($entity > 1 ? '/'.$entity : '').'/diffusionplans';
+                }
 
-               if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
-                       $conf->diffusionplans->multidir_output = array();
-               }
+                if (empty($conf->diffusionplans->multidir_output) || !is_array($conf->diffusionplans->multidir_output)) {
+                        $conf->diffusionplans->multidir_output = array();
+                }
 
-               if (empty($conf->diffusionplans->multidir_output[$entity])) {
-                       $conf->diffusionplans->multidir_output[$entity] = $conf->diffusionplans->dir_output;
-               }
+                if (empty($conf->diffusionplans->multidir_output[$entity])) {
+                        $conf->diffusionplans->multidir_output[$entity] = $conf->diffusionplans->dir_output;
+                }
 
-               if (!isset($conf->diffusion) || !is_object($conf->diffusion)) {
-                       $conf->diffusion = new stdClass();
-               }
+                $this->modulepart = 'diffusion';
+                $this->dir_output = $conf->diffusionplans->dir_output.'/diffusion';
 
-               if (empty($conf->diffusion->dir_output)) {
-                       $conf->diffusion->dir_output = $conf->diffusionplans->dir_output.'/diffusion';
-               }
-
-               if (empty($conf->diffusion->multidir_output) || !is_array($conf->diffusion->multidir_output)) {
-                       $conf->diffusion->multidir_output = array();
-               }
-
-               if (empty($conf->diffusion->multidir_output[$entity])) {
-                       $conf->diffusion->multidir_output[$entity] = $conf->diffusion->dir_output;
-               }
-
-               $this->modulepart = 'diffusion';
-               $this->dir_output = $conf->diffusion->multidir_output[$entity];
-
-               if (!empty($this->dir_output)) {
-                       dol_mkdir($this->dir_output);
-               }
+                if (!empty($this->dir_output)) {
+                        dol_mkdir($this->dir_output);
+                }
 
                 if (!getDolGlobalInt('MAIN_SHOW_TECHNICAL_ID') && isset($this->fields['rowid']) && !empty($this->fields['ref'])) {
                         $this->fields['rowid']['visible'] = 0;
