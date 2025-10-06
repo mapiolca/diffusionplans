@@ -30,6 +30,8 @@ Default = Default
 Delete = Delete
 Description = Description
 Diffusion = Diffusion
+# FR: Chaînes utilisées pour les sections PDF contacts et pièces jointes.
+# EN: Strings used for the PDF contacts and attachments sections.
 DiffusionAttachmentLine = %s (%s)
 DiffusionAttachmentsTitle = Attached documents
 DiffusionContact = Diffusion contact
