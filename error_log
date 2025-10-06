@@ -1,0 +1,4 @@
+[04-Aug-2025 00:44:54 Europe/Paris] PHP Fatal error:  Uncaught Error: Attempt to assign property "dir_output" on null in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/diffusion_card.php:121
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/diffusion_card.php on line 121

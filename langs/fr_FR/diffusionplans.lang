@@ -1,0 +1,47 @@
+# Translation file
+
+#
+# Generic
+#
+
+# Module label 'ModuleDiffusionPlansName'
+ModuleDiffusionPlansName = Diffusion de Plans
+# Module description 'ModuleDiffusionPlansDesc'
+ModuleDiffusionPlansDesc = Module permettant de créer des courriers de diffusions de plans ou de documents.
+
+#
+# Admin page
+#
+DiffusionPlansSetup = DiffusionPlans setup
+Settings = Settings
+DiffusionPlansSetupPage = DiffusionPlans setup page
+NewSection=New section
+DIFFUSIONPLANS_MYPARAM1 = My param 1
+DIFFUSIONPLANS_MYPARAM1Tooltip = My param 1 tooltip
+DIFFUSIONPLANS_MYPARAM2=My param 2
+DIFFUSIONPLANS_MYPARAM2Tooltip=My param 2 tooltip
+
+
+#
+# About page
+#
+About = About
+DiffusionPlansAbout = About DiffusionPlans
+DiffusionPlansAboutPage = DiffusionPlans about page
+
+#
+# Sample page
+#
+DiffusionPlansArea = Home DiffusionPlans
+MyPageName = My page name
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
+
+
+methodMail = Envoyer par e-mail
+methodLetter = Envoyer par courrier
+methodHand = Remis en main propre

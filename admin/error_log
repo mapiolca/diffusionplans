@@ -1,0 +1,8 @@
+[03-Aug-2025 22:33:39 Europe/Paris] PHP Fatal error:  Uncaught Error: Class "Diffusion" not found in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/admin/setup.php:238
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/admin/setup.php on line 238
+[03-Aug-2025 22:35:31 Europe/Paris] PHP Fatal error:  Uncaught Error: Failed opening required '/diffusionplans/class/diffusion.class.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/admin/setup.php:61
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/admin/setup.php on line 61

@@ -1,0 +1,46 @@
+# Translation file
+
+#
+# Generic
+#
+
+# Module label 'ModuleDiffusionPlansName'
+ModuleDiffusionPlansName = DiffusionPlans
+# Module description 'ModuleDiffusionPlansDesc'
+ModuleDiffusionPlansDesc = DiffusionPlans description
+
+#
+# Admin page
+#
+DiffusionPlansSetup = DiffusionPlans setup
+Settings = Settings
+DiffusionPlansSetupPage = DiffusionPlans setup page
+NewSection=New section
+DIFFUSIONPLANS_MYPARAM1 = My param 1
+DIFFUSIONPLANS_MYPARAM1Tooltip = My param 1 tooltip
+DIFFUSIONPLANS_MYPARAM2=My param 2
+DIFFUSIONPLANS_MYPARAM2Tooltip=My param 2 tooltip
+
+
+#
+# About page
+#
+About = About
+DiffusionPlansAbout = About DiffusionPlans
+DiffusionPlansAboutPage = DiffusionPlans about page
+
+#
+# Sample page
+#
+DiffusionPlansArea = Home DiffusionPlans
+MyPageName = My page name
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
+
+methodMail = Send by email
+methodLetter = Send by mail
+methodHand = Hand delivered

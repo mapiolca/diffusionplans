@@ -1,0 +1,171 @@
+[02-Aug-2025 15:27:28 Europe/Paris] PHP Warning:  require(../../../../main.inc.php): Failed to open stream: No such file or directory in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 43
+[02-Aug-2025 15:27:28 Europe/Paris] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../main.inc.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:43
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 43
+[02-Aug-2025 15:27:38 Europe/Paris] PHP Warning:  require(../../../../main.inc.php): Failed to open stream: No such file or directory in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 43
+[02-Aug-2025 15:27:38 Europe/Paris] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../main.inc.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:43
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 43
+[02-Aug-2025 15:27:55 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class User could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 15:27:58 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class User could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 15:28:20 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class User could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 15:28:20 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class User could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 15:28:21 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class User could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 15:28:50 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class User could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 15:28:51 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class User could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 15:29:07 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:140
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 140
+[02-Aug-2025 15:29:08 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:140
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 140
+[02-Aug-2025 15:31:44 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:156
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 156
+[02-Aug-2025 15:31:45 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:156
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 156
+[02-Aug-2025 15:33:14 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:156
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 156
+[02-Aug-2025 15:33:15 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:156
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 156
+[02-Aug-2025 15:33:15 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:156
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 156
+[02-Aug-2025 15:33:16 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:156
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 156
+[02-Aug-2025 16:04:22 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('letter_status', 1, 'diffusionplans_...', 18, Object(User))
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:04:26 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('mail_status', 1, 'diffusionplans_...', 18, Object(User))
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:04:29 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('letter_status', 1, 'diffusionplans_...', 18, Object(User))
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:04:45 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('letter_status', 0, 'diffusionplans_...', 18, Object(User))
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:05:36 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('mail_status', 1, 'diffusionplans_...', 18, Object(User))
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:05:52 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('mail_status', 1, 'diffusionplans_...', 18, Object(User))
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:08:03 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('mail_status', 1, 'diffusionplans_...', 18)
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:08:04 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('mail_status', 1, 'diffusionplans_...', 18)
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:08:06 Europe/Paris] PHP Fatal error:  Uncaught TypeError: DiffusionContact::update(): Argument #1 ($user) must be of type User, string given, called in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 149 and defined in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:564
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(149): DiffusionContact->update('mail_status', 1, 'diffusionplans_...', 18)
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 564
+[02-Aug-2025 16:31:43 Europe/Paris] PHP Parse error:  syntax error, unexpected identifier "errors", expecting ")" in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 588
+[02-Aug-2025 17:08:29 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class TraceableDB could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:567
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(131): DiffusionContact->update(Object(User), 'mail_status', 1, 'diffusionplans_...', 19)
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 567
+[02-Aug-2025 17:09:03 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class TraceableDB could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:567
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(131): DiffusionContact->update(Object(User), 'mail_status', 1, 'diffusionplans_...', 19)
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 567
+[02-Aug-2025 17:09:05 Europe/Paris] PHP Fatal error:  Uncaught Error: Object of class TraceableDB could not be converted to string in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php:567
+Stack trace:
+#0 /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php(131): DiffusionContact->update(Object(User), 'mail_status', 1, 'diffusionplans_...', 19)
+#1 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/class/diffusioncontact.class.php on line 567
+[02-Aug-2025 17:35:32 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:35:34 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:35:35 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:35:36 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:36:05 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:36:05 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:36:06 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:36:11 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:36:12 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
+[02-Aug-2025 17:36:12 Europe/Paris] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php:132
+Stack trace:
+#0 {main}
+  thrown in /home/ipsservi/public_html/lesmetiersdubatiment/develop/htdocs/custom/diffusionplans/ajax/objectonoff.php on line 132
