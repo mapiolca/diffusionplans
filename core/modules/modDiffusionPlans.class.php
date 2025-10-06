@@ -157,7 +157,11 @@ class modDiffusionPlans extends DolibarrModules
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/diffusionplans/temp","/diffusionplans/subdir");
-		$this->dirs = array("/diffusionplans/temp");
+                $this->dirs = array(
+                        "/diffusionplans/temp",
+                        "/diffusionplans/diffusion",
+                        "/diffusionplans/diffusioncontact",
+                );
 
 		// Config pages. Put here list of php page, stored into diffusionplans/admin directory, to use to setup module.
 		$this->config_page_url = array("setup.php@diffusionplans");
