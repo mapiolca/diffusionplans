@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2017       Laurent Destailleur      <eldy@users.sourceforge.net>
  * Copyright (C) 2023-2024  Frédéric France          <frederic.france@free.fr>
- * Copyright (C) 2025 Pierre ARDOIN
+ * Copyright (C) 2025 Pierre Ardoin <developpeur@lesmetiersdubatiment.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -266,116 +266,161 @@ class DiffusionContact extends CommonObject
                 return $this->syncLink($this->fk_diffusion, $this->fk_contact, $this->contact_source, $notrigger);
         }
 
-        /**
-         * FR: Synchronise (crée si nécessaire) le lien entre une diffusion et un contact.
-         * EN: Synchronise (create if required) the link between a diffusion and a contact.
-         *
-         * @param int $diffusionId Diffusion identifier
-         * @param int $contactId Contact identifier
-         * @param string $source Source flag (internal/external)
-         * @param int<0,1> $notrigger 0 to execute triggers, 1 to skip them
-         * @return int<-1,1>                      >0 if OK, <0 if KO
-         */
-        public function syncLink($diffusionId, $contactId, $source, $notrigger = 0)
-        {
-                global $langs, $user, $conf;
+	/**
+	 * FR: Synchronise (crée si nécessaire) le lien entre une diffusion et un contact.
+	 * EN: Synchronise (create if required) the link between a diffusion and a contact.
+	 *
+	 * @param int $diffusionId Diffusion identifier
+	 * @param int $contactId Contact identifier
+	 * @param string $source Source flag (internal/external)
+	 * @param int<0,1> $notrigger 0 to execute triggers, 1 to skip them
+	 * @return int<-1,1>			 >0 if OK, <0 if KO
+	 */
+	public function syncLink($diffusionId, $contactId, $source, $notrigger = 0)
+	{
+		global $langs, $user, $conf;
 
-                $diffusionId = (int) $diffusionId;
-                $contactId = (int) $contactId;
-                $source = strtolower((string) $source);
-                $source = preg_replace('/[^a-z0-9_]/', '', $source);
+		$diffusionId = (int) $diffusionId;
+		$contactId = (int) $contactId;
+		$source = strtolower((string) $source);
+		$source = preg_replace('/[^a-z0-9_]/', '', $source);
 
-                if ($diffusionId <= 0 || $contactId <= 0 || empty($source)) {
-                        $this->error = $langs->trans('DiffusionContactSyncError');
+		if ($diffusionId <= 0 || $contactId <= 0 || empty($source)) {
+			$this->error = $langs->trans('DiffusionContactSyncError');
 
-                        return -1;
-                }
+			return -1;
+		}
 
-                $this->db->begin();
+		$this->db->begin();
 
-                $sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX."diffusionplans_diffusioncontact";
-                $sql .= ' WHERE fk_diffusion = '.$diffusionId;
-                $sql .= ' AND fk_contact = '.$contactId;
-                $sql .= " AND contact_source = '".$this->db->escape($source)."'";
+		$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact';
+		$sql .= ' WHERE fk_diffusion = '.$diffusionId;
+		$sql .= ' AND fk_contact = '.$contactId;
+		$sql .= " AND contact_source = '".$this->db->escape($source)."'";
 
-                dol_syslog(__METHOD__." fetch existing link sql=".$sql, LOG_DEBUG);
-                $resql = $this->db->query($sql);
-                if (!$resql) {
-                        $this->error = $this->db->lasterror();
-                        $this->db->rollback();
+		dol_syslog(__METHOD__." fetch existing link sql=".$sql, LOG_DEBUG);
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+			$this->error = $this->db->lasterror();
+			$this->db->rollback();
 
-                        return -1;
-                }
+			return -1;
+		}
 
-                $existing = $this->db->fetch_object($resql);
-                $this->db->free($resql);
+		$existing = $this->db->fetch_object($resql);
+		$this->db->free($resql);
 
-                if ($existing) {
-                        $this->id = (int) $existing->rowid;
+		if ($existing) {
+			$this->id = (int) $existing->rowid;
 
-                        $updateSql = 'UPDATE '.MAIN_DB_PREFIX."diffusionplans_diffusioncontact";
-                        $updateSql .= ' SET fk_user_modif = '.((int) $user->id);
-                        $updateSql .= ' WHERE rowid = '.$this->id;
+			$updateSql = 'UPDATE '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact';
+			$updateSql .= ' SET fk_user_modif = '.((int) $user->id);
+			$updateSql .= ' WHERE rowid = '.$this->id;
 
-                        dol_syslog(__METHOD__." update existing link sql=".$updateSql, LOG_DEBUG);
-                        if (!$this->db->query($updateSql)) {
-                                $this->error = $this->db->lasterror();
-                                $this->db->rollback();
+			dol_syslog(__METHOD__." update existing link sql=".$updateSql, LOG_DEBUG);
+			if (!$this->db->query($updateSql)) {
+				$this->error = $this->db->lasterror();
+				$this->db->rollback();
 
-                                return -1;
-                        }
+				return -1;
+			}
 
-                        $this->db->commit();
+			$this->db->commit();
 
-                        return 1;
-                }
+			return 1;
+		}
 
-                $insertSql = 'INSERT INTO '.MAIN_DB_PREFIX."diffusionplans_diffusioncontact";
-                $insertSql .= ' (fk_diffusion, fk_contact, contact_source, mail_status, letter_status, hand_status, fk_user_modif)';
-                $insertSql .= ' VALUES (';
-                $insertSql .= $diffusionId.',';
-                $insertSql .= $contactId.", '".$this->db->escape($source)."',";
-                $insertSql .= ' 0, 0, 0,';
-                $insertSql .= (int) $user->id;
-                $insertSql .= ')';
+		$insertSql = 'INSERT INTO '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact';
+		$insertSql .= ' (fk_diffusion, fk_contact, contact_source, mail_status, letter_status, hand_status, fk_user_modif)';
+		$insertSql .= ' VALUES (';
+		$insertSql .= $diffusionId.',';
+		$insertSql .= $contactId.", '".$this->db->escape($source)."',";
+		$insertSql .= ' 0, 0, 0,';
+		$insertSql .= (int) $user->id;
+		$insertSql .= ')';
 
-                dol_syslog(__METHOD__." insert link sql=".$insertSql, LOG_DEBUG);
-                if (!$this->db->query($insertSql)) {
-                        $this->error = $this->db->lasterror();
-                        $this->db->rollback();
+		dol_syslog(__METHOD__." insert link sql=".$insertSql, LOG_DEBUG);
+		if (!$this->db->query($insertSql)) {
+			$this->error = $this->db->lasterror();
+			$this->db->rollback();
 
-                        return -1;
-                }
+			return -1;
+		}
 
-                $this->id = (int) $this->db->last_insert_id(MAIN_DB_PREFIX.'diffusionplans_diffusioncontact');
+		$this->id = (int) $this->db->last_insert_id(MAIN_DB_PREFIX.'diffusionplans_diffusioncontact');
 
-                if (!$notrigger) {
-                        include_once DOL_DOCUMENT_ROOT.'/core/class/interfaces.class.php';
-                        $interface = new Interfaces($this->db);
-                        $result = $interface->run_triggers('DIFFUSIONCONTACT_INSERT', $this, $user, $langs, $conf);
-                        if ($result < 0) {
-                                $this->error = $langs->trans('ErrorCallingTrigger');
-                                $this->db->rollback();
+		if (!$notrigger) {
+			include_once DOL_DOCUMENT_ROOT.'/core/class/interfaces.class.php';
+			$interface = new Interfaces($this->db);
+			$result = $interface->run_triggers('DIFFUSIONCONTACT_INSERT', $this, $user, $langs, $conf);
+			if ($result < 0) {
+				$this->error = $langs->trans('ErrorCallingTrigger');
+				$this->db->rollback();
 
-                                return -1;
-                        }
-                }
+				return -1;
+			}
+		}
 
-                $this->db->commit();
+		$this->db->commit();
 
-                return 1;
-        }
+		return 1;
+	}
 
-        /**
-         * FR: Supprime proprement le lien entre une diffusion et un contact.
-         * EN: Remove cleanly the link between a diffusion and a contact.
-         *
-         * @param int $diffusionId Diffusion identifier
-         * @param int $contactId Contact identifier
-         * @param string $source Source flag (internal/external)
-         * @param int<0,1> $notrigger 0 to execute triggers, 1 to skip them
-         * @return int<-1,1>                      >0 if OK, <0 if KO
-         */
+	/**
+	 * FR: Récupère les liens de contacts d'une diffusion pour alimenter l'affichage et le PDF.
+	 * EN: Retrieve diffusion contact links to feed the user interface and the PDF.
+	 *
+	 * @param int $diffusionId Diffusion identifier
+	 * @return array<int,array<string,mixed>>
+	 */
+	public function fetchDiffusionContactLinks($diffusionId)
+	{
+		$diffusionId = (int) $diffusionId;
+		$result = array();
+
+		if ($diffusionId <= 0) {
+			return $result;
+		}
+
+		$sql = 'SELECT dc.rowid, dc.fk_contact, dc.contact_source, dc.mail_status, dc.letter_status, dc.hand_status,';
+		$sql .= ' ec.position, ec.fk_c_type_contact, ctc.libelle as type_label, ctc.code as type_code';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc';
+		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."element_contact as ec ON ec.fk_element = dc.fk_diffusion";
+		$sql .= " AND ec.element = 'diffusion'";
+		$sql .= ' AND ec.source = dc.contact_source';
+		$sql .= " AND ((dc.contact_source = 'internal' AND ec.fk_user = dc.fk_contact)";
+		$sql .= " OR (dc.contact_source = 'external' AND ec.fk_socpeople = dc.fk_contact))";
+		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_type_contact as ctc ON ec.fk_c_type_contact = ctc.rowid';
+		$sql .= ' WHERE dc.fk_diffusion = '.$diffusionId;
+		$sql .= ' ORDER BY ec.position, dc.rowid';
+
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+			dol_syslog(__METHOD__.' sql='.$sql.' '.$this->db->lasterror(), LOG_ERR);
+
+			return $result;
+		}
+
+		while ($obj = $this->db->fetch_object($resql)) {
+			$result[] = array(
+				'rowid' => (int) $obj->rowid,
+				'fk_contact' => (int) $obj->fk_contact,
+				'contact_source' => (string) $obj->contact_source,
+				'fk_c_type_contact' => !empty($obj->fk_c_type_contact) ? (int) $obj->fk_c_type_contact : null,
+				'type_label' => !empty($obj->type_label) ? (string) $obj->type_label : '',
+				'type_code' => !empty($obj->type_code) ? (string) $obj->type_code : '',
+				'position' => isset($obj->position) ? (int) $obj->position : null,
+				'mail_status' => (int) $obj->mail_status,
+				'letter_status' => (int) $obj->letter_status,
+				'hand_status' => (int) $obj->hand_status,
+			);
+		}
+
+		$this->db->free($resql);
+
+		return $result;
+	}
+
         public function removeLink($diffusionId, $contactId, $source, $notrigger = 0)
         {
                 global $langs, $user, $conf;

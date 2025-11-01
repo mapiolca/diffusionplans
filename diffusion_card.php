@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2017       Laurent Destailleur     <eldy@users.sourceforge.net>
  * Copyright (C) 2024       Frédéric France         <frederic.france@free.fr>
- * Copyright (C) 2025 Pierre ARDOIN
+ * Copyright (C) 2025 Pierre Ardoin <developpeur@lesmetiersdubatiment.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -227,11 +227,18 @@ if (empty($reshook)) {
 	// Actions when printing a doc from card
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
 
-	// Action to move up and down lines of object
-	//include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';
+	if (!empty($object->id)) {
+		// FR: Précharge les liens de contacts pour alimenter le rendu PDF.
+		// EN: Preload contact links so the PDF renderer receives the prepared data.
+		$diffusioncontactloader = new DiffusionContact($db);
+		$object->pdf_contact_links = $diffusioncontactloader->fetchDiffusionContactLinks($object->id);
+	}
 
-	// Action to build doc
-	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
+// Action to move up and down lines of object
+//include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';
+
+// Action to build doc
+include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 	if ($action == 'set_thirdparty' && $permissiontoadd) {
 		$object->setValueFrom('fk_soc', GETPOSTINT('fk_soc'), '', null, 'date', '', $user, $triggermodname);
