@@ -42,6 +42,7 @@ DiffusionContactRemoveError = Impossible de supprimer le lien du contact pour ce
 DiffusionContactSyncError = Impossible de synchroniser le contact pour cette diffusion.
 DiffusionNoContacts = Aucun contact n'est lié à cette diffusion.
 DiffusionNoDocuments = Aucun document n'est joint à cette diffusion.
+DiffusionContactUsersColumn = Utilisateurs | Contacts
 DiffusionPlansArea = Accueil DiffusionPlans
 DiffusionPlansSetup = Configuration DiffusionPlans
 DiffusionPlansSetupPage = Page de configuration DiffusionPlans

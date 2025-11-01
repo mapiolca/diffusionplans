@@ -698,6 +698,14 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$email = '';
 			$phone = '';
 			$mobile = '';
+			$natureLabel = '';
+			// FR: Détermine la nature du contact pour aligner le PDF avec la fiche diffusion.
+			// EN: Determine contact nature so the PDF mirrors the diffusion card.
+			if ($source === 'internal') {
+				$natureLabel = $outputlangs->transnoentities('User');
+			} else {
+				$natureLabel = $outputlangs->transnoentities('ThirdPartyContact');
+			}
 
 			if ($source === 'internal') {
 				if ($userstatic->fetch($contactId) > 0) {
@@ -748,17 +756,18 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			}
 
 			$result[] = array(
-			'id' => $contactId,
-			'source' => $source,
-			'type_label' => $typeLabel,
-			'thirdparty_name' => $thirdpartyName,
-			'contact_name' => $contactName,
-			'email' => $email,
-			'phone' => $phone,
-			'mobile' => $mobile,
-			'mail_status' => isset($contactData['mail_status']) ? (int) $contactData['mail_status'] : 0,
-			'letter_status' => isset($contactData['letter_status']) ? (int) $contactData['letter_status'] : 0,
-			'hand_status' => isset($contactData['hand_status']) ? (int) $contactData['hand_status'] : 0,
+				'id' => $contactId,
+				'source' => $source,
+				'type_label' => $typeLabel,
+				'thirdparty_name' => $thirdpartyName,
+				'contact_name' => $contactName,
+				'nature_label' => $natureLabel,
+				'email' => $email,
+				'phone' => $phone,
+				'mobile' => $mobile,
+				'mail_status' => isset($contactData['mail_status']) ? (int) $contactData['mail_status'] : 0,
+				'letter_status' => isset($contactData['letter_status']) ? (int) $contactData['letter_status'] : 0,
+				'hand_status' => isset($contactData['hand_status']) ? (int) $contactData['hand_status'] : 0,
 			);
 		}
 
@@ -852,31 +861,36 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	       $pdf->MultiCell($width, 6, $outputlangs->transnoentities('DiffusionContactsTitle'), 0, 'L');
 	       $y = $pdf->GetY() + 1;
 
-	       // FR: Déclaration des colonnes, de leur libellé traduit et du formatage associé.
-	       // EN: Declare columns with their translated labels and formatting metadata.
-	       // FR: Largeurs harmonisées pour équilibrer noms, emails et indicateurs.
-	       // EN: Balanced widths to harmonise names, emails and delivery flags.
-	       $columns = array(
-		       array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.20, 'align' => 'L'),
-		       array('key' => 'contact_name', 'label' => 'Contact', 'width' => $width * 0.20, 'align' => 'L'),
-		       array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.12, 'align' => 'L'),
-			array('key' => 'email', 'label' => 'Email', 'width' => $width * 0.26, 'align' => 'L'),
-			array('key' => 'phone', 'label' => 'Phone', 'width' => $width * 0.10, 'align' => 'L'),
-			array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
-			array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
-			array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $width * 0.04, 'align' => 'C', 'status' => true),
+		// FR: Déclaration des colonnes, de leur libellé traduit et du formatage associé.
+		// EN: Declare columns with their translated labels and formatting metadata.
+		// FR: Largeurs alignées sur la fiche diffusion pour reproduire la présentation.
+		// EN: Widths aligned with the diffusion card to reproduce the presentation.
+		$columns = array(
+			array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.24, 'align' => 'L'),
+			array('key' => 'contact_name', 'label' => 'DiffusionContactUsersColumn', 'width' => $width * 0.24, 'align' => 'L', 'customlabel' => true),
+			array('key' => 'nature_label', 'label' => 'NatureOfContact', 'width' => $width * 0.16, 'align' => 'L'),
+			array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.16, 'align' => 'L'),
+			array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $width * 0.06, 'align' => 'C', 'status' => true),
+			array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $width * 0.06, 'align' => 'C', 'status' => true),
+			array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $width * 0.08, 'align' => 'C', 'status' => true),
 		);
 
-	       $pdf->SetFont('', 'B', $defaultFontSize - 1);
-	       $x = $this->marge_gauche;
-	       for ($i = 0; $i < count($columns); $i++) {
-		       $column = $columns[$i];
-		       // FR: Affiche l'en-tête de colonne avec la traduction appropriée.
-		       // EN: Output the column header with the proper translation.
-		       $pdf->SetXY($x, $y);
-		       $pdf->MultiCell($column['width'], 5, $outputlangs->transnoentities($column['label']), 0, $column['align'], 0, 0);
-		       $x += $column['width'];
-	       }
+		$pdf->SetFont('', 'B', $defaultFontSize - 1);
+		$x = $this->marge_gauche;
+		for ($i = 0; $i < count($columns); $i++) {
+			$column = $columns[$i];
+			// FR: Affiche l'en-tête de colonne avec la traduction appropriée.
+			// EN: Output the column header with the proper translation.
+			$label = $outputlangs->transnoentities($column['label']);
+			if (!empty($column['customlabel'])) {
+				// FR: Assemble le libellé composite "Utilisateurs | Contacts" pour refléter la fiche.
+				// EN: Assemble the composite label "Users | Contacts" to mirror the card.
+				$label = $outputlangs->transnoentities('Users').' | '.$outputlangs->transnoentities('Contacts');
+			}
+			$pdf->SetXY($x, $y);
+			$pdf->MultiCell($column['width'], 5, $label, 0, $column['align'], 0, 0);
+			$x += $column['width'];
+		}
 		$y += 5;
 		$pdf->SetDrawColor(200, 200, 200);
 		$pdf->line($this->marge_gauche, $y, $this->marge_gauche + $width, $y);
