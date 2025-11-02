@@ -366,85 +366,93 @@ class DiffusionContact extends CommonObject
 		return 1;
 	}
 
-	/**
-	 * FR: Récupère les liens de contacts d'une diffusion pour alimenter l'affichage et le PDF.
-	 * EN: Retrieve diffusion contact links to feed the user interface and the PDF.
-	 *
-	 * @param int $diffusionId Diffusion identifier
-	 * @return array<int,array<string,mixed>>
-	 */
-	public function fetchDiffusionContactLinks($diffusionId)
-	{
-		$diffusionId = (int) $diffusionId;
-		$result = array();
+		/**
+		 * FR: Récupère les liens de contacts d'une diffusion pour alimenter l'affichage et le PDF.
+		 * EN: Retrieve diffusion contact links to feed the user interface and the PDF.
+		 *
+		 * @param int $diffusionId Diffusion identifier
+		 * @return array<int,array<string,mixed>>
+		 */
+		public function fetchDiffusionContactLinks($diffusionId)
+		{
+			$diffusionId = (int) $diffusionId;
+			$result = array();
 
-		if ($diffusionId <= 0) {
+			if ($diffusionId <= 0) {
+				return $result;
+			}
+
+			// FR: Prépare la liste complète à partir des liens Dolibarr, avec nos données de diffusion en option.
+			// EN: Build the complete list from Dolibarr links, optionally enriched with our diffusion data.
+			$sql = 'SELECT';
+			$sql .= ' COALESCE(dc.rowid, 0) as link_rowid,';
+			$sql .= ' COALESCE(dc.fk_contact, CASE WHEN ec.source = \'internal\' THEN ec.fk_user ELSE ec.fk_socpeople END) as fk_contact,';
+			$sql .= ' COALESCE(dc.contact_source, ec.source) as contact_source,';
+			$sql .= ' COALESCE(dc.mail_status, 0) as mail_status,';
+			$sql .= ' COALESCE(dc.letter_status, 0) as letter_status,';
+			$sql .= ' COALESCE(dc.hand_status, 0) as hand_status,';
+			$sql .= ' ec.position, ec.fk_c_type_contact, ctc.libelle as type_label, ctc.code as type_code,';
+			$sql .= ' u.firstname as user_firstname, u.lastname as user_lastname, u.login as user_login,';
+			$sql .= ' u.email as user_email, u.office_phone as user_office_phone, u.user_mobile as user_mobile,';
+			$sql .= ' sp.firstname as contact_firstname, sp.lastname as contact_lastname, sp.email as contact_email,';
+			$sql .= ' sp.phone_pro as contact_phone_pro, sp.phone_perso as contact_phone_perso,';
+			$sql .= ' sp.phone_mobile as contact_phone_mobile, sp.fk_soc as contact_fk_soc,';
+			$sql .= ' s.nom as company_name';
+			$sql .= ' FROM '.MAIN_DB_PREFIX.'element_contact as ec';
+			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc ON dc.fk_diffusion = ec.fk_element';
+			$sql .= " AND dc.contact_source = ec.source";
+			$sql .= " AND dc.fk_contact = CASE WHEN ec.source = 'internal' THEN ec.fk_user ELSE ec.fk_socpeople END";
+			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'user as u ON ec.fk_user = u.rowid';
+			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'socpeople as sp ON ec.fk_socpeople = sp.rowid';
+			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON sp.fk_soc = s.rowid';
+			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_type_contact as ctc ON ec.fk_c_type_contact = ctc.rowid';
+			$sql .= " WHERE ec.element = 'diffusion'";
+			$sql .= ' AND ec.fk_element = '.$diffusionId;
+			$sql .= ' ORDER BY ec.position, link_rowid';
+
+			$resql = $this->db->query($sql);
+			if (!$resql) {
+				dol_syslog(__METHOD__.' sql='.$sql.' '.$this->db->lasterror(), LOG_ERR);
+
+				return $result;
+			}
+
+			while ($obj = $this->db->fetch_object($resql)) {
+				// FR: Capitalise les informations quel que soit l'état de synchronisation de la table dédiée.
+				// EN: Capture data regardless of the dedicated table synchronisation state.
+				$result[] = array(
+					'rowid' => !empty($obj->link_rowid) ? (int) $obj->link_rowid : 0,
+					'fk_contact' => !empty($obj->fk_contact) ? (int) $obj->fk_contact : 0,
+					'contact_source' => !empty($obj->contact_source) ? (string) $obj->contact_source : '',
+					'fk_c_type_contact' => !empty($obj->fk_c_type_contact) ? (int) $obj->fk_c_type_contact : null,
+					'type_label' => !empty($obj->type_label) ? (string) $obj->type_label : '',
+					'type_code' => !empty($obj->type_code) ? (string) $obj->type_code : '',
+					'position' => isset($obj->position) ? (int) $obj->position : null,
+					'mail_status' => isset($obj->mail_status) ? (int) $obj->mail_status : 0,
+					'letter_status' => isset($obj->letter_status) ? (int) $obj->letter_status : 0,
+					'hand_status' => isset($obj->hand_status) ? (int) $obj->hand_status : 0,
+					'user_firstname' => !empty($obj->user_firstname) ? (string) $obj->user_firstname : '',
+					'user_lastname' => !empty($obj->user_lastname) ? (string) $obj->user_lastname : '',
+					'user_login' => !empty($obj->user_login) ? (string) $obj->user_login : '',
+					'user_email' => !empty($obj->user_email) ? (string) $obj->user_email : '',
+					'user_office_phone' => !empty($obj->user_office_phone) ? (string) $obj->user_office_phone : '',
+					'user_mobile' => !empty($obj->user_mobile) ? (string) $obj->user_mobile : '',
+					'contact_firstname' => !empty($obj->contact_firstname) ? (string) $obj->contact_firstname : '',
+					'contact_lastname' => !empty($obj->contact_lastname) ? (string) $obj->contact_lastname : '',
+					'contact_email' => !empty($obj->contact_email) ? (string) $obj->contact_email : '',
+					'contact_phone_pro' => !empty($obj->contact_phone_pro) ? (string) $obj->contact_phone_pro : '',
+					'contact_phone_perso' => !empty($obj->contact_phone_perso) ? (string) $obj->contact_phone_perso : '',
+					'contact_phone_mobile' => !empty($obj->contact_phone_mobile) ? (string) $obj->contact_phone_mobile : '',
+					'contact_fk_soc' => isset($obj->contact_fk_soc) ? (int) $obj->contact_fk_soc : 0,
+					'company_name' => !empty($obj->company_name) ? (string) $obj->company_name : '',
+				);
+			}
+
+			$this->db->free($resql);
+
 			return $result;
 		}
-		
-		// FR: Sélectionne les données principales en joignant directement utilisateurs et contacts via fk_contact.
-		// EN: Select core data by joining users and contacts directly through fk_contact.
-		$sql = 'SELECT dc.rowid, dc.fk_contact, dc.contact_source, dc.mail_status, dc.letter_status, dc.hand_status,';
-		$sql .= ' ec.position, ec.fk_c_type_contact, ctc.libelle as type_label, ctc.code as type_code,';
-		$sql .= ' u.firstname as user_firstname, u.lastname as user_lastname, u.login as user_login,';
-		$sql .= ' u.email as user_email, u.office_phone as user_office_phone, u.user_mobile as user_mobile,';
-		$sql .= ' sp.firstname as contact_firstname, sp.lastname as contact_lastname, sp.email as contact_email,';
-		$sql .= ' sp.phone_pro as contact_phone_pro, sp.phone_perso as contact_phone_perso,';
-		$sql .= ' sp.phone_mobile as contact_phone_mobile, sp.fk_soc as contact_fk_soc,';
-		$sql .= ' s.nom as company_name';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."element_contact as ec ON ec.fk_element = dc.fk_diffusion";
-		$sql .= " AND ec.element = 'diffusion'";
-		$sql .= ' AND ec.source = dc.contact_source';
-		$sql .= " AND ((dc.contact_source = 'internal' AND ec.fk_user = dc.fk_contact)";
-		$sql .= " OR (dc.contact_source = 'external' AND ec.fk_socpeople = dc.fk_contact))";
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."user as u ON (dc.contact_source = 'internal' AND u.rowid = dc.fk_contact)";
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."socpeople as sp ON (dc.contact_source = 'external' AND sp.rowid = dc.fk_contact)";
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON (sp.fk_soc = s.rowid)';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_type_contact as ctc ON ec.fk_c_type_contact = ctc.rowid';
-		$sql .= ' WHERE dc.fk_diffusion = '.$diffusionId;
-		$sql .= ' ORDER BY ec.position, dc.rowid';
-		
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			dol_syslog(__METHOD__.' sql='.$sql.' '.$this->db->lasterror(), LOG_ERR);
 
-			return $result;
-		}
-		
-		while ($obj = $this->db->fetch_object($resql)) {
-			$result[] = array(
-			'rowid' => (int) $obj->rowid,
-			'fk_contact' => (int) $obj->fk_contact,
-			'contact_source' => (string) $obj->contact_source,
-			'fk_c_type_contact' => !empty($obj->fk_c_type_contact) ? (int) $obj->fk_c_type_contact : null,
-			'type_label' => !empty($obj->type_label) ? (string) $obj->type_label : '',
-			'type_code' => !empty($obj->type_code) ? (string) $obj->type_code : '',
-			'position' => isset($obj->position) ? (int) $obj->position : null,
-			'mail_status' => (int) $obj->mail_status,
-			'letter_status' => (int) $obj->letter_status,
-			'hand_status' => (int) $obj->hand_status,
-			'user_firstname' => !empty($obj->user_firstname) ? (string) $obj->user_firstname : '',
-			'user_lastname' => !empty($obj->user_lastname) ? (string) $obj->user_lastname : '',
-			'user_login' => !empty($obj->user_login) ? (string) $obj->user_login : '',
-			'user_email' => !empty($obj->user_email) ? (string) $obj->user_email : '',
-			'user_office_phone' => !empty($obj->user_office_phone) ? (string) $obj->user_office_phone : '',
-			'user_mobile' => !empty($obj->user_mobile) ? (string) $obj->user_mobile : '',
-			'contact_firstname' => !empty($obj->contact_firstname) ? (string) $obj->contact_firstname : '',
-			'contact_lastname' => !empty($obj->contact_lastname) ? (string) $obj->contact_lastname : '',
-			'contact_email' => !empty($obj->contact_email) ? (string) $obj->contact_email : '',
-			'contact_phone_pro' => !empty($obj->contact_phone_pro) ? (string) $obj->contact_phone_pro : '',
-			'contact_phone_perso' => !empty($obj->contact_phone_perso) ? (string) $obj->contact_phone_perso : '',
-			'contact_phone_mobile' => !empty($obj->contact_phone_mobile) ? (string) $obj->contact_phone_mobile : '',
-			'contact_fk_soc' => isset($obj->contact_fk_soc) ? (int) $obj->contact_fk_soc : 0,
-			'company_name' => !empty($obj->company_name) ? (string) $obj->company_name : '',
-			);
-		}
-		
-		$this->db->free($resql);
-
-			return $result;
-		}
 
         public function removeLink($diffusionId, $contactId, $source, $notrigger = 0)
         {
