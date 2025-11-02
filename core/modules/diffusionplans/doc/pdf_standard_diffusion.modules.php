@@ -911,15 +911,14 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	       $pdf->MultiCell($width, 6, $outputlangs->transnoentities('DiffusionContactsTitle'), 0, 'L');
 	       $y = $pdf->GetY() + 1;
 
-		// FR: Déclaration des colonnes, de leur libellé traduit et du formatage associé.
-		// EN: Declare columns with their translated labels and formatting metadata.
-		// FR: Largeurs alignées sur la fiche diffusion pour reproduire la présentation.
-		// EN: Widths aligned with the diffusion card to reproduce the presentation.
+		// FR: Déclaration des colonnes et des largeurs pour un tableau équilibré sans la colonne combinée des utilisateurs.
+		// EN: Declare columns and widths for a balanced table without the combined users column.
+		// FR: Largeur accrue sur la société afin d'afficher également le contact sélectionné.
+		// EN: Increased width on the third party to also display the selected contact.
 		$columns = array(
-			array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.24, 'align' => 'L'),
-			array('key' => 'contact_name', 'label' => 'DiffusionContactUsersColumn', 'width' => $width * 0.24, 'align' => 'L', 'customlabel' => true),
-			array('key' => 'nature_label', 'label' => 'NatureOfContact', 'width' => $width * 0.16, 'align' => 'L'),
-			array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.16, 'align' => 'L'),
+			array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.44, 'align' => 'L'),
+			array('key' => 'nature_label', 'label' => 'NatureOfContact', 'width' => $width * 0.18, 'align' => 'L'),
+			array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.18, 'align' => 'L'),
 			array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $width * 0.06, 'align' => 'C', 'status' => true),
 			array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $width * 0.06, 'align' => 'C', 'status' => true),
 			array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $width * 0.08, 'align' => 'C', 'status' => true),
@@ -932,11 +931,6 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			// FR: Affiche l'en-tête de colonne avec la traduction appropriée.
 			// EN: Output the column header with the proper translation.
 			$label = $outputlangs->transnoentities($column['label']);
-			if (!empty($column['customlabel'])) {
-				// FR: Assemble le libellé composite "Utilisateurs | Contacts" pour refléter la fiche.
-				// EN: Assemble the composite label "Users | Contacts" to mirror the card.
-				$label = $outputlangs->transnoentities('Users').' | '.$outputlangs->transnoentities('Contacts');
-			}
 			$pdf->SetXY($x, $y);
 			$pdf->MultiCell($column['width'], 5, $label, 0, $column['align'], 0, 0);
 			$x += $column['width'];
@@ -996,8 +990,36 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	*/
        protected function formatContactColumnValue(array $contact, array $column, $outputlangs)
        {
-	       $key = $column['key'];
-	       if (!empty($column['status'])) {
+		$key = $column['key'];
+		if ($key === 'thirdparty_name') {
+			// FR: Combine la société, le contact et ses coordonnées dans une seule cellule.
+			// EN: Combine the company, the contact and their details into a single cell.
+			$lines = array();
+			if (!empty($contact[$key])) {
+				$lines[] = (string) $contact[$key];
+			}
+			if (!empty($contact['contact_name'])) {
+				$lines[] = (string) $contact['contact_name'];
+			}
+			$details = array();
+			if (!empty($contact['email'])) {
+				$details[] = (string) $contact['email'];
+			}
+			$primaryPhone = '';
+			if (!empty($contact['phone'])) {
+				$primaryPhone = (string) $contact['phone'];
+			} elseif (!empty($contact['mobile'])) {
+				$primaryPhone = (string) $contact['mobile'];
+			}
+			if ($primaryPhone !== '') {
+				$details[] = $primaryPhone;
+			}
+			if (!empty($details)) {
+				$lines[] = implode(' - ', $details);
+			}
+			return implode("\n", $lines);
+		}
+		if (!empty($column['status'])) {
 		       // FR: Transforme les indicateurs booléens en libellés Oui/Non traduits.
 		       // EN: Turn boolean flags into translated Yes/No labels.
 		       return !empty($contact[$key]) ? $outputlangs->transnoentities('Yes') : $outputlangs->transnoentities('No');
