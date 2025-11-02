@@ -688,12 +688,14 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$contactData = is_array($contactRow) ? $contactRow : (array) $contactRow;
 			$source = isset($contactData['contact_source']) ? (string) $contactData['contact_source'] : '';
 			$contactId = isset($contactData['fk_contact']) ? (int) $contactData['fk_contact'] : 0;
-
+			
 			if ($contactId <= 0 || $source === '') {
 				continue;
 			}
-
-			$thirdpartyName = '';
+			
+			// FR: Exploite prioritairement les informations préparées dans llx_diffusionplans_diffusioncontact.
+			// EN: Use the data prepared in llx_diffusionplans_diffusioncontact as the primary source.
+			$thirdpartyName = !empty($contactData['company_name']) ? (string) $contactData['company_name'] : '';
 			$contactName = '';
 			$email = '';
 			$phone = '';
@@ -706,68 +708,116 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			} else {
 				$natureLabel = $outputlangs->transnoentities('ThirdPartyContact');
 			}
-
+			
 			if ($source === 'internal') {
-				if ($userstatic->fetch($contactId) > 0) {
-					$contactName = $userstatic->getFullName($outputlangs);
-					$email = $userstatic->email;
-					$phone = $userstatic->office_phone;
-					$mobile = $userstatic->user_mobile;
+				// FR: Récupère les informations internes issues directement de llx_diffusionplans_diffusioncontact.
+				// EN: Populate internal contact details directly from llx_diffusionplans_diffusioncontact.
+				$firstname = isset($contactData['user_firstname']) ? (string) $contactData['user_firstname'] : '';
+				$lastname = isset($contactData['user_lastname']) ? (string) $contactData['user_lastname'] : '';
+				$login = isset($contactData['user_login']) ? (string) $contactData['user_login'] : '';
+				$contactName = trim($firstname.' '.($lastname !== '' ? $lastname : ''));
+				if ($contactName === '') {
+					$contactName = $login;
 				}
-				if (!empty($mysoc->name)) {
-					$thirdpartyName = $mysoc->name;
-				}
-			} else {
-				$externalContactFetched = $contactstatic->fetch($contactId) > 0;
-				if ($externalContactFetched) {
-					$contactName = $contactstatic->getFullName($outputlangs);
-					$email = $contactstatic->email;
-					$phone = $contactstatic->phone_pro;
-					if (empty($phone) && !empty($contactstatic->phone_perso)) {
-						$phone = $contactstatic->phone_perso;
-					}
-					$mobile = $contactstatic->phone_mobile;
-
-					if (!empty($contactstatic->socid) && $contactstatic->socid > 0) {
-						if ($companystatic->fetch($contactstatic->socid) > 0) {
-							$thirdpartyName = $companystatic->name;
+				$email = isset($contactData['user_email']) ? (string) $contactData['user_email'] : '';
+				$phone = isset($contactData['user_office_phone']) ? (string) $contactData['user_office_phone'] : '';
+				$mobile = isset($contactData['user_mobile']) ? (string) $contactData['user_mobile'] : '';
+				
+				if ($contactName === '' || ($email === '' && $phone === '' && $mobile === '')) {
+					$userclone = clone $userstatic;
+					if ($userclone->fetch($contactId) > 0) {
+						if ($contactName === '') {
+							$contactName = $userclone->getFullName($outputlangs);
+						}
+						if ($email === '') {
+							$email = (string) $userclone->email;
+						}
+						if ($phone === '') {
+							$phone = (string) $userclone->office_phone;
+						}
+						if ($mobile === '') {
+							$mobile = (string) $userclone->user_mobile;
 						}
 					}
 				}
-
-				if (empty($thirdpartyName) && $externalContactFetched && (int) $contactstatic->socid < 0 && !empty($mysoc->name)) {
-					$thirdpartyName = $mysoc->name;
+				
+				if ($thirdpartyName === '' && !empty($mysoc->name)) {
+					$thirdpartyName = (string) $mysoc->name;
+				}
+			} else {
+				// FR: Utilise les données externes stockées dans la table dédiée, puis complète si besoin via les fiches Dolibarr.
+				// EN: Use external contact data stored in the dedicated table, then complete it from Dolibarr cards if required.
+				$firstname = isset($contactData['contact_firstname']) ? (string) $contactData['contact_firstname'] : '';
+				$lastname = isset($contactData['contact_lastname']) ? (string) $contactData['contact_lastname'] : '';
+				$contactName = trim($firstname.' '.($lastname !== '' ? $lastname : ''));
+				$email = isset($contactData['contact_email']) ? (string) $contactData['contact_email'] : '';
+				if (!empty($contactData['contact_phone_pro'])) {
+					$phone = (string) $contactData['contact_phone_pro'];
+				} elseif (!empty($contactData['contact_phone_perso'])) {
+					$phone = (string) $contactData['contact_phone_perso'];
+				}
+				$mobile = isset($contactData['contact_phone_mobile']) ? (string) $contactData['contact_phone_mobile'] : '';
+				
+				if ($contactName === '' || $email === '' || ($phone === '' && $mobile === '')) {
+					$contactclone = clone $contactstatic;
+					if ($contactclone->fetch($contactId) > 0) {
+						if ($contactName === '') {
+							$contactName = $contactclone->getFullName($outputlangs);
+						}
+						if ($email === '') {
+							$email = (string) $contactclone->email;
+						}
+						if ($phone === '') {
+							$phone = !empty($contactclone->phone_pro) ? (string) $contactclone->phone_pro : (string) $contactclone->phone_perso;
+						}
+						if ($mobile === '') {
+							$mobile = (string) $contactclone->phone_mobile;
+						}
+						if ($thirdpartyName === '' && !empty($contactclone->socid) && $contactclone->socid > 0) {
+							$companyclone = clone $companystatic;
+							if ($companyclone->fetch($contactclone->socid) > 0) {
+								$thirdpartyName = (string) $companyclone->name;
+							}
+						}
+					}
+				}
+				
+				if ($thirdpartyName === '' && !empty($contactData['contact_fk_soc'])) {
+					$companyclone = clone $companystatic;
+					if ($companyclone->fetch((int) $contactData['contact_fk_soc']) > 0) {
+						$thirdpartyName = (string) $companyclone->name;
+					}
+				}
+				
+				if ($thirdpartyName === '' && !empty($mysoc->name)) {
+					$thirdpartyName = (string) $mysoc->name;
 				}
 			}
-
-			if (empty($thirdpartyName) && !empty($mysoc->name) && $source === 'internal') {
-				$thirdpartyName = $mysoc->name;
-			}
-
-			if (empty($phone) && !empty($mobile)) {
+			
+			if ($phone === '' && $mobile !== '') {
 				$phone = $mobile;
 			}
-
+			
 			$typeLabel = '';
 			$typeLabelKey = isset($contactData['type_label']) ? (string) $contactData['type_label'] : '';
 			if ($typeLabelKey !== '') {
 				$translated = $outputlangs->transnoentitiesnoconv($typeLabelKey);
 				$typeLabel = !empty($translated) ? (string) $translated : $typeLabelKey;
 			}
-
+			
 			$result[] = array(
-				'id' => $contactId,
-				'source' => $source,
-				'type_label' => $typeLabel,
-				'thirdparty_name' => $thirdpartyName,
-				'contact_name' => $contactName,
-				'nature_label' => $natureLabel,
-				'email' => $email,
-				'phone' => $phone,
-				'mobile' => $mobile,
-				'mail_status' => isset($contactData['mail_status']) ? (int) $contactData['mail_status'] : 0,
-				'letter_status' => isset($contactData['letter_status']) ? (int) $contactData['letter_status'] : 0,
-				'hand_status' => isset($contactData['hand_status']) ? (int) $contactData['hand_status'] : 0,
+			'id' => $contactId,
+			'source' => $source,
+			'type_label' => $typeLabel,
+			'thirdparty_name' => $thirdpartyName,
+			'contact_name' => $contactName,
+			'nature_label' => $natureLabel,
+			'email' => $email,
+			'phone' => $phone,
+			'mobile' => $mobile,
+			'mail_status' => isset($contactData['mail_status']) ? (int) $contactData['mail_status'] : 0,
+			'letter_status' => isset($contactData['letter_status']) ? (int) $contactData['letter_status'] : 0,
+			'hand_status' => isset($contactData['hand_status']) ? (int) $contactData['hand_status'] : 0,
 			);
 		}
 
