@@ -700,15 +700,6 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$email = '';
 			$phone = '';
 			$mobile = '';
-			$natureLabel = '';
-			// FR: Détermine la nature du contact pour aligner le PDF avec la fiche diffusion.
-			// EN: Determine contact nature so the PDF mirrors the diffusion card.
-			if ($source === 'internal') {
-				$natureLabel = $outputlangs->transnoentities('User');
-			} else {
-				$natureLabel = $outputlangs->transnoentities('ThirdPartyContact');
-			}
-			
 			if ($source === 'internal') {
 				// FR: Récupère les informations internes issues directement de llx_diffusionplans_diffusioncontact.
 				// EN: Populate internal contact details directly from llx_diffusionplans_diffusioncontact.
@@ -811,7 +802,6 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			'type_label' => $typeLabel,
 			'thirdparty_name' => $thirdpartyName,
 			'contact_name' => $contactName,
-			'nature_label' => $natureLabel,
 			'email' => $email,
 			'phone' => $phone,
 			'mobile' => $mobile,
@@ -911,17 +901,20 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	       $pdf->MultiCell($width, 6, $outputlangs->transnoentities('DiffusionContactsTitle'), 0, 'L');
 	       $y = $pdf->GetY() + 1;
 
-		// FR: Déclaration des colonnes et des largeurs pour un tableau équilibré sans la colonne combinée des utilisateurs.
-		// EN: Declare columns and widths for a balanced table without the combined users column.
-		// FR: Largeur accrue sur la société afin d'afficher également le contact sélectionné.
-		// EN: Increased width on the third party to also display the selected contact.
+		// FR: Calcule des largeurs équilibrées pour la colonne Contact restaurée et les indicateurs de diffusion.
+		// EN: Compute balanced widths for the restored Contact column and the delivery status indicators.
+		$statusColumnWidth = $width * 0.07;
+		$contactColumnWidth = $width * 0.33;
+		$thirdpartyColumnWidth = $width - ($contactColumnWidth + (3 * $statusColumnWidth));
+
+		// FR: Déclare les colonnes alignées sur la fiche diffusion tout en supprimant la nature du contact.
+		// EN: Declare columns aligned with the diffusion card while dropping the contact nature column.
 		$columns = array(
-			array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $width * 0.44, 'align' => 'L'),
-			array('key' => 'nature_label', 'label' => 'NatureOfContact', 'width' => $width * 0.18, 'align' => 'L'),
-			array('key' => 'type_label', 'label' => 'ContactType', 'width' => $width * 0.18, 'align' => 'L'),
-			array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $width * 0.06, 'align' => 'C', 'status' => true),
-			array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $width * 0.06, 'align' => 'C', 'status' => true),
-			array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $width * 0.08, 'align' => 'C', 'status' => true),
+			array('key' => 'thirdparty_name', 'label' => 'ThirdParty', 'width' => $thirdpartyColumnWidth, 'align' => 'L'),
+			array('key' => 'contact_name', 'label' => 'Contact', 'width' => $contactColumnWidth, 'align' => 'L'),
+			array('key' => 'mail_status', 'label' => 'methodMail', 'width' => $statusColumnWidth, 'align' => 'C', 'status' => true),
+			array('key' => 'letter_status', 'label' => 'methodLetter', 'width' => $statusColumnWidth, 'align' => 'C', 'status' => true),
+			array('key' => 'hand_status', 'label' => 'methodHand', 'width' => $statusColumnWidth, 'align' => 'C', 'status' => true),
 		);
 
 		$pdf->SetFont('', 'B', $defaultFontSize - 1);
@@ -992,14 +985,16 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
        {
 		$key = $column['key'];
 		if ($key === 'thirdparty_name') {
-			// FR: Combine la société, le contact et ses coordonnées dans une seule cellule.
-			// EN: Combine the company, the contact and their details into a single cell.
+			// FR: Affiche uniquement la raison sociale pour refléter la colonne « Tiers ».
+			// EN: Display only the third-party name to mirror the "Third party" column.
+			return !empty($contact[$key]) ? (string) $contact[$key] : '';
+		}
+		if ($key === 'contact_name') {
+			// FR: Assemble le nom du contact et ses coordonnées principales.
+			// EN: Combine the contact name with their primary contact details.
 			$lines = array();
 			if (!empty($contact[$key])) {
 				$lines[] = (string) $contact[$key];
-			}
-			if (!empty($contact['contact_name'])) {
-				$lines[] = (string) $contact['contact_name'];
 			}
 			$details = array();
 			if (!empty($contact['email'])) {
@@ -1019,11 +1014,13 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			}
 			return implode("\n", $lines);
 		}
+
 		if (!empty($column['status'])) {
-		       // FR: Transforme les indicateurs booléens en libellés Oui/Non traduits.
-		       // EN: Turn boolean flags into translated Yes/No labels.
-		       return !empty($contact[$key]) ? $outputlangs->transnoentities('Yes') : $outputlangs->transnoentities('No');
-	       }
+			// FR: Affiche une coche lorsque la méthode est activée.
+			// EN: Show a check mark when the delivery method is enabled.
+			return !empty($contact[$key]) ? '✓' : '';
+		}
+
 
 	       // FR: Retourne la valeur textuelle si elle existe, sinon une chaîne vide.
 	       // EN: Return the textual value when it exists, otherwise an empty string.

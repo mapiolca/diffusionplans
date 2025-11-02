@@ -382,33 +382,44 @@ class DiffusionContact extends CommonObject
 				return $result;
 			}
 
-			// FR: Prépare la liste complète à partir des liens Dolibarr, avec nos données de diffusion en option.
-			// EN: Build the complete list from Dolibarr links, optionally enriched with our diffusion data.
+			// FR: Construit la requête à partir de la table dédiée aux diffusions pour suivre l'état exact des liens.
+			// EN: Build the query from the dedicated diffusion table to mirror the exact state of the links.
 			$sql = 'SELECT';
-			$sql .= ' COALESCE(dc.rowid, 0) as link_rowid,';
-			$sql .= ' COALESCE(dc.fk_contact, CASE WHEN ec.source = \'internal\' THEN ec.fk_user ELSE ec.fk_socpeople END) as fk_contact,';
-			$sql .= ' COALESCE(dc.contact_source, ec.source) as contact_source,';
-			$sql .= ' COALESCE(dc.mail_status, 0) as mail_status,';
-			$sql .= ' COALESCE(dc.letter_status, 0) as letter_status,';
-			$sql .= ' COALESCE(dc.hand_status, 0) as hand_status,';
-			$sql .= ' ec.position, ec.fk_c_type_contact, ctc.libelle as type_label, ctc.code as type_code,';
-			$sql .= ' u.firstname as user_firstname, u.lastname as user_lastname, u.login as user_login,';
-			$sql .= ' u.email as user_email, u.office_phone as user_office_phone, u.user_mobile as user_mobile,';
-			$sql .= ' sp.firstname as contact_firstname, sp.lastname as contact_lastname, sp.email as contact_email,';
-			$sql .= ' sp.phone_pro as contact_phone_pro, sp.phone_perso as contact_phone_perso,';
-			$sql .= ' sp.phone_mobile as contact_phone_mobile, sp.fk_soc as contact_fk_soc,';
+			$sql .= ' dc.rowid as link_rowid,';
+			$sql .= ' dc.fk_contact,';
+			$sql .= ' dc.contact_source,';
+			$sql .= ' dc.mail_status,';
+			$sql .= ' dc.letter_status,';
+			$sql .= ' dc.hand_status,';
+			$sql .= ' ec.position,';
+			$sql .= ' ec.fk_c_type_contact,';
+			$sql .= ' ctc.libelle as type_label,';
+			$sql .= ' ctc.code as type_code,';
+			$sql .= ' u.firstname as user_firstname,';
+			$sql .= ' u.lastname as user_lastname,';
+			$sql .= ' u.login as user_login,';
+			$sql .= ' u.email as user_email,';
+			$sql .= ' u.office_phone as user_office_phone,';
+			$sql .= ' u.user_mobile as user_mobile,';
+			$sql .= ' sp.firstname as contact_firstname,';
+			$sql .= ' sp.lastname as contact_lastname,';
+			$sql .= ' sp.email as contact_email,';
+			$sql .= ' sp.phone_pro as contact_phone_pro,';
+			$sql .= ' sp.phone_perso as contact_phone_perso,';
+			$sql .= ' sp.phone_mobile as contact_phone_mobile,';
+			$sql .= ' sp.fk_soc as contact_fk_soc,';
 			$sql .= ' s.nom as company_name';
-			$sql .= ' FROM '.MAIN_DB_PREFIX.'element_contact as ec';
-			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc ON dc.fk_diffusion = ec.fk_element';
-			$sql .= " AND dc.contact_source = ec.source";
-			$sql .= " AND dc.fk_contact = CASE WHEN ec.source = 'internal' THEN ec.fk_user ELSE ec.fk_socpeople END";
-			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'user as u ON ec.fk_user = u.rowid';
-			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'socpeople as sp ON ec.fk_socpeople = sp.rowid';
-			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON sp.fk_soc = s.rowid';
+			$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc';
+			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."element_contact as ec ON ec.element = 'diffusion'";
+			$sql .= ' AND ec.fk_element = dc.fk_diffusion';
+			$sql .= " AND ((dc.contact_source = 'internal' AND ec.source = 'internal' AND ec.fk_user = dc.fk_contact)";
+			$sql .= " OR (dc.contact_source = 'external' AND ec.source = 'external' AND ec.fk_socpeople = dc.fk_contact))";
 			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_type_contact as ctc ON ec.fk_c_type_contact = ctc.rowid';
-			$sql .= " WHERE ec.element = 'diffusion'";
-			$sql .= ' AND ec.fk_element = '.$diffusionId;
-			$sql .= ' ORDER BY ec.position, link_rowid';
+			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."user as u ON (dc.contact_source = 'internal' AND u.rowid = dc.fk_contact)";
+			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."socpeople as sp ON (dc.contact_source = 'external' AND sp.rowid = dc.fk_contact)";
+			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON sp.fk_soc = s.rowid';
+			$sql .= ' WHERE dc.fk_diffusion = ' . $diffusionId;
+			$sql .= ' ORDER BY COALESCE(ec.position, dc.rowid), dc.rowid';
 
 			$resql = $this->db->query($sql);
 			if (!$resql) {
@@ -418,13 +429,13 @@ class DiffusionContact extends CommonObject
 			}
 
 			while ($obj = $this->db->fetch_object($resql)) {
-				// FR: Capitalise les informations quel que soit l'état de synchronisation de la table dédiée.
-				// EN: Capture data regardless of the dedicated table synchronisation state.
+				// FR: Construit un tableau associatif fidèle aux informations disponibles côté fiche diffusion.
+				// EN: Build an associative array consistent with the data displayed on the diffusion card.
 				$result[] = array(
-					'rowid' => !empty($obj->link_rowid) ? (int) $obj->link_rowid : 0,
-					'fk_contact' => !empty($obj->fk_contact) ? (int) $obj->fk_contact : 0,
+					'rowid' => isset($obj->link_rowid) ? (int) $obj->link_rowid : 0,
+					'fk_contact' => isset($obj->fk_contact) ? (int) $obj->fk_contact : 0,
 					'contact_source' => !empty($obj->contact_source) ? (string) $obj->contact_source : '',
-					'fk_c_type_contact' => !empty($obj->fk_c_type_contact) ? (int) $obj->fk_c_type_contact : null,
+					'fk_c_type_contact' => isset($obj->fk_c_type_contact) ? (int) $obj->fk_c_type_contact : null,
 					'type_label' => !empty($obj->type_label) ? (string) $obj->type_label : '',
 					'type_code' => !empty($obj->type_code) ? (string) $obj->type_code : '',
 					'position' => isset($obj->position) ? (int) $obj->position : null,
