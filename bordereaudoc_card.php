@@ -176,14 +176,14 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action === 'confirm_delete' && GETPOST('confirm', 'alpha') === 'yes' && $permissiondelete && $object->id > 0) {
-		$result = $object->delete($user);
-		if ($result > 0) {
-			header('Location: '.dol_buildpath('/diffusionplans/diffusion_list.php', 1));
-			exit;
-		}
-		setEventMessages($object->error, $object->errors, 'errors');
-	}
+if ($action === 'confirm_delete' && GETPOST('confirm', 'alpha') === 'yes' && $permissiondelete && $object->id > 0) {
+$result = $object->delete($user);
+if ($result > 0) {
+header('Location: '.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1));
+exit;
+}
+setEventMessages($object->error, $object->errors, 'errors');
+}
 
 	if ($action === 'confirm_validate' && GETPOST('confirm', 'alpha') === 'yes' && $permissiontovalidate && $object->id > 0) {
 		$result = $object->validate($user);
@@ -372,7 +372,7 @@ if ($action === 'create') {
 	print '<div class="center">';
 	print '<input type="submit" class="button" value="'.$langs->trans('Create').'">';
 	print '&nbsp;';
-	print '<a class="button" href="'.($backtopage ? $backtopage : dol_buildpath('/diffusionplans/diffusion_list.php', 1)).'">'.$langs->trans('Cancel').'</a>';
+print '<a class="button" href="'.($backtopage ? $backtopage : dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1)).'">'.$langs->trans('Cancel').'</a>';
 	print '</div>';
 
 	print '</form>';
@@ -410,7 +410,7 @@ if ($object->id > 0) {
 		print $confirmform;
 	}
 
-	$linkback = '<a href="'.dol_buildpath('/diffusionplans/diffusion_list.php', 1).'">'.$langs->trans('BackToList').'</a>';
+$linkback = '<a href="'.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1).'">'.$langs->trans('BackToList').'</a>';
 	$morehtmlref = '';
 	if (!empty($object->fk_project)) {
 		$projectstatic = new Project($db);

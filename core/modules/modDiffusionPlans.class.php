@@ -440,57 +440,57 @@ $r = 0;
 
 
 
-				/* BEGIN MODULEBUILDER LEFTMENU DIFFUSION */
-		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=diffusionplans',
-			'type' => 'left',
-			'titre' => 'Diffusion',
-			'mainmenu' => 'diffusionplans',
-			'leftmenu' => 'diffusion',
-			'url' => '/diffusionplans/diffusion_list.php',
-			'langs' => 'diffusionplans@diffusionplans',
-			'position' => 1001,
-			'enabled' => 'isModEnabled(\'diffusionplans\')',
-			'perms' => '$user->hasRight(\'diffusionplans\', \'diffusion\', \'read\')',
-			'target' => '',
-			'user' => 2,
-			'object' => 'Diffusion',
-		);
-		/* END MODULEBUILDER LEFTMENU DIFFUSION */
-		/* BEGIN MODULEBUILDER LEFTMENU DIFFUSION */
-		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=diffusionplans,fk_leftmenu=diffusion',
-			'type' => 'left',
-			'titre' => 'List Diffusion',
-			'mainmenu' => 'diffusionplans',
-			'leftmenu' => 'diffusionplans_diffusion_list',
-			'url' => '/diffusionplans/diffusion_list.php',
-			'langs' => 'diffusionplans@diffusionplans',
-			'position' => 1002,
-			'enabled' => 'isModEnabled(\'diffusionplans\')',
-			'perms' => '$user->hasRight(\'diffusionplans\', \'diffusion\', \'read\')',
-			'target' => '',
-			'user' => 2,
-			'object' => 'Diffusion',
-		);
-		/* END MODULEBUILDER LEFTMENU DIFFUSION */
-		/* BEGIN MODULEBUILDER LEFTMENU DIFFUSION */
-		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=diffusionplans,fk_leftmenu=diffusion',
-			'type' => 'left',
-			'titre' => 'New Diffusion',
-			'mainmenu' => 'diffusionplans',
-			'leftmenu' => 'diffusionplans_diffusion_new',
+/* BEGIN MODULEBUILDER LEFTMENU DIFFUSION */
+$this->menu[$r++] = array(
+'fk_menu' => 'fk_mainmenu=diffusionplans',
+'type' => 'left',
+'titre' => 'Diffusion',
+'mainmenu' => 'diffusionplans',
+'leftmenu' => 'diffusion',
+'url' => '/diffusionplans/bordereaudoc_list.php',
+'langs' => 'diffusionplans@diffusionplans',
+'position' => 1001,
+'enabled' => 'isModEnabled(\'diffusionplans\')',
+'perms' => '$user->hasRight(\'diffusionplans\', \'bordereaudoc\', \'read\')',
+'target' => '',
+'user' => 2,
+'object' => 'Bordereaudoc',
+);
+/* END MODULEBUILDER LEFTMENU DIFFUSION */
+/* BEGIN MODULEBUILDER LEFTMENU DIFFUSION */
+$this->menu[$r++] = array(
+'fk_menu' => 'fk_mainmenu=diffusionplans,fk_leftmenu=diffusion',
+'type' => 'left',
+'titre' => 'List Diffusion',
+'mainmenu' => 'diffusionplans',
+'leftmenu' => 'diffusionplans_diffusion_list',
+'url' => '/diffusionplans/bordereaudoc_list.php',
+'langs' => 'diffusionplans@diffusionplans',
+'position' => 1002,
+'enabled' => 'isModEnabled(\'diffusionplans\')',
+'perms' => '$user->hasRight(\'diffusionplans\', \'bordereaudoc\', \'read\')',
+'target' => '',
+'user' => 2,
+'object' => 'Bordereaudoc',
+);
+/* END MODULEBUILDER LEFTMENU DIFFUSION */
+/* BEGIN MODULEBUILDER LEFTMENU DIFFUSION */
+$this->menu[$r++] = array(
+'fk_menu' => 'fk_mainmenu=diffusionplans,fk_leftmenu=diffusion',
+'type' => 'left',
+'titre' => 'New Diffusion',
+'mainmenu' => 'diffusionplans',
+'leftmenu' => 'diffusionplans_diffusion_new',
 'url' => '/diffusionplans/bordereaudoc_card.php?action=create',
-			'langs' => 'diffusionplans@diffusionplans',
-			'position' => 1003,
-			'enabled' => 'isModEnabled(\'diffusionplans\')',
-			'perms' => '$user->hasRight(\'diffusionplans\', \'diffusion\', \'write\')',
-			'target' => '',
-			'user' => 2,
-			'object' => 'Diffusion',
-		);
-		/* END MODULEBUILDER LEFTMENU DIFFUSION */
+'langs' => 'diffusionplans@diffusionplans',
+'position' => 1003,
+'enabled' => 'isModEnabled(\'diffusionplans\')',
+'perms' => '$user->hasRight(\'diffusionplans\', \'bordereaudoc\', \'write\')',
+'target' => '',
+'user' => 2,
+'object' => 'Bordereaudoc',
+);
+/* END MODULEBUILDER LEFTMENU DIFFUSION */
 
 		/* BEGIN MODULEBUILDER LEFTMENU MYOBJECT */
 		/*
@@ -508,7 +508,7 @@ $r = 0;
 			'perms' => '$user->hasRight("diffusionplans", "diffusion", "read")',
 			'target' => '',
 			'user' => 2,				                // 0=Menu for internal users, 1=external users, 2=both
-			'object' => 'Diffusion'
+			'object' => 'Bordereaudoc'
 		);
 		$this->menu[$r++]=array(
 			'fk_menu' => 'fk_mainmenu=diffusionplans,fk_leftmenu=diffusion',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -523,7 +523,7 @@ $r = 0;
 			'perms' => '$user->hasRight("diffusionplans", "diffusion", "write")'
 			'target' => '',
 			'user' => 2,				                // 0=Menu for internal users, 1=external users, 2=both
-			'object' => 'Diffusion'
+			'object' => 'Bordereaudoc'
 		);
 		$this->menu[$r++]=array(
 			'fk_menu' => 'fk_mainmenu=diffusionplans,fk_leftmenu=diffusion',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -538,7 +538,7 @@ $r = 0;
 			'perms' => '$user->hasRight("diffusionplans", "diffusion", "read")'
 			'target' => '',
 			'user' => 2,				                // 0=Menu for internal users, 1=external users, 2=both
-			'object' => 'Diffusion'
+			'object' => 'Bordereaudoc'
 		);
 		*/
 		/* END MODULEBUILDER LEFTMENU MYOBJECT */
