@@ -57,6 +57,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 dol_include_once('/diffusionplans/class/bordereaudoc.class.php');
+dol_include_once('/diffusionplans/core/modules/bordereaudoc/modules_bordereaudoc.php');
 dol_include_once('/diffusionplans/lib/diffusionplans_bordereaudoc.lib.php');
 
 /** @var Conf $conf */

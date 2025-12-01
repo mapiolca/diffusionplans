@@ -64,6 +64,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
 dol_include_once('/diffusionplans/class/bordereaudoc.class.php');
+dol_include_once('/diffusionplans/core/modules/bordereaudoc/modules_bordereaudoc.php');
 
 // Load translations
 $langs->loadLangs(array('diffusionplans@diffusionplans', 'other', 'projects'));
