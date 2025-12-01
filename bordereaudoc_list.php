@@ -54,6 +54,7 @@ if (!$res) {
 }
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once __DIR__.'/class/bordereaudoc.class.php';
@@ -96,6 +97,7 @@ $toselect = GETPOST('toselect', 'array');
 
 // Objects
 $form = new Form($db);
+$formproject = new FormProjets($db);
 $projectstatic = new Project($db);
 $object = new Bordereaudoc($db);
 
@@ -114,7 +116,7 @@ if ($action === 'confirm_delete' && $confirm === 'yes' && $massaction === 'delet
 	}
 	$resFetch = $object->fetch((int) $selectedId);
 	if ($resFetch > 0) {
-	if ((int) $object->status === Bordereaudoc::STATUS_DRAFT) {
+if ((int) $object->statut === Bordereaudoc::STATUS_DRAFT) {
 	$resDel = $object->delete($user);
 	if ($resDel < 0) {
 	$error++;
@@ -152,7 +154,7 @@ Bordereaudoc::STATUS_DELIVERED => $langs->trans('Delivered'),
 Bordereaudoc::STATUS_CLOSED => $langs->trans('Closed')
 );
 
-$sql = 'SELECT t.rowid, t.ref, t.title, t.fk_project, t.status, t.datec, t.tms, p.ref as project_ref, p.title as project_title,';
+$sql = 'SELECT t.rowid, t.ref, t.title, t.fk_project, t.statut, t.datec, t.tms, p.ref as project_ref, p.title as project_title,';
 $sql .= ' bc.cnt_contact as nb_contacts, bf.cnt_visible as nb_visible_files';
 $sql .= ' FROM '.MAIN_DB_PREFIX.'bordereaudoc as t';
 $sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."projet as p ON p.rowid = t.fk_project";
@@ -169,7 +171,7 @@ if (!empty($search_project)) {
 	$sql .= ' AND t.fk_project = '.((int) $search_project);
 }
 if ($search_status >= 0) {
-	$sql .= ' AND t.status = '.((int) $search_status);
+$sql .= ' AND t.statut = '.((int) $search_status);
 }
 if ($search_date_start > 0) {
 	$sql .= " AND t.datec >= '".$db->idate($search_date_start)."'";
@@ -257,7 +259,7 @@ print '<tr class="liste_titre">';
 print_liste_field_titre($langs->trans('Ref'), $_SERVER['PHP_SELF'], 't.ref', '', $param, '', $sortfield, $sortorder);
 print_liste_field_titre($langs->trans('Title'), $_SERVER['PHP_SELF'], 't.title', '', $param, '', $sortfield, $sortorder);
 print_liste_field_titre($langs->trans('Project'), $_SERVER['PHP_SELF'], 'p.ref', '', $param, '', $sortfield, $sortorder);
-print_liste_field_titre($langs->trans('Status'), $_SERVER['PHP_SELF'], 't.status', '', $param, '', $sortfield, $sortorder, 'center');
+print_liste_field_titre($langs->trans('Status'), $_SERVER['PHP_SELF'], 't.statut', '', $param, '', $sortfield, $sortorder, 'center');
 print_liste_field_titre($langs->trans('DateCreation'), $_SERVER['PHP_SELF'], 't.datec', '', $param, '', $sortfield, $sortorder, 'center');
 print_liste_field_titre($langs->trans('DateModificationShort'), $_SERVER['PHP_SELF'], 't.tms', '', $param, '', $sortfield, $sortorder, 'center');
 print_liste_field_titre($langs->trans('ContactsCount'), $_SERVER['PHP_SELF'], 'nb_contacts', '', $param, '', $sortfield, $sortorder, 'right');
@@ -276,8 +278,8 @@ print '<td class="liste_titre">';
 print '<input type="text" class="flat" name="search_title" value="'.dol_escape_htmltag($search_title).'">';
 		print '</td>';
 print '<td class="liste_titre">';
-print $form->select_projet($search_project, 'search_project', 1, '', 0, 0, 1, 0, 0, '', 1);
-		print '</td>';
+print $formproject->select_projects(-1, $search_project, 'search_project', 0, 0, 1, 1, 0, 0, '', 1, 0, array(), false);
+print '</td>';
 print '<td class="liste_titre center">';
 print $form->selectarray('search_status', $statusLabels, $search_status, 1);
 		print '</td>';
@@ -306,7 +308,7 @@ if ($resql) {
 		$link = dol_buildpath('/diffusionplans/bordereaudoc_card.php', 1).'?id='.$obj->rowid;
 		$projectstatic->id = $obj->fk_project;
 		$projectstatic->ref = $obj->project_ref;
-		$projectstatic->title = $obj->project_title;
+$projectstatic->title = $obj->project_title;
 
 		print '<tr class="oddeven">';
 		if (!empty($massactionbutton)) {
@@ -323,7 +325,7 @@ if ($resql) {
 			print $projectstatic->getNomUrl(1);
 		}
 		print '</td>';
-		print '<td class="center">'.(isset($statusLabels[$obj->status]) ? $statusLabels[$obj->status] : '').'</td>';
+print '<td class="center">'.(isset($statusLabels[$obj->statut]) ? $statusLabels[$obj->statut] : '').'</td>';
 		print '<td class="center">'.dol_print_date($db->jdate($obj->datec), 'day').'</td>';
 		print '<td class="center">'.dol_print_date($db->jdate($obj->tms), 'dayhour').'</td>';
 		print '<td class="right">'.(int) $obj->nb_contacts.'</td>';

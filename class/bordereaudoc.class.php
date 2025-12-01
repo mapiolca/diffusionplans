@@ -63,29 +63,29 @@ class Bordereaudoc extends CommonObject
 	/**
 	 * @var array Fields definition
 	 */
-	public $fields = array(
-	'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1),
-	'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'validate' => 1),
-	'title' => array('type' => 'varchar(255)', 'label' => 'Title', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'validate' => 1),
-	'description' => array('type' => 'html', 'label' => 'Description', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 3, 'validate' => 1),
-	'fk_project' => array('type' => 'integer:Project:projet/class/project.class.php:1', 'label' => 'Project', 'picto' => 'project', 'enabled' => "isModEnabled('project')", 'position' => 40, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1),
-	'status' => array('type' => 'integer', 'label' => 'Status', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'arrayofkeyval' => array('0' => 'Draft', '1' => 'Validated', '2' => 'Delivered', '3' => 'Closed'), 'validate' => 1),
-	'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => -2, 'index' => 1),
-	'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => -2),
-	'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => -2),
-	'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => -2),
-	'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'picto' => 'user', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => -2),
-	'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => -2),
-	'last_main_doc' => array('type' => 'varchar(255)', 'label' => 'LastMainDoc', 'enabled' => '1', 'position' => 120, 'notnull' => 0, 'visible' => 0),
-	'model_pdf' => array('type' => 'varchar(255)', 'label' => 'ModelPDF', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 0),
-	);
+public $fields = array(
+'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1),
+'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'validate' => 1),
+'title' => array('type' => 'varchar(255)', 'label' => 'Title', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'validate' => 1),
+'description' => array('type' => 'html', 'label' => 'Description', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 3, 'validate' => 1),
+'fk_project' => array('type' => 'integer:Project:projet/class/project.class.php:1', 'label' => 'Project', 'picto' => 'project', 'enabled' => "isModEnabled('project')", 'position' => 40, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1),
+'statut' => array('type' => 'integer', 'label' => 'Status', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'arrayofkeyval' => array('0' => 'Draft', '1' => 'Validated', '2' => 'Delivered', '3' => 'Closed'), 'validate' => 1),
+'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => -2, 'index' => 1),
+'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => -2),
+'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => -2),
+'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => -2),
+'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'picto' => 'user', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => -2),
+'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => -2),
+'last_main_doc' => array('type' => 'varchar(255)', 'label' => 'LastMainDoc', 'enabled' => '1', 'position' => 120, 'notnull' => 0, 'visible' => 0),
+'model_pdf' => array('type' => 'varchar(255)', 'label' => 'ModelPDF', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 0),
+);
 
 	public $rowid;
 	public $ref;
 	public $title;
 	public $description;
 	public $fk_project;
-	public $status;
+public $statut;
 	public $entity;
 	public $datec;
 	public $tms;
@@ -110,7 +110,7 @@ class Bordereaudoc extends CommonObject
 
 		$this->fields['entity']['default'] = !empty($conf->entity) ? (int) $conf->entity : 1;
 		$this->fields['datec']['default'] = dol_now();
-		$this->fields['status']['default'] = self::STATUS_DRAFT;
+$this->fields['statut']['default'] = self::STATUS_DRAFT;
 	}
 
 	/**
@@ -148,7 +148,7 @@ class Bordereaudoc extends CommonObject
 		$this->entity = !empty($this->entity) ? $this->entity : $user->entity;
 		$this->datec = dol_now();
 		$this->fk_user_creat = $user->id;
-		$this->status = self::STATUS_DRAFT;
+$this->statut = self::STATUS_DRAFT;
 
 		return parent::create($user, $notrigger);
 	}
@@ -171,7 +171,7 @@ class Bordereaudoc extends CommonObject
 			$this->ref = $this->getNextNumRef($user);
 		}
 
-		$this->status = self::STATUS_VALIDATED;
+$this->statut = self::STATUS_VALIDATED;
 		$this->fk_user_modif = $user->id;
 
 		return $this->update($user);
@@ -185,7 +185,7 @@ class Bordereaudoc extends CommonObject
 	 */
 	public function setDraft(User $user)
 	{
-		$this->status = self::STATUS_DRAFT;
+$this->statut = self::STATUS_DRAFT;
 		$this->fk_user_modif = $user->id;
 
 		return $this->update($user);
@@ -199,7 +199,7 @@ class Bordereaudoc extends CommonObject
 	 */
 	public function setDelivered(User $user)
 	{
-		$this->status = self::STATUS_DELIVERED;
+$this->statut = self::STATUS_DELIVERED;
 		$this->fk_user_modif = $user->id;
 
 		return $this->update($user);
@@ -248,7 +248,7 @@ class Bordereaudoc extends CommonObject
 	 */
 	public function setClosed(User $user)
 	{
-		$this->status = self::STATUS_CLOSED;
+$this->statut = self::STATUS_CLOSED;
 		$this->fk_user_modif = $user->id;
 	
 		return $this->update($user);
@@ -303,7 +303,7 @@ class Bordereaudoc extends CommonObject
 		$key = $basepath.'/'.ltrim($relativeName, '/');
 		$seen[$key] = 1;
 		if (!isset($existingMap[$key])) {
-		$visible = ((int) $this->status === self::STATUS_DRAFT) ? 1 : 0;
+$visible = ((int) $this->statut === self::STATUS_DRAFT) ? 1 : 0;
 		$this->addFileIndex($file['name'], $basepath, $visible, $user);
 	}
 	}

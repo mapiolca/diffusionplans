@@ -157,7 +157,7 @@ if (empty($reshook)) {
 	}
 
 	if ($action === 'update' && $permissiontoadd && $object->id > 0) {
-		if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+		if ((int) $object->statut !== Bordereaudoc::STATUS_DRAFT) {
 			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 			$action = 'view';
 		} else {
@@ -232,7 +232,7 @@ setEventMessages($object->error, $object->errors, 'errors');
 	}
 
 	if ($action === 'addprojectcontacts' && $permissiontoadd && $object->id > 0) {
-		if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+		if ((int) $object->statut !== Bordereaudoc::STATUS_DRAFT) {
 			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 		} else {
 			$added = $object->addProjectExternalContacts($user);
@@ -246,33 +246,33 @@ setEventMessages($object->error, $object->errors, 'errors');
 	}
 
 if ($action === 'saverecipients' && $permissiontoadd && $object->id > 0) {
-if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+if ((int) $object->statut !== Bordereaudoc::STATUS_DRAFT) {
 setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 } else {
 $sendEmail = GETPOST('send_email', 'array');
-			$sendMail = GETPOST('send_mail', 'array');
-			$sendHand = GETPOST('send_hand', 'array');
-			$active = GETPOST('active', 'array');
+$sendMail = GETPOST('send_mail', 'array');
+$sendHand = GETPOST('send_hand', 'array');
+$active = GETPOST('active', 'array');
 
-			$lines = $object->getRecipients();
-			foreach ($lines as $line) {
-				$lineData = array(
-					'send_email' => isset($sendEmail[$line->rowid]) ? 1 : 0,
-					'send_mail' => isset($sendMail[$line->rowid]) ? 1 : 0,
-					'send_hand' => isset($sendHand[$line->rowid]) ? 1 : 0,
-					'active' => isset($active[$line->rowid]) ? 1 : 0,
-				);
-				$object->updateRecipientFlags($line->rowid, $lineData);
-			}
+$lines = $object->getRecipients();
+foreach ($lines as $line) {
+$lineData = array(
+'send_email' => isset($sendEmail[$line->rowid]) ? 1 : 0,
+'send_mail' => isset($sendMail[$line->rowid]) ? 1 : 0,
+'send_hand' => isset($sendHand[$line->rowid]) ? 1 : 0,
+'active' => isset($active[$line->rowid]) ? 1 : 0,
+);
+$object->updateRecipientFlags($line->rowid, $lineData);
+}
 
-			setEventMessages($langs->trans('BordereaudocRecipientsUpdated'), null, 'mesgs');
+setEventMessages($langs->trans('BordereaudocRecipientsUpdated'), null, 'mesgs');
 }
 
 $action = 'view';
 }
 
 if ($action === 'savefiles' && $permissiontoadd && $object->id > 0) {
-if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+if ((int) $object->statut !== Bordereaudoc::STATUS_DRAFT) {
 setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 } else {
 $visible = GETPOST('is_visible', 'array');
@@ -341,7 +341,6 @@ setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 }
 }
 }
-}
 
 // View
 $help_url = '';
@@ -385,18 +384,18 @@ print '<a class="button" href="'.($backtopage ? $backtopage : dol_buildpath('/di
 
 
 if ($object->id > 0) {
-	if ($action === 'edit' && (((int) $object->status) !== Bordereaudoc::STATUS_DRAFT || !$permissiontoadd)) {
+	if ($action === 'edit' && (((int) $object->statut) !== Bordereaudoc::STATUS_DRAFT || !$permissiontoadd)) {
 		$action = 'view';
 	}
 
 	$confirmform = '';
-	if ($action === 'valid' && $permissiontovalidate && $object->status == Bordereaudoc::STATUS_DRAFT) {
+	if ($action === 'valid' && $permissiontovalidate && $object->statut == Bordereaudoc::STATUS_DRAFT) {
 		$confirmform = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('ValidateBordereaudoc'), $langs->trans('ConfirmValidateBordereaudoc'), 'confirm_validate', '', 0, 1);
 	}
-	if ($action === 'deliver' && $permissiontoarchive && $object->status == Bordereaudoc::STATUS_VALIDATED) {
+	if ($action === 'deliver' && $permissiontoarchive && $object->statut == Bordereaudoc::STATUS_VALIDATED) {
 		$confirmform = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('DeliverBordereaudoc'), $langs->trans('ConfirmDeliverBordereaudoc'), 'confirm_delivered', '', 0, 1);
 	}
-	if ($action === 'close' && $permissiontoarchive && $object->status == Bordereaudoc::STATUS_DELIVERED) {
+	if ($action === 'close' && $permissiontoarchive && $object->statut == Bordereaudoc::STATUS_DELIVERED) {
 		$confirmform = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('CloseBordereaudoc'), $langs->trans('ConfirmCloseBordereaudoc'), 'confirm_close', '', 0, 1);
 	}
 
@@ -452,19 +451,19 @@ $linkback = '<a href="'.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1
 		print '</form>';
 	} else {
 		$buttons = array();
-		if ($object->status == Bordereaudoc::STATUS_DRAFT && $permissiontoadd) {
+		if ($object->statut == Bordereaudoc::STATUS_DRAFT && $permissiontoadd) {
 		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit">'.$langs->trans('Modify').'</a>';
 		}
-		if ($object->status == Bordereaudoc::STATUS_DRAFT && $permissiontovalidate) {
+		if ($object->statut == Bordereaudoc::STATUS_DRAFT && $permissiontovalidate) {
 		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=valid">'.$langs->trans('Validate').'</a>';
 		}
-		if ($object->status == Bordereaudoc::STATUS_VALIDATED && $permissiontoarchive) {
+		if ($object->statut == Bordereaudoc::STATUS_VALIDATED && $permissiontoarchive) {
 		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=deliver">'.$langs->trans('MarkDelivered').'</a>';
 		}
-		if ($object->status == Bordereaudoc::STATUS_DELIVERED && $permissiontoarchive) {
+		if ($object->statut == Bordereaudoc::STATUS_DELIVERED && $permissiontoarchive) {
 		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close">'.$langs->trans('Close').'</a>';
 		}
-		if ($object->status >= Bordereaudoc::STATUS_VALIDATED && $permissiontosend) {
+		if ($object->statut >= Bordereaudoc::STATUS_VALIDATED && $permissiontosend) {
 		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=sendemail">'.$langs->trans('SendMail').'</a>';
 		}
 		if ($permissiontoread) {
@@ -481,7 +480,7 @@ $linkback = '<a href="'.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1
 	}
 	
 		$recipients = $object->getRecipients();
-		$caneditrecipients = ((int) $object->status === Bordereaudoc::STATUS_DRAFT && $permissiontoadd);
+		$caneditrecipients = ((int) $object->statut === Bordereaudoc::STATUS_DRAFT && $permissiontoadd);
 		
 		print '<div class="ficheaddleft">';
 		print load_fiche_titre($langs->trans('BordereaudocRecipients'), '', 'fa-address-book');
@@ -569,7 +568,7 @@ $linkback = '<a href="'.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1
 		print '</form>';
 		print '</div>';
 		
-		$caneditfiles = ((int) $object->status === Bordereaudoc::STATUS_DRAFT && $permissiontoadd);
+		$caneditfiles = ((int) $object->statut === Bordereaudoc::STATUS_DRAFT && $permissiontoadd);
 		$filedir = $upload_dir;
 		$urlsource = $_SERVER['PHP_SELF'].'?id='.$object->id;
 		
