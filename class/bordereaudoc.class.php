@@ -182,6 +182,30 @@ public $statut;
 	}
 
 	/**
+	 * Update object in database.
+	 *
+	 * @param User $user      Current user
+	 * @param bool $notrigger Disable triggers
+	 * @return int
+	 */
+	public function update(User $user, $notrigger = false)
+	{
+		if (empty($this->id) && empty($this->rowid)) {
+			return -1;
+		}
+
+		if (empty($this->fk_project)) {
+			$this->error = 'ErrorFieldRequired';
+
+			return -1;
+		}
+
+		$this->fk_user_modif = $user->id;
+
+		return $this->updateCommon($user, $notrigger);
+	}
+
+	/**
 	 * Validate object
 	 *
 	 * @param User $user Current user
