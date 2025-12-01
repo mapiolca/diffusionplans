@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        bordereaudoc_list.php
+ * \file	bordereaudoc_list.php
  * \ingroup     diffusionplans
  * \brief       List page for Bordereaudoc objects.
  */
@@ -70,7 +70,7 @@ $sortfield = GETPOST('sortfield', 'aZ09comma');
 $sortorder = GETPOST('sortorder', 'aZ09comma');
 $page = (int) GETPOST('page', 'int');
 if ($page < 0) {
-	$page = 0;
+$page = 0;
 }
 $limit = GETPOSTINT('limit') ? GETPOSTINT('limit') : $conf->liste_limit;
 $offset = $limit * $page;
@@ -79,6 +79,15 @@ $search_ref = GETPOST('search_ref', 'alpha');
 $search_title = GETPOST('search_title', 'alpha');
 $search_project = GETPOSTINT('search_project');
 $search_status = GETPOSTINT('search_status', -1);
+$search_date_startday = GETPOSTINT('search_date_startday');
+$search_date_startmonth = GETPOSTINT('search_date_startmonth');
+$search_date_startyear = GETPOSTINT('search_date_startyear');
+$search_date_endday = GETPOSTINT('search_date_endday');
+$search_date_endmonth = GETPOSTINT('search_date_endmonth');
+$search_date_endyear = GETPOSTINT('search_date_endyear');
+
+$search_date_start = dol_mktime(0, 0, 0, $search_date_startmonth, $search_date_startday, $search_date_startyear);
+$search_date_end = dol_mktime(23, 59, 59, $search_date_endmonth, $search_date_endday, $search_date_endyear);
 
 // Objects
 $form = new Form($db);
@@ -98,9 +107,12 @@ Bordereaudoc::STATUS_DELIVERED => $langs->trans('Delivered'),
 Bordereaudoc::STATUS_CLOSED => $langs->trans('Closed')
 );
 
-$sql = 'SELECT t.rowid, t.ref, t.title, t.fk_project, t.status, p.ref as project_ref, p.title as project_title';
+$sql = 'SELECT t.rowid, t.ref, t.title, t.fk_project, t.status, t.datec, t.tms, p.ref as project_ref, p.title as project_title,';
+$sql .= ' bc.cnt_contact as nb_contacts, bf.cnt_visible as nb_visible_files';
 $sql .= ' FROM '.MAIN_DB_PREFIX.'bordereaudoc as t';
 $sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."projet as p ON p.rowid = t.fk_project";
+$sql .= ' LEFT JOIN (SELECT fk_bordereaudoc, COUNT(*) as cnt_contact FROM '.MAIN_DB_PREFIX."bordereaudoc_contact WHERE active = 1 AND entity IN (".getEntity('bordereaudoc').") GROUP BY fk_bordereaudoc) as bc ON bc.fk_bordereaudoc = t.rowid";
+$sql .= ' LEFT JOIN (SELECT fk_bordereaudoc, COUNT(*) as cnt_visible FROM '.MAIN_DB_PREFIX."bordereaudoc_file WHERE is_visible = 1 AND entity IN (".getEntity('bordereaudoc').") GROUP BY fk_bordereaudoc) as bf ON bf.fk_bordereaudoc = t.rowid";
 $sql .= ' WHERE t.entity IN ('.getEntity('bordereaudoc').')';
 if (!empty($search_ref)) {
 	$sql .= natural_search('t.ref', $search_ref);
@@ -114,8 +126,14 @@ if (!empty($search_project)) {
 if ($search_status >= 0) {
 	$sql .= ' AND t.status = '.((int) $search_status);
 }
+if ($search_date_start > 0) {
+	$sql .= " AND t.datec >= '".$db->idate($search_date_start)."'";
+}
+if ($search_date_end > 0) {
+	$sql .= " AND t.datec <= '".$db->idate($search_date_end)."'";
+}
 
-$sql .= $db->order($sortfield, $sortorder);
+$sql .= $db->order($sortfield, $sortorder ? $sortorder : 'DESC');
 $sql .= $db->plimit($limit + 1, $offset);
 
 $resql = $db->query($sql);
@@ -126,7 +144,7 @@ if (!$resql) {
 	$num = $db->num_rows($resql);
 }
 
-$newcardbutton = '';
+	$newcardbutton = '';
 if (!empty($user->rights->diffusionplans->bordereaudoc->write)) {
 	$newcardbutton = dolGetButtonTitle($langs->trans('NewBordereaudoc'), '', 'fa fa-plus-circle', dol_buildpath('/diffusionplans/bordereaudoc_card.php', 1).'?action=create');
 }
@@ -144,6 +162,24 @@ if (!empty($search_project)) {
 if ($search_status >= 0) {
 	$param .= '&search_status='.(int) $search_status;
 }
+if ($search_date_startday) {
+	$param .= '&search_date_startday='.(int) $search_date_startday;
+}
+if ($search_date_startmonth) {
+	$param .= '&search_date_startmonth='.(int) $search_date_startmonth;
+}
+if ($search_date_startyear) {
+	$param .= '&search_date_startyear='.(int) $search_date_startyear;
+}
+if ($search_date_endday) {
+	$param .= '&search_date_endday='.(int) $search_date_endday;
+}
+if ($search_date_endmonth) {
+	$param .= '&search_date_endmonth='.(int) $search_date_endmonth;
+}
+if ($search_date_endyear) {
+	$param .= '&search_date_endyear='.(int) $search_date_endyear;
+}
 
 llxHeader('', $langs->trans('BordereaudocList'));
 
@@ -156,9 +192,13 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable noborder centpercent listofitems">';
 print '<tr class="liste_titre">';
 print_liste_field_titre($langs->trans('Ref'), $_SERVER['PHP_SELF'], 't.ref', '', $param, '', $sortfield, $sortorder);
-print_liste_field_titre($langs->trans('Project'), $_SERVER['PHP_SELF'], 'p.ref', '', $param, '', $sortfield, $sortorder);
 print_liste_field_titre($langs->trans('Title'), $_SERVER['PHP_SELF'], 't.title', '', $param, '', $sortfield, $sortorder);
+print_liste_field_titre($langs->trans('Project'), $_SERVER['PHP_SELF'], 'p.ref', '', $param, '', $sortfield, $sortorder);
 print_liste_field_titre($langs->trans('Status'), $_SERVER['PHP_SELF'], 't.status', '', $param, '', $sortfield, $sortorder, 'center');
+print_liste_field_titre($langs->trans('DateCreation'), $_SERVER['PHP_SELF'], 't.datec', '', $param, '', $sortfield, $sortorder, 'center');
+print_liste_field_titre($langs->trans('DateModificationShort'), $_SERVER['PHP_SELF'], 't.tms', '', $param, '', $sortfield, $sortorder, 'center');
+print_liste_field_titre($langs->trans('ContactsCount'), $_SERVER['PHP_SELF'], 'nb_contacts', '', $param, '', $sortfield, $sortorder, 'right');
+print_liste_field_titre($langs->trans('VisibleDocuments'), $_SERVER['PHP_SELF'], 'nb_visible_files', '', $param, '', $sortfield, $sortorder, 'right');
 print_liste_field_titre('');
 print '</tr>';
 
@@ -167,17 +207,25 @@ print '<td class="liste_titre">';
 print '<input type="text" class="flat" name="search_ref" value="'.dol_escape_htmltag($search_ref).'">';
 print '</td>';
 print '<td class="liste_titre">';
-print $form->select_projet($search_project, 'search_project', 1, '', 0, 0, 1, 0, 0, '', 1);
+print '<input type="text" class="flat" name="search_title" value="'.dol_escape_htmltag($search_title).'">';
 print '</td>';
 print '<td class="liste_titre">';
-print '<input type="text" class="flat" name="search_title" value="'.dol_escape_htmltag($search_title).'">';
+print $form->select_projet($search_project, 'search_project', 1, '', 0, 0, 1, 0, 0, '', 1);
 print '</td>';
 print '<td class="liste_titre center">';
 print $form->selectarray('search_status', $statusLabels, $search_status, 1);
 print '</td>';
+print '<td class="liste_titre center">';
+print $form->selectDate($search_date_start, 'search_date_start', 0, 0, 1, '', 1, 0, 1);
+print '<br>'; 
+print $form->selectDate($search_date_end, 'search_date_end', 0, 0, 1, '', 1, 0, 1);
+print '</td>';
 print '<td class="liste_titre right">';
 print $form->showFilterAndCheckAddButtons(0);
 print '</td>';
+print '<td class="liste_titre right"></td>';
+print '<td class="liste_titre right"></td>';
+print '<td class="liste_titre right"></td>';
 print '</tr>';
 
 $i = 0;
@@ -198,13 +246,17 @@ if ($resql) {
 		print '<td class="nowrap">';
 		print '<a href="'.$link.'">'.dol_escape_htmltag($obj->ref).'</a>';
 		print '</td>';
+		print '<td class="tdoverflowmax200">'.dol_escape_htmltag($obj->title).'</td>';
 		print '<td class="nowrap">';
 		if (!empty($obj->fk_project)) {
 			print $projectstatic->getNomUrl(1);
 		}
 		print '</td>';
-		print '<td class="tdoverflowmax200">'.dol_escape_htmltag($obj->title).'</td>';
 		print '<td class="center">'.(isset($statusLabels[$obj->status]) ? $statusLabels[$obj->status] : '').'</td>';
+		print '<td class="center">'.dol_print_date($db->jdate($obj->datec), 'day').'</td>';
+		print '<td class="center">'.dol_print_date($db->jdate($obj->tms), 'dayhour').'</td>';
+		print '<td class="right">'.(int) $obj->nb_contacts.'</td>';
+		print '<td class="right">'.(int) $obj->nb_visible_files.'</td>';
 		print '<td class="right">';
 		print '</td>';
 		print '</tr>';
