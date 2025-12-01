@@ -111,15 +111,18 @@ $upload_dir = '';
 $modulepart = 'bordereaudoc';
 $relativepath = '';
 if ($object->id > 0) {
-$upload_dir = $object->getDocumentsDirectory();
-$relativepath = 'bordereaudoc/'.dol_sanitizeFileName($object->ref);
+	$upload_dir = $object->getDocumentsDirectory();
+	$relativepath = 'bordereaudoc/'.dol_sanitizeFileName($object->ref);
 }
 
 if ($object->id > 0) {
-$permissiontoaddfile = $permissiontoadd;
-$param = '?id='.$object->id;
-include DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_pre_headers.tpl.php';
-$object->syncDocumentIndex($user);
+	$permissiontoaddfile = $permissiontoadd;
+	$param = '?id='.$object->id;
+	$preheaderfile = DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_pre_headers.tpl.php';
+	if (is_readable($preheaderfile)) {
+		include $preheaderfile;
+}
+	$object->syncDocumentIndex($user);
 }
 
 // Actions
