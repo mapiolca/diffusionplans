@@ -108,7 +108,7 @@ if (empty($object->id)) {
 }
 
 $upload_dir = $object->getDocumentsDirectory();
-$modulepart = 'diffusionplans';
+$modulepart = 'bordereaudoc';
 $relativepath = 'bordereaudoc/'.dol_sanitizeFileName($object->ref);
 
 if ($object->id > 0) {

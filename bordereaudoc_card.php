@@ -107,7 +107,7 @@ $object->fetch($id, $ref);
 }
 
 $upload_dir = '';
-$modulepart = 'diffusionplans';
+$modulepart = 'bordereaudoc';
 $relativepath = '';
 if ($object->id > 0) {
 $upload_dir = $object->getDocumentsDirectory();
@@ -467,7 +467,7 @@ $linkback = '<a href="'.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1
 		if ($permissiontoread) {
 		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=builddoc">'.$langs->trans('GeneratePDF').'</a>';
 		    if (!empty($object->last_main_doc)) {
-		        $modulepart = 'diffusionplans';
+$modulepart = 'bordereaudoc';
 		        $filename = basename($object->last_main_doc);
 		        $filelink = DOL_URL_ROOT.'/document.php?modulepart='.urlencode($modulepart).'&file='.urlencode($object->last_main_doc);
 		        $buttons[] = '<a class="butAction" href="'.$filelink.'">'.$langs->trans('Download').'</a>';
