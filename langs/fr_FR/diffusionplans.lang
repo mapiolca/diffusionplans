@@ -188,3 +188,4 @@ MarkDelivered = Marquer comme remis
 BordereaudocMailSubject=Bordereau %s
 BordereaudocMailDefaultIntro=Veuillez trouver ci-joint le bordereau %s et les documents associés.
 BordereaudocMailDocuments=Documents disponibles
+ErrorBordereaudocDeleteDraftOnly=Seuls les bordereaux en brouillon peuvent être supprimés

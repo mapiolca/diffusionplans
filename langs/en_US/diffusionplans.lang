@@ -188,3 +188,4 @@ BordereaudocFilesUpdated = File list updated
 BordereaudocMailSubject=Delivery slip %s
 BordereaudocMailDefaultIntro=Please find below the delivery slip %s and the related documents.
 BordereaudocMailDocuments=Documents available
+ErrorBordereaudocDeleteDraftOnly=Only draft delivery slips can be deleted

@@ -70,7 +70,7 @@ $sortfield = GETPOST('sortfield', 'aZ09comma');
 $sortorder = GETPOST('sortorder', 'aZ09comma');
 $page = (int) GETPOST('page', 'int');
 if ($page < 0) {
-$page = 0;
+	$page = 0;
 }
 $limit = GETPOSTINT('limit') ? GETPOSTINT('limit') : $conf->liste_limit;
 $offset = $limit * $page;
@@ -89,9 +89,54 @@ $search_date_endyear = GETPOSTINT('search_date_endyear');
 $search_date_start = dol_mktime(0, 0, 0, $search_date_startmonth, $search_date_startday, $search_date_startyear);
 $search_date_end = dol_mktime(23, 59, 59, $search_date_endmonth, $search_date_endday, $search_date_endyear);
 
+$action = GETPOST('action', 'aZ09');
+$massaction = GETPOST('massaction', 'alpha');
+$confirm = GETPOST('confirm', 'alpha');
+$toselect = GETPOST('toselect', 'array');
+
 // Objects
 $form = new Form($db);
 $projectstatic = new Project($db);
+$object = new Bordereaudoc($db);
+
+$formconfirm = '';
+
+$arrayofmassactions = array();
+if (!empty($user->rights->diffusionplans->bordereaudoc->delete)) {
+	$arrayofmassactions['delete'] = $langs->trans('Delete');
+}
+
+if ($action === 'confirm_delete' && $confirm === 'yes' && $massaction === 'delete' && !empty($toselect)) {
+	$error = 0;
+	foreach ($toselect as $selectedId) {
+	if (empty($selectedId)) {
+	continue;
+	}
+	$resFetch = $object->fetch((int) $selectedId);
+	if ($resFetch > 0) {
+	if ((int) $object->status === Bordereaudoc::STATUS_DRAFT) {
+	$resDel = $object->delete($user);
+	if ($resDel < 0) {
+	$error++;
+	setEventMessages($object->error, $object->errors, 'errors');
+	}
+	} else {
+	$error++;
+	setEventMessages($langs->trans('ErrorBordereaudocDeleteDraftOnly', $object->ref), null, 'errors');
+	}
+	}
+	}
+
+	if (!$error) {
+	setEventMessages($langs->trans('RecordDeleted'), null, 'mesgs');
+	header('Location: '.$_SERVER['PHP_SELF']);
+	exit;
+	}
+	}
+
+if ($massaction === 'delete' && !empty($arrayofmassactions) && !empty($toselect)) {
+$formconfirm = $form->formconfirm($_SERVER['PHP_SELF'], $langs->trans('Delete'), $langs->trans('ConfirmDelete'), 'confirm_delete', array('massaction' => 'delete', 'toselect' => $toselect));
+}
 
 if (empty($sortfield)) {
 	$sortfield = 't.ref';
@@ -144,9 +189,14 @@ if (!$resql) {
 	$num = $db->num_rows($resql);
 }
 
-	$newcardbutton = '';
+$newcardbutton = '';
 if (!empty($user->rights->diffusionplans->bordereaudoc->write)) {
 	$newcardbutton = dolGetButtonTitle($langs->trans('NewBordereaudoc'), '', 'fa fa-plus-circle', dol_buildpath('/diffusionplans/bordereaudoc_card.php', 1).'?action=create');
+}
+
+$massactionbutton = '';
+if (!empty($arrayofmassactions)) {
+	$massactionbutton = $form->selectMassAction($massaction, $arrayofmassactions);
 }
 
 $param = '';
@@ -183,14 +233,27 @@ if ($search_date_endyear) {
 
 llxHeader('', $langs->trans('BordereaudocList'));
 
-print '<form method="GET" action="'.$_SERVER['PHP_SELF'].'" name="search_form">';
-print '<input type="hidden" name="token" value="'.newToken().'">';
+if (!empty($formconfirm)) {
+	print $formconfirm;
+}
 
-print_barre_liste($langs->trans('BordereaudocList'), $page, $_SERVER['PHP_SELF'], $param, $sortfield, $sortorder, '', $num, $totalnboflines = '', '', 0, '', '', $newcardbutton, '', 0, 0, 1);
+print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'" name="search_form">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="">';
+print '<input type="hidden" name="massaction" value="'.dol_escape_htmltag($massaction).'">';
+print '<input type="hidden" name="sortfield" value="'.dol_escape_htmltag($sortfield).'">';
+print '<input type="hidden" name="sortorder" value="'.dol_escape_htmltag($sortorder).'">';
+print '<input type="hidden" name="page" value="'.(int) $page.'">';
+print '<input type="hidden" name="limit" value="'.(int) $limit.'">';
+
+print_barre_liste($langs->trans('BordereaudocList'), $page, $_SERVER['PHP_SELF'], $param, $sortfield, $sortorder, '', $num, $totalnboflines = '', '', 0, '', '', $massactionbutton.$newcardbutton, '', 0, 0, 1);
 
 print '<div class="div-table-responsive">';
 print '<table class="tagtable noborder centpercent listofitems">';
 print '<tr class="liste_titre">';
+		if (!empty($massactionbutton)) {
+	print_liste_field_titre($form->showCheckAddButtons($num, 'checkforselect'), '', '', '', '', 'center width20');
+}
 print_liste_field_titre($langs->trans('Ref'), $_SERVER['PHP_SELF'], 't.ref', '', $param, '', $sortfield, $sortorder);
 print_liste_field_titre($langs->trans('Title'), $_SERVER['PHP_SELF'], 't.title', '', $param, '', $sortfield, $sortorder);
 print_liste_field_titre($langs->trans('Project'), $_SERVER['PHP_SELF'], 'p.ref', '', $param, '', $sortfield, $sortorder);
@@ -203,26 +266,29 @@ print_liste_field_titre('');
 print '</tr>';
 
 print '<tr class="liste_titre">';
+		if (!empty($massactionbutton)) {
+	print '<td class="liste_titre center"></td>';
+}
 print '<td class="liste_titre">';
 print '<input type="text" class="flat" name="search_ref" value="'.dol_escape_htmltag($search_ref).'">';
-print '</td>';
+		print '</td>';
 print '<td class="liste_titre">';
 print '<input type="text" class="flat" name="search_title" value="'.dol_escape_htmltag($search_title).'">';
-print '</td>';
+		print '</td>';
 print '<td class="liste_titre">';
 print $form->select_projet($search_project, 'search_project', 1, '', 0, 0, 1, 0, 0, '', 1);
-print '</td>';
+		print '</td>';
 print '<td class="liste_titre center">';
 print $form->selectarray('search_status', $statusLabels, $search_status, 1);
-print '</td>';
+		print '</td>';
 print '<td class="liste_titre center">';
 print $form->selectDate($search_date_start, 'search_date_start', 0, 0, 1, '', 1, 0, 1);
-print '<br>'; 
+print '<br>';
 print $form->selectDate($search_date_end, 'search_date_end', 0, 0, 1, '', 1, 0, 1);
-print '</td>';
+		print '</td>';
 print '<td class="liste_titre right">';
-print $form->showFilterAndCheckAddButtons(0);
-print '</td>';
+print $form->showFilterAndCheckAddButtons($massactionbutton ? 1 : 0);
+		print '</td>';
 print '<td class="liste_titre right"></td>';
 print '<td class="liste_titre right"></td>';
 print '<td class="liste_titre right"></td>';
@@ -243,6 +309,11 @@ if ($resql) {
 		$projectstatic->title = $obj->project_title;
 
 		print '<tr class="oddeven">';
+		if (!empty($massactionbutton)) {
+		print '<td class="center">';
+		print '<input class="flat checkforselect" type="checkbox" name="toselect[]" value="'.(int) $obj->rowid.'">';
+		print '</td>';
+}
 		print '<td class="nowrap">';
 		print '<a href="'.$link.'">'.dol_escape_htmltag($obj->ref).'</a>';
 		print '</td>';
