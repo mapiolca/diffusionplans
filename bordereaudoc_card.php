@@ -59,6 +59,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
 dol_include_once('/diffusionplans/class/bordereaudoc.class.php');
@@ -123,6 +124,10 @@ if (empty($reshook)) {
 
 		$result = $object->create($user);
 		if ($result > 0) {
+			if (!empty($object->fk_project)) {
+				$object->addProjectExternalContacts($user);
+			}
+
 			if (!empty($backtopage)) {
 				header('Location: '.$backtopage);
 				exit;
@@ -207,6 +212,46 @@ if (empty($reshook)) {
 		if ($result <= 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
 		}
+	}
+
+	if ($action === 'addprojectcontacts' && $permissiontoadd && $object->id > 0) {
+		if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
+		} else {
+			$added = $object->addProjectExternalContacts($user);
+			if ($added >= 0) {
+				setEventMessages($langs->trans('BordereaudocAddRecipients'), null, 'mesgs');
+			} else {
+				setEventMessages($object->error, $object->errors, 'errors');
+			}
+		}
+		$action = 'view';
+	}
+
+	if ($action === 'saverecipients' && $permissiontoadd && $object->id > 0) {
+		if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
+		} else {
+			$sendEmail = GETPOST('send_email', 'array');
+			$sendMail = GETPOST('send_mail', 'array');
+			$sendHand = GETPOST('send_hand', 'array');
+			$active = GETPOST('active', 'array');
+
+			$lines = $object->getRecipients();
+			foreach ($lines as $line) {
+				$lineData = array(
+					'send_email' => isset($sendEmail[$line->rowid]) ? 1 : 0,
+					'send_mail' => isset($sendMail[$line->rowid]) ? 1 : 0,
+					'send_hand' => isset($sendHand[$line->rowid]) ? 1 : 0,
+					'active' => isset($active[$line->rowid]) ? 1 : 0,
+				);
+				$object->updateRecipientFlags($line->rowid, $lineData);
+			}
+
+			setEventMessages($langs->trans('BordereaudocRecipientsUpdated'), null, 'mesgs');
+		}
+
+		$action = 'view';
 	}
 
 	if ($action === 'sendemail' && $permissiontosend && $object->id > 0) {
@@ -380,11 +425,99 @@ if ($object->id > 0) {
 		    }
 		}
 
-		print '<div class="tabsAction">'.implode('&nbsp;', $buttons).'</div>';
+	print '<div class="tabsAction">'.implode('&nbsp;', $buttons).'</div>';
 	}
-
 	
-dol_fiche_end();
+		$recipients = $object->getRecipients();
+		$caneditrecipients = ((int) $object->status === Bordereaudoc::STATUS_DRAFT && $permissiontoadd);
+		
+		print '<div class="ficheaddleft">';
+		print load_fiche_titre($langs->trans('BordereaudocRecipients'), '', 'fa-address-book');
+		
+		if ($caneditrecipients) {
+		print '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+		print '<input type="hidden" name="action" value="addprojectcontacts">';
+		print '<input type="hidden" name="id" value="'.$object->id.'">';
+		print '<div class="tabsAction">';
+		print '<input type="submit" class="butAction" value="'.$langs->trans('BordereaudocAddRecipients').'">';
+		print '</div>';
+		print '</form>';
+		}
+		
+		print '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+		print '<input type="hidden" name="action" value="saverecipients">';
+		print '<input type="hidden" name="id" value="'.$object->id.'">';
+		print '<table class="noborder centpercent">';
+		print '<tr class="liste_titre">';
+		print '<th>'.$langs->trans('ThirdParty').'</th>';
+		print '<th>'.$langs->trans('Contact').'</th>';
+		print '<th>'.$langs->trans('BordereaudocContactNature').'</th>';
+		print '<th>'.$langs->trans('BordereaudocContactType').'</th>';
+		print '<th>'.$langs->trans('BordereaudocSendEmail').'</th>';
+		print '<th>'.$langs->trans('BordereaudocSendMail').'</th>';
+		print '<th>'.$langs->trans('BordereaudocSendHand').'</th>';
+		print '<th>'.$langs->trans('BordereaudocDetach').'</th>';
+		print '</tr>';
+		
+		$socstatic = new Societe($db);
+		$contactstatic = new Contact($db);
+		
+		if (!empty($recipients)) {
+		foreach ($recipients as $line) {
+		print '<tr class="oddeven">';
+		print '<td>';
+		if (!empty($line->fk_soc)) {
+		$socstatic->id = $line->fk_soc;
+		$socstatic->name = $line->socname;
+		print $socstatic->getNomUrl(1);
+		} else {
+		print '&nbsp;';
+		}
+		print '</td>';
+		print '<td>';
+		if (!empty($line->fk_contact)) {
+		$contactstatic->id = $line->fk_contact;
+		$contactstatic->lastname = $line->lastname;
+		$contactstatic->firstname = $line->firstname;
+		$contactstatic->civility_id = $line->civility;
+		print $contactstatic->getNomUrl(1);
+		} else {
+		print '&nbsp;';
+		}
+		print '</td>';
+		print '<td>'.(!empty($line->nature_contact) ? dol_escape_htmltag($line->nature_contact) : '&nbsp;').'</td>';
+		print '<td>'.(!empty($line->type_contact) ? dol_escape_htmltag($line->type_contact) : '&nbsp;').'</td>';
+		if ($caneditrecipients) {
+		print '<td class="center"><input type="checkbox" name="send_email['.$line->rowid.']" value="1" '.(!empty($line->send_email) ? 'checked' : '').'></td>';
+		print '<td class="center"><input type="checkbox" name="send_mail['.$line->rowid.']" value="1" '.(!empty($line->send_mail) ? 'checked' : '').'></td>';
+		print '<td class="center"><input type="checkbox" name="send_hand['.$line->rowid.']" value="1" '.(!empty($line->send_hand) ? 'checked' : '').'></td>';
+		print '<td class="center"><input type="checkbox" name="active['.$line->rowid.']" value="1" '.(!empty($line->active) ? 'checked' : '').'></td>';
+		} else {
+		print '<td class="center">'.yn($line->send_email, 1, 0, 1).'</td>';
+		print '<td class="center">'.yn($line->send_mail, 1, 0, 1).'</td>';
+		print '<td class="center">'.yn($line->send_hand, 1, 0, 1).'</td>';
+		print '<td class="center">'.yn($line->active, 1, 0, 1).'</td>';
+		}
+		print '</tr>';
+		}
+		} else {
+		print '<tr class="oddeven"><td colspan="8" class="center">'.$langs->trans('None').'</td></tr>';
+		}
+		
+		print '</table>';
+		
+		if ($caneditrecipients && !empty($recipients)) {
+		print '<div class="center margintoponly">';
+		print '<input type="submit" class="button" value="'.$langs->trans('Save').'">';
+		print '</div>';
+		}
+		
+		print '</form>';
+		print '</div>';
+		
+		dol_fiche_end();
 }
 
 // Footer

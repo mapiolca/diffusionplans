@@ -153,11 +153,11 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Validate object
-	*
-	* @param User $user Current user
-	* @return int
-	*/
+	 * Validate object
+	 *
+	 * @param User $user Current user
+	 * @return int
+	 */
 	public function validate(User $user)
 	{
 		if (empty($this->fk_project)) {
@@ -177,11 +177,11 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Set status back to draft
-	*
-	* @param User $user Current user
-	* @return int
-	*/
+	 * Set status back to draft
+	 *
+	 * @param User $user Current user
+	 * @return int
+	 */
 	public function setDraft(User $user)
 	{
 		$this->status = self::STATUS_DRAFT;
@@ -191,17 +191,52 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Mark as delivered
-	*
-	* @param User $user Current user
-	* @return int
-	*/
+	 * Mark as delivered
+	 *
+	 * @param User $user Current user
+	 * @return int
+	 */
 	public function setDelivered(User $user)
 	{
 		$this->status = self::STATUS_DELIVERED;
 		$this->fk_user_modif = $user->id;
 
 		return $this->update($user);
+	}
+
+	/**
+	 * Add external project contacts as recipients
+	 *
+	 * @param User $user Current user
+	 * @return int
+	 */
+	public function addProjectExternalContacts(User $user)
+	{
+		if (empty($this->fk_project) || empty($this->id)) {
+			return 0;
+		}
+
+		$project = new Project($this->db);
+		if ($project->fetch($this->fk_project) <= 0) {
+			return -1;
+		}
+
+		$contacts = $project->liste_contact(-1, 'external');
+		if (empty($contacts)) {
+			return 0;
+		}
+
+		$added = 0;
+		foreach ($contacts as $contact) {
+			if ($this->recipientExists($contact['id'])) {
+				continue;
+			}
+
+			$this->addRecipient($user, $contact['socid'], $contact['id'], $contact['libelle_fonction'], 'External', 1, 0, 0);
+			$added++;
+		}
+
+		return $added;
 	}
 
 	/**
