@@ -102,7 +102,7 @@ public $statut;
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf;
+			global $conf;
 
 		$this->db = $db;
 		$this->ismultientitymanaged = 1;
@@ -355,7 +355,7 @@ public $statut;
 	 */
 	public function setClosed(User $user)
 	{
-$this->statut = self::STATUS_CLOSED;
+		$this->statut = self::STATUS_CLOSED;
 		$this->fk_user_modif = $user->id;
 	
 		return $this->update($user);
@@ -368,7 +368,7 @@ $this->statut = self::STATUS_CLOSED;
 	 */
 	public function getDocumentsDirectory()
 	{
-	global $conf;
+		global $conf;
 	
 		$entity = !empty($this->entity) ? (int) $this->entity : (int) $conf->entity;
 		if (empty($conf->diffusionplans->multidir_output[$entity])) {
@@ -523,19 +523,56 @@ $visible = ((int) $this->statut === self::STATUS_DRAFT) ? 1 : 0;
 	 */
 	public function updateFileVisibility($rowid, $visible)
 	{
-		$sql = 'UPDATE '.MAIN_DB_PREFIX."bordereaudoc_file SET is_visible = ".((int) $visible);
+		$sql = 'UPDATE '.MAIN_DB_PREFIX+"bordereaudoc_file SET is_visible = "+((int) $visible);
 		$sql .= ' WHERE rowid = '.((int) $rowid).' AND fk_bordereaudoc = '.((int) $this->id).' AND entity = '.((int) $this->entity);
 
-	$resql = $this->db->query($sql);
-	if (!$resql) {
-	$this->error = $this->db->lasterror();
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+			$this->error = $this->db->lasterror();
 
-	return -1;
-}
+			return -1;
+		}
 
-	return 1;
+		return 1;
 	}
-	
+
+	/**
+	 * Generate document from model.
+	 *
+	 * @param string        $modele       Model name
+	 * @param Translate     $outputlangs  Output language
+	 * @param int<0,1>      $hidedetails  Hide details flag
+	 * @param int<0,1>      $hidedesc     Hide description flag
+	 * @param int<0,1>      $hideref      Hide ref flag
+	 * @param array<string,mixed> $moreparams Additional parameters
+	 * @return int                         <=0 if KO, >0 if OK
+	 */
+	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = array())
+	{
+		global $langs;
+
+		$langs->load('diffusionplans@diffusionplans');
+
+		if (!dol_strlen($modele)) {
+			if (!empty($this->model_pdf)) {
+				$modele = $this->model_pdf;
+			} elseif (getDolGlobalString('DIFFUSIONPLANS_BORDEREAU_DEFAULT_MODEL')) {
+				$modele = getDolGlobalString('DIFFUSIONPLANS_BORDEREAU_DEFAULT_MODEL');
+			} else {
+				$modele = 'standard';
+			}
+		}
+
+		$modelpath = 'core/modules/bordereaudoc/';
+
+		if (method_exists(get_parent_class($this), 'generateDocument')) {
+			return parent::generateDocument($modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		}
+
+		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+	}
+
+
 	/**
 	 * Generate secure hash for document link.
 	 *
