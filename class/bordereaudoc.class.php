@@ -148,9 +148,9 @@ $this->fields['statut']['default'] = self::STATUS_DRAFT;
 		$this->entity = !empty($this->entity) ? $this->entity : $user->entity;
 		$this->datec = dol_now();
 		$this->fk_user_creat = $user->id;
-$this->statut = self::STATUS_DRAFT;
+		$this->statut = self::STATUS_DRAFT;
 
-		return parent::create($user, $notrigger);
+		return $this->createCommon($user, $notrigger);
 	}
 
 	/**
