@@ -347,10 +347,10 @@ class modDiffusionPlans extends DolibarrModules
 		//    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'isModEnabled("diffusionplans")', 'priority'=>50)
 		// );
 
-		// Permissions provided by this module
-		$this->rights = array();
-		$r = 0;
-		// Add here entries to declare new permissions
+// Permissions provided by this module
+$this->rights = array();
+$r = 0;
+// Add here entries to declare new permissions
 		/* BEGIN MODULEBUILDER PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', (0 * 10) + 0 + 1);
 		$this->rights[$r][1] = 'Read Diffusion object of DiffusionPlans';
@@ -382,8 +382,38 @@ class modDiffusionPlans extends DolibarrModules
 		$this->rights[$r][4] = 'diffusioncontact';
 		$this->rights[$r][5] = 'delete';
 		$r++;
-
-		/* END MODULEBUILDER PERMISSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 0 + 1);
+		$this->rights[$r][1] = 'Read Bordereaudoc object of DiffusionPlans';
+		$this->rights[$r][4] = 'bordereaudoc';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 1 + 1);
+		$this->rights[$r][1] = 'Create/Update Bordereaudoc object of DiffusionPlans';
+		$this->rights[$r][4] = 'bordereaudoc';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 2 + 1);
+		$this->rights[$r][1] = 'Validate Bordereaudoc object of DiffusionPlans';
+		$this->rights[$r][4] = 'bordereaudoc';
+		$this->rights[$r][5] = 'validate';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 3 + 1);
+		$this->rights[$r][1] = 'Send Bordereaudoc object of DiffusionPlans';
+		$this->rights[$r][4] = 'bordereaudoc';
+		$this->rights[$r][5] = 'send';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 4 + 1);
+		$this->rights[$r][1] = 'Archive Bordereaudoc object of DiffusionPlans';
+		$this->rights[$r][4] = 'bordereaudoc';
+		$this->rights[$r][5] = 'archive';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 5 + 1);
+		$this->rights[$r][1] = 'Delete Bordereaudoc object of DiffusionPlans';
+		$this->rights[$r][4] = 'bordereaudoc';
+		$this->rights[$r][5] = 'delete';
+		$r++;
+		
+				/* END MODULEBUILDER PERMISSIONS */
 
 
 		// Main menu entries to add
