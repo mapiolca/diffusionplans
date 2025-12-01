@@ -58,6 +58,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
@@ -80,6 +81,7 @@ $optioncss = GETPOST('optioncss', 'aZ');
 $object = new Bordereaudoc($db);
 $form = new Form($db);
 $formproject = new FormProjets($db);
+$formfile = new FormFile($db);
 $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('bordereaudoccard', 'globalcard'));
 
@@ -96,12 +98,27 @@ if (!$permissiontoread) {
 }
 
 if (empty($action) && empty($id) && empty($ref)) {
-	$action = 'create';
+$action = 'create';
 }
 
 // Fetch object
 if (!empty($id) || !empty($ref)) {
-	$object->fetch($id, $ref);
+$object->fetch($id, $ref);
+}
+
+$upload_dir = '';
+$modulepart = 'diffusionplans';
+$relativepath = '';
+if ($object->id > 0) {
+$upload_dir = $object->getDocumentsDirectory();
+$relativepath = 'bordereaudoc/'.dol_sanitizeFileName($object->ref);
+}
+
+if ($object->id > 0) {
+$permissiontoaddfile = $permissiontoadd;
+$param = '?id='.$object->id;
+include DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_pre_headers.tpl.php';
+$object->syncDocumentIndex($user);
 }
 
 // Actions
@@ -228,11 +245,11 @@ if (empty($reshook)) {
 		$action = 'view';
 	}
 
-	if ($action === 'saverecipients' && $permissiontoadd && $object->id > 0) {
-		if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
-			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
-		} else {
-			$sendEmail = GETPOST('send_email', 'array');
+if ($action === 'saverecipients' && $permissiontoadd && $object->id > 0) {
+if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
+} else {
+$sendEmail = GETPOST('send_email', 'array');
 			$sendMail = GETPOST('send_mail', 'array');
 			$sendHand = GETPOST('send_hand', 'array');
 			$active = GETPOST('active', 'array');
@@ -249,10 +266,26 @@ if (empty($reshook)) {
 			}
 
 			setEventMessages($langs->trans('BordereaudocRecipientsUpdated'), null, 'mesgs');
-		}
+}
 
-		$action = 'view';
-	}
+$action = 'view';
+}
+
+if ($action === 'savefiles' && $permissiontoadd && $object->id > 0) {
+if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
+} else {
+$visible = GETPOST('is_visible', 'array');
+$lines = $object->getDocumentIndex();
+foreach ($lines as $line) {
+$flag = isset($visible[$line->rowid]) ? 1 : 0;
+$object->updateFileVisibility($line->rowid, $flag);
+}
+setEventMessages($langs->trans('BordereaudocFilesUpdated'), null, 'mesgs');
+}
+
+$action = 'view';
+}
 
 	if ($action === 'sendemail' && $permissiontosend && $object->id > 0) {
 		require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
@@ -517,7 +550,60 @@ if ($object->id > 0) {
 		print '</form>';
 		print '</div>';
 		
-		dol_fiche_end();
+		$caneditfiles = ((int) $object->status === Bordereaudoc::STATUS_DRAFT && $permissiontoadd);
+		$filedir = $upload_dir;
+		$urlsource = $_SERVER['PHP_SELF'].'?id='.$object->id;
+		
+		print '<div class="ficheaddleft">';
+		print load_fiche_titre($langs->trans('BordereaudocFiles'), '', 'fa-files-o');
+		print $formfile->showdocuments($modulepart, $relativepath, $filedir, $urlsource, $caneditfiles, $caneditfiles, $object->model_pdf, 1, 0, 0, 0, 0, '', '', '', 1);
+		
+		$doclines = $object->getDocumentIndex();
+		if (!empty($doclines)) {
+		if ($caneditfiles) {
+		print '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+		print '<input type="hidden" name="action" value="savefiles">';
+		print '<input type="hidden" name="id" value="'.$object->id.'">';
+		}
+		
+		print '<table class="noborder centpercent">';
+		print '<tr class="liste_titre">';
+		print '<th>'.$langs->trans('File').'</th>';
+		print '<th class="center">'.$langs->trans('BordereaudocListed').'</th>';
+		print '<th>'.$langs->trans('BordereaudocDownloadLink').'</th>';
+		print '</tr>';
+		
+		foreach ($doclines as $line) {
+		print '<tr class="oddeven">';
+		$relativefile = trim($line->filepath.'/'.dol_sanitizeFileName($line->filename), '/');
+		$fileurl = DOL_URL_ROOT.'/document.php?modulepart='.urlencode($modulepart).'&file='.urlencode($relativefile);
+		$hashurl = dol_buildpath('/diffusionplans/public/bordereaudocdownload.php', 2).'?hash='.urlencode($line->hash);
+		print '<td><a href="'.$fileurl.'">'.img_mime($line->filename, '', 'pictofixedwidth').' '.dol_escape_htmltag($line->filename).'</a></td>';
+		if ($caneditfiles) {
+		print '<td class="center"><input type="checkbox" name="is_visible['.$line->rowid.']" value="1" '.(!empty($line->is_visible) ? 'checked' : '').'></td>';
+		} else {
+		print '<td class="center">'.yn($line->is_visible, 1, 0, 1).'</td>';
+		}
+		print '<td><a href="'.$hashurl.'" target="_blank" rel="noopener">'.dol_escape_htmltag($hashurl).'</a></td>';
+		print '</tr>';
+		}
+		
+		print '</table>';
+		
+		if ($caneditfiles) {
+		print '<div class="center margintoponly">';
+		print '<input type="submit" class="button" value="'.$langs->trans('Save').'">';
+		print '</div>';
+		print '</form>';
+		}
+		} else {
+		print '<div class="opacitymedium">'.$langs->trans('BordereaudocNoFiles').'</div>';
+		}
+		
+		print '</div>';
+
+dol_fiche_end();
 }
 
 // Footer

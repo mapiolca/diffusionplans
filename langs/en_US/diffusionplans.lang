@@ -179,3 +179,7 @@ ConfirmDeliverBordereaudoc = Do you confirm to mark this delivery slip as delive
 CloseBordereaudoc = Archive the delivery slip
 ConfirmCloseBordereaudoc = Do you confirm to archive this delivery slip?
 MarkDelivered = Mark as delivered
+BordereaudocListed = Listed in the delivery slip
+BordereaudocDownloadLink = Public download link
+BordereaudocNoFiles = No file is indexed for this delivery slip.
+BordereaudocFilesUpdated = File list updated

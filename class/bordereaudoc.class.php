@@ -25,6 +25,7 @@
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 /**
 * Class for Bordereaudoc
@@ -32,36 +33,36 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 class Bordereaudoc extends CommonObject
 {
 	/**
-	* @var string Module name
-	*/
+	 * @var string Module name
+	 */
 	public $module = 'diffusionplans';
 
 	/**
-	* @var string Element name
-	*/
+	 * @var string Element name
+	 */
 	public $element = 'bordereaudoc';
 
 	/**
-	* @var string Table without prefix
-	*/
+	 * @var string Table without prefix
+	 */
 	public $table_element = 'bordereaudoc';
 
 	/**
-	* @var string Picto code
-	*/
+	 * @var string Picto code
+	 */
 	public $picto = 'fa-paper-plane';
 
 	/**
-	* Status constants
-	*/
+	 * Status constants
+	 */
 	const STATUS_DRAFT = 0;
 	const STATUS_VALIDATED = 1;
 	const STATUS_DELIVERED = 2;
 	const STATUS_CLOSED = 3;
 
 	/**
-	* @var array Fields definition
-	*/
+	 * @var array Fields definition
+	 */
 	public $fields = array(
 	'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1),
 	'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'validate' => 1),
@@ -95,10 +96,10 @@ class Bordereaudoc extends CommonObject
 	public $model_pdf;
 
 	/**
-	* Constructor
-	*
-	* @param DoliDB $db Database handler
-	*/
+	 * Constructor
+	 *
+	 * @param DoliDB $db Database handler
+	 */
 	public function __construct(DoliDB $db)
 	{
 		global $conf;
@@ -113,11 +114,11 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Get next reference for object
-	*
-	* @param User $user Current user
-	* @return string
-	*/
+	 * Get next reference for object
+	 *
+	 * @param User $user Current user
+	 * @return string
+	 */
 	public function getNextNumRef(User $user)
 	{
 		$prefix = getDolGlobalString('DIFFUSIONPLANS_BORDEREAU_REF_PREFIX', 'BRD');
@@ -126,12 +127,12 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Create object in database
-	*
-	* @param User $user Current user
-	* @param bool $notrigger Disable triggers
-	* @return int
-	*/
+	 * Create object in database
+	 *
+	 * @param User $user Current user
+	 * @param bool $notrigger Disable triggers
+	 * @return int
+	 */
 	public function create(User $user, $notrigger = false)
 	{
 		if (empty($this->fk_project)) {
@@ -240,25 +241,214 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Close object
-	*
-	* @param User $user Current user
-	* @return int
-	*/
+	 * Close object
+	 *
+	 * @param User $user Current user
+	 * @return int
+	 */
 	public function setClosed(User $user)
 	{
 		$this->status = self::STATUS_CLOSED;
 		$this->fk_user_modif = $user->id;
-
+	
 		return $this->update($user);
 	}
-
+	
 	/**
-	* Load project contacts into bordereaudoc contacts table
-	*
-	* @param User $user Current user
-	* @return int
-	*/
+	 * Get documents directory for the bordereaudoc.
+	 *
+	 * @return string
+	 */
+	public function getDocumentsDirectory()
+	{
+	global $conf;
+	
+		$entity = !empty($this->entity) ? (int) $this->entity : (int) $conf->entity;
+		if (empty($conf->diffusionplans->multidir_output[$entity])) {
+		return '';
+	}
+	
+		$path = rtrim($conf->diffusionplans->multidir_output[$entity], '/').'/bordereaudoc/'.dol_sanitizeFileName($this->ref);
+		dol_mkdir($path);
+	
+		return $path;
+	}
+	
+	/**
+	 * Synchronize filesystem files with database index.
+	 *
+	 * @param User $user Current user
+	 * @return int
+	 */
+	public function syncDocumentIndex(User $user)
+	{
+		$dir = $this->getDocumentsDirectory();
+		if (empty($dir)) {
+		return -1;
+	}
+	
+		$fsFiles = dol_dir_list($dir, 'files', 0, '', '(\.meta|_preview.*\.png)$', '', '', 1);
+		$existing = $this->fetchDocumentIndex();
+		$existingMap = array();
+		$basepath = 'bordereaudoc/'.dol_sanitizeFileName($this->ref);
+	
+		foreach ($existing as $line) {
+		$key = trim($line->filepath, '/').'/'.$line->filename;
+		$existingMap[$key] = $line;
+	}
+	
+		$seen = array();
+		foreach ($fsFiles as $file) {
+		$relativeName = !empty($file['relativename']) ? $file['relativename'] : $file['name'];
+		$key = $basepath.'/'.ltrim($relativeName, '/');
+		$seen[$key] = 1;
+		if (!isset($existingMap[$key])) {
+		$visible = ((int) $this->status === self::STATUS_DRAFT) ? 1 : 0;
+		$this->addFileIndex($file['name'], $basepath, $visible, $user);
+	}
+	}
+	
+		foreach ($existingMap as $key => $line) {
+		if (!isset($seen[$key])) {
+		$this->deleteFileIndex($line->rowid);
+	}
+	}
+	
+		return 1;
+	}
+	
+	/**
+	 * Get indexed files for the bordereaudoc.
+	 *
+	 * @param int $onlyVisible Restrict to visible files
+	 * @return array
+	 */
+	public function getDocumentIndex($onlyVisible = 0)
+	{
+		$sql = 'SELECT rowid, fk_bordereaudoc, filename, filepath, hash, is_visible, entity';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'bordereaudoc_file';
+		$sql .= ' WHERE fk_bordereaudoc = '.((int) $this->id).' AND entity = '.((int) $this->entity);
+		if (!empty($onlyVisible)) {
+		$sql .= ' AND is_visible = 1';
+	}
+	
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+		$this->error = $this->db->lasterror();
+	
+		return array();
+	}
+	
+		$lines = array();
+		while ($obj = $this->db->fetch_object($resql)) {
+		$lines[] = $obj;
+	}
+	
+		return $lines;
+	}
+	
+	/**
+	 * Fetch document index without filtering.
+	 *
+	 * @return array
+	 */
+	protected function fetchDocumentIndex()
+	{
+		return $this->getDocumentIndex(0);
+	}
+	
+	/**
+	 * Add index entry for a file.
+	 *
+	 * @param string $filename  File name
+	 * @param string $filepath  Relative path
+	 * @param int    $visible   Visibility flag
+	 * @param User   $user      Current user
+	 * @param string $hashValue Hash value
+	 * @return int
+	 */
+	public function addFileIndex($filename, $filepath, $visible, User $user, $hashValue = '')
+	{
+		if (empty($hashValue)) {
+		$hashValue = $this->generateFileHash();
+	}
+	
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX."bordereaudoc_file (fk_bordereaudoc, filename, filepath, hash, is_visible, entity, datec, tms, fk_user_creat)";
+		$sql .= " VALUES (".((int) $this->id).", '".$this->db->escape($filename)."', '".$this->db->escape($filepath)."', '".$this->db->escape($hashValue)."', ".((int) $visible).", ".((int) $this->entity).", ".$this->db->idate(dol_now()).", ".$this->db->idate(dol_now()).", ".((int) $user->id).")";
+	
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+		$this->error = $this->db->lasterror();
+	
+		return -1;
+	}
+	
+		return $this->db->last_insert_id(MAIN_DB_PREFIX.'bordereaudoc_file');
+	}
+	
+	/**
+	 * Delete index entry.
+	 *
+	 * @param int $rowid Line id
+	 * @return int
+	 */
+	public function deleteFileIndex($rowid)
+	{
+		$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'bordereaudoc_file WHERE rowid = '.((int) $rowid);
+		$sql .= ' AND fk_bordereaudoc = '.((int) $this->id).' AND entity = '.((int) $this->entity);
+	
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+		$this->error = $this->db->lasterror();
+	
+		return -1;
+	}
+	
+		return 1;
+	}
+	
+	/**
+	 * Update visibility flag for an indexed file.
+	 *
+	 * @param int $rowid    Line id
+	 * @param int $visible  Visibility flag
+	 * @return int
+	 */
+	public function updateFileVisibility($rowid, $visible)
+	{
+		$sql = 'UPDATE '.MAIN_DB_PREFIX."bordereaudoc_file SET is_visible = ".((int) $visible);
+		$sql .= ' WHERE rowid = '.((int) $rowid).' AND fk_bordereaudoc = '.((int) $this->id).' AND entity = '.((int) $this->entity);
+
+	$resql = $this->db->query($sql);
+	if (!$resql) {
+	$this->error = $this->db->lasterror();
+
+	return -1;
+}
+
+	return 1;
+	}
+	
+	/**
+	 * Generate secure hash for document link.
+	 *
+	 * @return string
+	 */
+	protected function generateFileHash()
+	{
+		try {
+		return hash('sha256', bin2hex(random_bytes(32)).microtime(true).$this->id.dol_print_date(dol_now(), 'dayrfc'));
+		} catch (Exception $e) {
+		return hash('sha256', uniqid((string) $this->id, true));
+	}
+	}
+	
+	/**
+	 * Load project contacts into bordereaudoc contacts table
+	 *
+	 * @param User $user Current user
+	 * @return int
+	 */
 	public function loadProjectContacts(User $user)
 	{
 		if (empty($this->fk_project)) {
@@ -291,11 +481,11 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Check if recipient already exists
-	*
-	* @param int $contactId Contact id
-	* @return bool
-	*/
+	 * Check if recipient already exists
+	 *
+	 * @param int $contactId Contact id
+	 * @return bool
+	 */
 	protected function recipientExists($contactId)
 	{
 		$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX."bordereaudoc_contact WHERE fk_bordereaudoc = ".((int) $this->id)." AND fk_contact =".((int) $contactId);
@@ -310,18 +500,18 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Add a recipient
-	*
-	* @param User   $user       Current user
-	* @param int    $socid      Thirdparty id
-	* @param int    $contactId  Contact id
-	* @param string $typeContact Type label
-	* @param string $nature     Nature label
-	* @param int    $email      Send email flag
-	* @param int    $mail       Send mail flag
-	* @param int    $hand       Hand delivery flag
-	* @return int
-	*/
+	 * Add a recipient
+	 *
+	 * @param User   $user       Current user
+	 * @param int    $socid      Thirdparty id
+	 * @param int    $contactId  Contact id
+	 * @param string $typeContact Type label
+	 * @param string $nature     Nature label
+	 * @param int    $email      Send email flag
+	 * @param int    $mail       Send mail flag
+	 * @param int    $hand       Hand delivery flag
+	 * @return int
+	 */
 	public function addRecipient(User $user, $socid, $contactId, $typeContact = '', $nature = '', $email = 1, $mail = 0, $hand = 0)
 	{
 		$sql = 'INSERT INTO '.MAIN_DB_PREFIX."bordereaudoc_contact (datec, tms, fk_bordereaudoc, fk_soc, fk_contact, nature_contact, type_contact, send_email, send_mail, send_hand, active, entity, fk_user_creat)";
@@ -339,12 +529,12 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Update recipient flags
-	*
-	* @param int   $lineId Line id
-	* @param array $data   Data to update
-	* @return int
-	*/
+	 * Update recipient flags
+	 *
+	 * @param int   $lineId Line id
+	 * @param array $data   Data to update
+	 * @return int
+	 */
 	public function updateRecipientFlags($lineId, array $data)
 	{
 		$fields = array();
@@ -372,11 +562,11 @@ class Bordereaudoc extends CommonObject
 	}
 
 	/**
-	* Get recipients list
-	*
-	* @param int $onlyActive Restrict to active
-	* @return array
-	*/
+	 * Get recipients list
+	 *
+	 * @param int $onlyActive Restrict to active
+	 * @return array
+	 */
 	public function getRecipients($onlyActive = 0)
 	{
 		$sql = 'SELECT bc.rowid, bc.fk_soc, bc.fk_contact, bc.nature_contact, bc.type_contact, bc.send_email, bc.send_mail, bc.send_hand, bc.active, s.nom as socname, c.lastname, c.firstname, c.civility as civility';
