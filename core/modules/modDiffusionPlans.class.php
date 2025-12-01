@@ -225,9 +225,12 @@ class modDiffusionPlans extends DolibarrModules
 		// );
 		$i = 0;
 		$this->const = array(
-			$i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON', 'chaine', 'mod_diffusion_standard', '', 0, 'current'],
-            $i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/diffusionplans/diffusion/', '', 0, 'current'],
-            $i++ => ['DIFFUSIONPLANS_DIFFUSION_DEFAULT_MODEL', 'chaine', 'standard_diffusion', '', 0, 'current'],
+		$i++ => array('DIFFUSIONPLANS_DIFFUSION_ADDON', 'chaine', 'mod_diffusion_standard', '', 0, 'current'),
+		$i++ => array('DIFFUSIONPLANS_DIFFUSION_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/diffusionplans/diffusion/', '', 0, 'current'),
+		$i++ => array('DIFFUSIONPLANS_DIFFUSION_DEFAULT_MODEL', 'chaine', 'standard_diffusion', '', 0, 'current'),
+		$i++ => array('DIFFUSIONPLANS_BORDEREAU_REF_PREFIX', 'chaine', 'BRD', 'Prefix for bordereaudoc references', 0, 'current'),
+		$i++ => array('DIFFUSIONPLANS_BORDEREAU_DEFAULT_MODEL', 'chaine', 'standard', 'Default PDF model for bordereaudoc', 0, 'current'),
+		$i++ => array('DIFFUSIONPLANS_BORDEREAU_MAIL_TEMPLATE', 'chaine', '', 'Mail template code for bordereaudoc emails', 0, 'current'),
 		);
 
 		// Some keys to add into the overwriting translation tables
@@ -348,8 +351,8 @@ class modDiffusionPlans extends DolibarrModules
 		// );
 
 // Permissions provided by this module
-$this->rights = array();
-$r = 0;
+		$this->rights = array();
+		$r = 0;
 // Add here entries to declare new permissions
 		/* BEGIN MODULEBUILDER PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', (0 * 10) + 0 + 1);
@@ -403,11 +406,16 @@ $r = 0;
 		$this->rights[$r][5] = 'send';
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 4 + 1);
+		$this->rights[$r][1] = 'Set delivered Bordereaudoc of DiffusionPlans';
+		$this->rights[$r][4] = 'bordereaudoc';
+		$this->rights[$r][5] = 'set_diffuse';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 5 + 1);
 		$this->rights[$r][1] = 'Archive Bordereaudoc object of DiffusionPlans';
 		$this->rights[$r][4] = 'bordereaudoc';
 		$this->rights[$r][5] = 'archive';
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 5 + 1);
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 6 + 1);
 		$this->rights[$r][1] = 'Delete Bordereaudoc object of DiffusionPlans';
 		$this->rights[$r][4] = 'bordereaudoc';
 		$this->rights[$r][5] = 'delete';
@@ -650,6 +658,7 @@ $this->menu[$r++] = array(
 		$moduledir = dol_sanitizeFileName('diffusionplans');
 		$myTmpObjects = array();
 		$myTmpObjects['Diffusion'] = array('includerefgeneration' => 1, 'includedocgeneration' => 1);
+		$myTmpObjects['Bordereaudoc'] = array('includerefgeneration' => 1, 'includedocgeneration' => 1);
 
 		foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 			if ($myTmpObjectArray['includerefgeneration']) {
