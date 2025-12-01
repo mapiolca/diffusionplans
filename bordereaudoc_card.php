@@ -24,33 +24,33 @@
 // Load Dolibarr environment
 $res = 0;
 if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) {
-	$res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+$res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
 }
 $tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME'];
 $tmp2 = realpath(__FILE__);
 $i = strlen($tmp) - 1;
 $j = strlen($tmp2) - 1;
 while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) {
-	$i--;
-	$j--;
+$i--;
+$j--;
 }
 if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) {
-	$res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
+$res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
 }
 if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) {
-	$res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+$res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
 }
 if (!$res && file_exists("../main.inc.php")) {
-	$res = @include "../main.inc.php";
+$res = @include "../main.inc.php";
 }
 if (!$res && file_exists("../../main.inc.php")) {
-	$res = @include "../../main.inc.php";
+$res = @include "../../main.inc.php";
 }
 if (!$res && file_exists("../../../main.inc.php")) {
-	$res = @include "../../../main.inc.php";
+$res = @include "../../../main.inc.php";
 }
 if (!$res) {
-	die("Include of main fails");
+die("Include of main fails");
 }
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
@@ -59,6 +59,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
 dol_include_once('/diffusionplans/class/bordereaudoc.class.php');
 
@@ -93,6 +94,10 @@ if (!$permissiontoread) {
 	accessforbidden();
 }
 
+if (empty($action) && empty($id) && empty($ref)) {
+	$action = 'create';
+}
+
 // Fetch object
 if (!empty($id) || !empty($ref)) {
 	$object->fetch($id, $ref);
@@ -111,128 +116,133 @@ if ($reshook < 0) {
 }
 if (empty($reshook)) {
 	if ($action === 'add' && $permissiontoadd) {
-	        $object->ref = GETPOST('ref', 'alpha');
-	        $object->title = GETPOST('title', 'alpha');
-	        $object->description = dol_htmlcleanlastbr(GETPOST('description', 'restricthtml'));
-	        $object->fk_project = GETPOSTINT('fk_project');
+		$object->ref = GETPOST('ref', 'alpha');
+		$object->title = GETPOST('title', 'alpha');
+		$object->description = dol_htmlcleanlastbr(GETPOST('description', 'restricthtml'));
+		$object->fk_project = GETPOSTINT('fk_project');
 
-	        $result = $object->create($user);
-	        if ($result > 0) {
-	                if (!empty($backtopage)) {
-	                        header('Location: '.$backtopage);
-	                        exit;
-	                }
-	                header('Location: '.dol_buildpath('/diffusionplans/bordereaudoc_card.php', 1).'?id='.$object->id);
-	                exit;
-	        }
-	        setEventMessages($object->error, $object->errors, 'errors');
-	        $action = 'create';
+		$result = $object->create($user);
+		if ($result > 0) {
+			if (!empty($backtopage)) {
+				header('Location: '.$backtopage);
+				exit;
+			}
+			header('Location: '.dol_buildpath('/diffusionplans/bordereaudoc_card.php', 1).'?id='.$object->id);
+			exit;
+		}
+		setEventMessages($object->error, $object->errors, 'errors');
+		$action = 'create';
 	}
 
 	if ($action === 'update' && $permissiontoadd && $object->id > 0) {
-	        $object->title = GETPOST('title', 'alpha');
-	        $object->description = dol_htmlcleanlastbr(GETPOST('description', 'restricthtml'));
-	        $object->fk_project = GETPOSTINT('fk_project');
-	        $object->fk_user_modif = $user->id;
-	        $result = $object->update($user);
-	        if ($result > 0) {
-	                setEventMessages($langs->trans('RecordModifiedSuccessfully'), null, 'mesgs');
-	                $action = 'view';
-	        } else {
-	                setEventMessages($object->error, $object->errors, 'errors');
-	                $action = 'edit';
-	        }
+		if ((int) $object->status !== Bordereaudoc::STATUS_DRAFT) {
+			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
+			$action = 'view';
+		} else {
+			$object->title = GETPOST('title', 'alpha');
+			$object->description = dol_htmlcleanlastbr(GETPOST('description', 'restricthtml'));
+			$object->fk_project = GETPOSTINT('fk_project');
+			$object->fk_user_modif = $user->id;
+			$result = $object->update($user);
+			if ($result > 0) {
+				setEventMessages($langs->trans('RecordModifiedSuccessfully'), null, 'mesgs');
+				$action = 'view';
+			} else {
+				setEventMessages($object->error, $object->errors, 'errors');
+				$action = 'edit';
+			}
+		}
 	}
 
 	if ($action === 'confirm_delete' && GETPOST('confirm', 'alpha') === 'yes' && $permissiondelete && $object->id > 0) {
-	        $result = $object->delete($user);
-	        if ($result > 0) {
-	                header('Location: '.dol_buildpath('/diffusionplans/diffusion_list.php', 1));
-	                exit;
-	        }
-	        setEventMessages($object->error, $object->errors, 'errors');
+		$result = $object->delete($user);
+		if ($result > 0) {
+			header('Location: '.dol_buildpath('/diffusionplans/diffusion_list.php', 1));
+			exit;
+		}
+		setEventMessages($object->error, $object->errors, 'errors');
 	}
 
 	if ($action === 'confirm_validate' && GETPOST('confirm', 'alpha') === 'yes' && $permissiontovalidate && $object->id > 0) {
-	        $result = $object->validate($user);
-	        if ($result > 0) {
-	                setEventMessages($langs->trans('BordereaudocValidated'), null, 'mesgs');
-	                $action = 'view';
-	        } else {
-	                setEventMessages($object->error, $object->errors, 'errors');
-	        }
+		$result = $object->validate($user);
+		if ($result > 0) {
+			setEventMessages($langs->trans('BordereaudocValidated'), null, 'mesgs');
+			$action = 'view';
+		} else {
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
 	}
 
 	if ($action === 'confirm_delivered' && GETPOST('confirm', 'alpha') === 'yes' && $permissiontoarchive && $object->id > 0) {
-	        $result = $object->setDelivered($user);
-	        if ($result > 0) {
-	                setEventMessages($langs->trans('BordereaudocDelivered'), null, 'mesgs');
-	                $action = 'view';
-	        } else {
-	                setEventMessages($object->error, $object->errors, 'errors');
-	        }
+		$result = $object->setDelivered($user);
+		if ($result > 0) {
+			setEventMessages($langs->trans('BordereaudocDelivered'), null, 'mesgs');
+			$action = 'view';
+		} else {
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
 	}
 
 	if ($action === 'confirm_close' && GETPOST('confirm', 'alpha') === 'yes' && $permissiontoarchive && $object->id > 0) {
-	        $result = $object->setClosed($user);
-	        if ($result > 0) {
-	                setEventMessages($langs->trans('BordereaudocClosed'), null, 'mesgs');
-	                $action = 'view';
-	        } else {
-	                setEventMessages($object->error, $object->errors, 'errors');
-	        }
+		$result = $object->setClosed($user);
+		if ($result > 0) {
+			setEventMessages($langs->trans('BordereaudocClosed'), null, 'mesgs');
+			$action = 'view';
+		} else {
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
 	}
 
 	if ($action === 'builddoc' && $permissiontoread && $object->id > 0) {
-	        $model = GETPOST('model', 'alpha');
-	        if (empty($model)) {
-	                $model = $object->model_pdf ? $object->model_pdf : 'standard';
-	        }
-	        if ($model !== $object->model_pdf) {
-	                $object->model_pdf = $model;
-	                $object->update($user);
-	        }
+		$model = GETPOST('model', 'alpha');
+		if (empty($model)) {
+			$model = $object->model_pdf ? $object->model_pdf : 'standard';
+		}
+		if ($model !== $object->model_pdf) {
+			$object->model_pdf = $model;
+			$object->update($user);
+		}
 
-	        $result = $object->generateDocument($model, $langs);
-	        if ($result <= 0) {
-	                setEventMessages($object->error, $object->errors, 'errors');
-	        }
+		$result = $object->generateDocument($model, $langs);
+		if ($result <= 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
 	}
 
 	if ($action === 'sendemail' && $permissiontosend && $object->id > 0) {
-	        require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+		require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 
-	        if (empty($object->last_main_doc)) {
-	                $object->generateDocument($object->model_pdf ? $object->model_pdf : 'standard', $langs);
-	        }
+		if (empty($object->last_main_doc)) {
+			$object->generateDocument($object->model_pdf ? $object->model_pdf : 'standard', $langs);
+		}
 
-	        $filepath = dol_buildpath('/custom/diffusionplans/documents/'.$object->ref, 0);
-	        $filename = dol_sanitizeFileName($object->ref.'.pdf');
-	        $fullpath = $filepath.'/'.$filename;
+		$filepath = dol_buildpath('/custom/diffusionplans/documents/'.$object->ref, 0);
+		$filename = dol_sanitizeFileName($object->ref.'.pdf');
+		$fullpath = $filepath.'/'.$filename;
 
-	        $recipients = array();
-	        $lines = $object->getRecipients(1);
-	        foreach ($lines as $line) {
-	                if (!empty($line->send_email) && !empty($line->fk_contact)) {
-	                        $contact = new Contact($db);
-	                        if ($contact->fetch($line->fk_contact) > 0 && !empty($contact->email)) {
-	                                $recipients[] = $contact->email;
-	                        }
-	                }
-	        }
+		$recipients = array();
+		$lines = $object->getRecipients(1);
+		foreach ($lines as $line) {
+			if (!empty($line->send_email) && !empty($line->fk_contact)) {
+				$contact = new Contact($db);
+				if ($contact->fetch($line->fk_contact) > 0 && !empty($contact->email)) {
+					$recipients[] = $contact->email;
+				}
+			}
+		}
 
-	        if (empty($recipients)) {
-	                setEventMessages($langs->trans('ErrorNoEMailRecipientSelected'), null, 'errors');
-	        } else {
-	                $subject = $langs->trans('Bordereaudoc').' '.$object->ref;
-	                $body = dol_htmlentitiesbr($object->description);
-	                $mailfile = new CMailFile($subject, implode(',', $recipients), $user->email, $body, array($fullpath), array($filename), array('application/pdf'));
-	                if ($mailfile->sendfile()) {
-	                        setEventMessages($langs->trans('MailSuccessfulySent', implode(',', $recipients)), null, 'mesgs');
-	                } else {
-	                        setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-	                }
-	        }
+		if (empty($recipients)) {
+			setEventMessages($langs->trans('ErrorNoEMailRecipientSelected'), null, 'errors');
+		} else {
+			$subject = $langs->trans('Bordereaudoc').' '.$object->ref;
+			$body = dol_htmlentitiesbr($object->description);
+			$mailfile = new CMailFile($subject, implode(',', $recipients), $user->email, $body, array($fullpath), array($filename), array('application/pdf'));
+			if ($mailfile->sendfile()) {
+				setEventMessages($langs->trans('MailSuccessfulySent', implode(',', $recipients)), null, 'mesgs');
+			} else {
+				setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+			}
+		}
 	}
 }
 
@@ -277,6 +287,10 @@ if ($action === 'create') {
 }
 
 if ($object->id > 0) {
+	if ($action === 'edit' && (((int) $object->status) !== Bordereaudoc::STATUS_DRAFT || !$permissiontoadd)) {
+		$action = 'view';
+	}
+
 	$head = array();
 	$head[0][0] = dol_buildpath('/diffusionplans/bordereaudoc_card.php', 1).'?id='.$object->id;
 	$head[0][1] = $langs->trans('Card');
@@ -291,13 +305,46 @@ if ($object->id > 0) {
 		$projectstatic->fetch($object->fk_project);
 		$morehtmlref .= '<br>'.$projectstatic->getNomUrl(1);
 	}
+
+	$editmode = ($action === 'edit');
+	if ($editmode) {
+		print '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+		print '<input type="hidden" name="action" value="update">';
+		print '<input type="hidden" name="id" value="'.$object->id.'">';
+	}
+
 	print '<table class="border centpercent">';
 	print '<tr><td class="titlefield">'.$langs->trans('Ref').'</td><td>'.$form->showrefnav($object, 'ref', $linkback, true, 'ref', 'ref', '').'</td></tr>';
-	print '<tr><td>'.$langs->trans('BordereaudocTitle').'</td><td>'.dol_escape_htmltag($object->title).'</td></tr>';
-	print '<tr><td>'.$langs->trans('Project').'</td><td>'.$morehtmlref.'</td></tr>';
-	print '<tr><td class="tdtop">'.$langs->trans('Description').'</td><td>'.dol_htmlentitiesbr($object->description).'</td></tr>';
+	if ($editmode) {
+		print '<tr><td>'.$langs->trans('BordereaudocTitle').'</td><td><input type="text" class="minwidth300" name="title" value="'.dol_escape_htmltag($object->title).'"></td></tr>';
+		print '<tr><td>'.$langs->trans('Project').'</td><td>'.$formproject->select_projects(-1, $object->fk_project, 'fk_project', 0, 0, 1, 1, 0, 0, '', 1, 0, array(), false).'</td></tr>';
+		print '<tr><td class="tdtop">'.$langs->trans('Description').'</td><td>';
+		$doleditor = new DolEditor('description', $object->description, '', 160, 'dolibarr_notes', '', false, true, getDolGlobalInt('FCKEDITOR_ENABLE_SOCIETE'), 15, 90);
+		$doleditor->Create(0, '', false, 'contenteditable');
+		print '</td></tr>';
+	} else {
+		print '<tr><td>'.$langs->trans('BordereaudocTitle').'</td><td>'.dol_escape_htmltag($object->title).'</td></tr>';
+		print '<tr><td>'.$langs->trans('Project').'</td><td>'.$morehtmlref.'</td></tr>';
+		print '<tr><td class="tdtop">'.$langs->trans('Description').'</td><td>'.dol_htmlentitiesbr($object->description).'</td></tr>';
+	}
 	print '<tr><td>'.$langs->trans('Status').'</td><td>'.$object->getLibStatut(5).'</td></tr>';
 	print '</table>';
+
+	if ($editmode) {
+		print '<div class="center">';
+		print '<input type="submit" class="button" value="'.$langs->trans('Save').'">';
+		print '&nbsp;';
+		print '<a class="button" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">'.$langs->trans('Cancel').'</a>';
+		print '</div>';
+		print '</form>';
+	} else {
+		print '<div class="tabsAction">';
+		if ($object->status == Bordereaudoc::STATUS_DRAFT && $permissiontoadd) {
+			print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit">'.$langs->trans('Modify').'</a>';
+		}
+		print '</div>';
+	}
 
 	dol_fiche_end();
 }
@@ -306,3 +353,4 @@ if ($object->id > 0) {
 dol_print_footer();
 llxFooter();
 $db->close();
+
