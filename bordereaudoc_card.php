@@ -125,7 +125,7 @@ $object->syncDocumentIndex($user);
 if ($cancel && $backtopage) {
 	header("Location: ".$backtopage);
 	exit;
-}
+	}
 
 $parameters = array('id' => $object->id, 'ref' => $object->ref);
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
@@ -177,12 +177,12 @@ if (empty($reshook)) {
 	}
 
 if ($action === 'confirm_delete' && GETPOST('confirm', 'alpha') === 'yes' && $permissiondelete && $object->id > 0) {
-$result = $object->delete($user);
-if ($result > 0) {
-header('Location: '.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1));
-exit;
-}
-setEventMessages($object->error, $object->errors, 'errors');
+	$result = $object->delete($user);
+	if ($result > 0) {
+		header('Location: '.dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1));
+		exit;
+	}
+	setEventMessages($object->error, $object->errors, 'errors');
 }
 
 	if ($action === 'confirm_validate' && GETPOST('confirm', 'alpha') === 'yes' && $permissiontovalidate && $object->id > 0) {
@@ -247,7 +247,7 @@ setEventMessages($object->error, $object->errors, 'errors');
 
 if ($action === 'saverecipients' && $permissiontoadd && $object->id > 0) {
 if ((int) $object->statut !== Bordereaudoc::STATUS_DRAFT) {
-setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
+	setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 } else {
 $sendEmail = GETPOST('send_email', 'array');
 $sendMail = GETPOST('send_mail', 'array');
@@ -265,7 +265,7 @@ $lineData = array(
 $object->updateRecipientFlags($line->rowid, $lineData);
 }
 
-setEventMessages($langs->trans('BordereaudocRecipientsUpdated'), null, 'mesgs');
+	setEventMessages($langs->trans('BordereaudocRecipientsUpdated'), null, 'mesgs');
 }
 
 $action = 'view';
@@ -273,7 +273,7 @@ $action = 'view';
 
 if ($action === 'savefiles' && $permissiontoadd && $object->id > 0) {
 if ((int) $object->statut !== Bordereaudoc::STATUS_DRAFT) {
-setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
+	setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 } else {
 $visible = GETPOST('is_visible', 'array');
 $lines = $object->getDocumentIndex();
@@ -281,7 +281,7 @@ foreach ($lines as $line) {
 $flag = isset($visible[$line->rowid]) ? 1 : 0;
 $object->updateFileVisibility($line->rowid, $flag);
 }
-setEventMessages($langs->trans('BordereaudocFilesUpdated'), null, 'mesgs');
+	setEventMessages($langs->trans('BordereaudocFilesUpdated'), null, 'mesgs');
 }
 
 $action = 'view';
@@ -299,7 +299,7 @@ $objectref = dol_sanitizeFileName($object->ref);
 $basedir = !empty($conf->diffusionplans->multidir_output[$object->entity]) ? $conf->diffusionplans->multidir_output[$object->entity] : $conf->document_root[$object->entity];
 $fullpath = $basedir.'/'.$objectref.'/'.$objectref.'.pdf';
 if (!file_exists($fullpath)) {
-setEventMessages($langs->trans('ErrorFailedToLoadFile'), null, 'errors');
+	setEventMessages($langs->trans('ErrorFailedToLoadFile'), null, 'errors');
 } else {
 $recipients = array();
 $lines = $object->getRecipients(1);
@@ -314,7 +314,7 @@ $recipients[] = $contact->email;
 
 $recipients = array_unique($recipients);
 if (empty($recipients)) {
-setEventMessages($langs->trans('ErrorNoEMailRecipientSelected'), null, 'errors');
+	setEventMessages($langs->trans('ErrorNoEMailRecipientSelected'), null, 'errors');
 } else {
 $subject = $langs->trans('BordereaudocMailSubject', $object->ref);
 $template = getDolGlobalString('DIFFUSIONPLANS_BORDEREAU_MAIL_TEMPLATE', '');
@@ -333,9 +333,9 @@ $body .= '- '.$docline->filename.' : '.$link."\n";
 $htmlbody = nl2br(dol_htmlentitiesbr($body));
 $mailfile = new CMailFile($subject, implode(',', $recipients), $user->email, $htmlbody, array($fullpath), array(basename($fullpath)), array('application/pdf'), '', '', 0, 1);
 if ($mailfile->sendfile()) {
-setEventMessages($langs->trans('MailSuccessfulySent', implode(',', $recipients)), null, 'mesgs');
+	setEventMessages($langs->trans('MailSuccessfulySent', implode(',', $recipients)), null, 'mesgs');
 } else {
-setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+	setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 }
 }
 }
@@ -371,16 +371,14 @@ if ($action === 'create') {
 	print '<div class="center">';
 	print '<input type="submit" class="button" value="'.$langs->trans('Create').'">';
 	print '&nbsp;';
-print '<a class="button" href="'.($backtopage ? $backtopage : dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1)).'">'.$langs->trans('Cancel').'</a>';
+	print '<a class="button" href="'.($backtopage ? $backtopage : dol_buildpath('/diffusionplans/bordereaudoc_list.php', 1)).'">'.$langs->trans('Cancel').'</a>';
 	print '</div>';
 
 	print '</form>';
-
-	dol_print_footer();
 	llxFooter();
 	$db->close();
 	exit;
-}
+	}
 
 
 if ($object->id > 0) {
@@ -625,7 +623,6 @@ dol_fiche_end();
 }
 
 // Footer
-dol_print_footer();
-llxFooter();
-$db->close();
+	llxFooter();
+	$db->close();
 
