@@ -123,14 +123,24 @@ public $statut;
 	 */
 	public function fetch($id, $ref = '', $loadAll = true)
 	{
-		$result = $this->fetchCommon($id, $ref, 'ref');
+		// EN: Ensure only one identifier is used to avoid malformed queries
+		$id = (int) $id;
+		$ref = trim((string) $ref);
+
+		if (!empty($id)) {
+			$result = $this->fetchCommon($id);
+		} elseif (!empty($ref)) {
+			$result = $this->fetchCommon(0, $ref, 'ref');
+		} else {
+			return 0;
+		}
+
 		if ($result > 0 && $loadAll) {
 			$this->fetchDocumentIndex();
 		}
 
 		return $result;
 	}
-
 	/**
 	 * Get next reference for object
 	 *
