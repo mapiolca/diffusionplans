@@ -110,7 +110,25 @@ public $statut;
 
 		$this->fields['entity']['default'] = !empty($conf->entity) ? (int) $conf->entity : 1;
 		$this->fields['datec']['default'] = dol_now();
-$this->fields['statut']['default'] = self::STATUS_DRAFT;
+		$this->fields['statut']['default'] = self::STATUS_DRAFT;
+	}
+
+	/**
+	 * Load object by id or ref.
+	 *
+	 * @param int    $id       Object id
+	 * @param string $ref      Object ref
+	 * @param bool   $loadAll  Load children data
+	 * @return int             <0 if KO, 0 not found, >0 if OK
+	 */
+	public function fetch($id, $ref = '', $loadAll = true)
+	{
+		$result = $this->fetchCommon($id, $ref, 'ref');
+		if ($result > 0 && $loadAll) {
+			$this->fetchDocumentIndex();
+		}
+
+		return $result;
 	}
 
 	/**
