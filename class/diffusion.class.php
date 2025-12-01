@@ -914,7 +914,7 @@ class Diffusion extends CommonObject
 			$label = implode($this->getTooltipContentArray($params));
 		}
 
-		$url = dol_buildpath('/diffusionplans/diffusion_card.php', 1).'?id='.$this->id;
+$url = dol_buildpath('/diffusionplans/bordereaudoc_card.php', 1).'?id='.$this->id;
 
 		if ($option !== 'nolink') {
 			// Add param to save lastsearch_values or not

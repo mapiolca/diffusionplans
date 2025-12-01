@@ -41,7 +41,7 @@ function diffusionPrepareHead($object)
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/diffusionplans/diffusion_card.php", 1).'?id='.$object->id;
+$head[$h][0] = dol_buildpath("/diffusionplans/bordereaudoc_card.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Diffusion");
 	$head[$h][2] = 'card';
 	$h++;

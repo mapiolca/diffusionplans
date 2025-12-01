@@ -481,7 +481,7 @@ $r = 0;
 			'titre' => 'New Diffusion',
 			'mainmenu' => 'diffusionplans',
 			'leftmenu' => 'diffusionplans_diffusion_new',
-			'url' => '/diffusionplans/diffusion_card.php?action=create',
+'url' => '/diffusionplans/bordereaudoc_card.php?action=create',
 			'langs' => 'diffusionplans@diffusionplans',
 			'position' => 1003,
 			'enabled' => 'isModEnabled(\'diffusionplans\')',
@@ -516,7 +516,7 @@ $r = 0;
 			'titre' => 'New_Diffusion',
 			'mainmenu' => 'diffusionplans',
 			'leftmenu' => 'diffusionplans_diffusion_new',
-			'url' => '/diffusionplans/diffusion_card.php?action=create',
+'url' => '/diffusionplans/bordereaudoc_card.php?action=create',
 			'langs' => 'diffusionplans@diffusionplans',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 1000 + $r,
 			'enabled' => 'isModEnabled("diffusionplans")', // Define condition to show or hide menu entry. Use 'isModEnabled("diffusionplans")' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
