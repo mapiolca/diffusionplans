@@ -286,9 +286,21 @@ if ($action === 'create') {
 	exit;
 }
 
+
 if ($object->id > 0) {
 	if ($action === 'edit' && (((int) $object->status) !== Bordereaudoc::STATUS_DRAFT || !$permissiontoadd)) {
 		$action = 'view';
+	}
+
+	$confirmform = '';
+	if ($action === 'valid' && $permissiontovalidate && $object->status == Bordereaudoc::STATUS_DRAFT) {
+		$confirmform = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('ValidateBordereaudoc'), $langs->trans('ConfirmValidateBordereaudoc'), 'confirm_validate', '', 0, 1);
+	}
+	if ($action === 'deliver' && $permissiontoarchive && $object->status == Bordereaudoc::STATUS_VALIDATED) {
+		$confirmform = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('DeliverBordereaudoc'), $langs->trans('ConfirmDeliverBordereaudoc'), 'confirm_delivered', '', 0, 1);
+	}
+	if ($action === 'close' && $permissiontoarchive && $object->status == Bordereaudoc::STATUS_DELIVERED) {
+		$confirmform = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('CloseBordereaudoc'), $langs->trans('ConfirmCloseBordereaudoc'), 'confirm_close', '', 0, 1);
 	}
 
 	$head = array();
@@ -297,6 +309,9 @@ if ($object->id > 0) {
 	$head[0][2] = 'card';
 
 	dol_fiche_head($head, 'card', $langs->trans('Bordereaudoc'), -1, 'fa-paper-plane');
+	if (!empty($confirmform)) {
+		print $confirmform;
+	}
 
 	$linkback = '<a href="'.dol_buildpath('/diffusionplans/diffusion_list.php', 1).'">'.$langs->trans('BackToList').'</a>';
 	$morehtmlref = '';
@@ -339,14 +354,37 @@ if ($object->id > 0) {
 		print '</div>';
 		print '</form>';
 	} else {
-		print '<div class="tabsAction">';
+		$buttons = array();
 		if ($object->status == Bordereaudoc::STATUS_DRAFT && $permissiontoadd) {
-			print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit">'.$langs->trans('Modify').'</a>';
+		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit">'.$langs->trans('Modify').'</a>';
 		}
-		print '</div>';
+		if ($object->status == Bordereaudoc::STATUS_DRAFT && $permissiontovalidate) {
+		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=valid">'.$langs->trans('Validate').'</a>';
+		}
+		if ($object->status == Bordereaudoc::STATUS_VALIDATED && $permissiontoarchive) {
+		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=deliver">'.$langs->trans('MarkDelivered').'</a>';
+		}
+		if ($object->status == Bordereaudoc::STATUS_DELIVERED && $permissiontoarchive) {
+		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close">'.$langs->trans('Close').'</a>';
+		}
+		if ($object->status >= Bordereaudoc::STATUS_VALIDATED && $permissiontosend) {
+		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=sendemail">'.$langs->trans('SendMail').'</a>';
+		}
+		if ($permissiontoread) {
+		    $buttons[] = '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=builddoc">'.$langs->trans('GeneratePDF').'</a>';
+		    if (!empty($object->last_main_doc)) {
+		        $modulepart = 'diffusionplans';
+		        $filename = basename($object->last_main_doc);
+		        $filelink = DOL_URL_ROOT.'/document.php?modulepart='.urlencode($modulepart).'&file='.urlencode($object->last_main_doc);
+		        $buttons[] = '<a class="butAction" href="'.$filelink.'">'.$langs->trans('Download').'</a>';
+		    }
+		}
+
+		print '<div class="tabsAction">'.implode('&nbsp;', $buttons).'</div>';
 	}
 
-	dol_fiche_end();
+	
+dol_fiche_end();
 }
 
 // Footer
