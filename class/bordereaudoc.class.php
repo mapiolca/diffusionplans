@@ -199,38 +199,93 @@ public $statut;
 			$this->ref = $this->getNextNumRef($user);
 		}
 
-$this->statut = self::STATUS_VALIDATED;
+		$this->statut = self::STATUS_VALIDATED;
 		$this->fk_user_modif = $user->id;
 
 		return $this->update($user);
 	}
 
 	/**
-	 * Set status back to draft
+	 * Set status back to draft.
 	 *
 	 * @param User $user Current user
 	 * @return int
 	 */
 	public function setDraft(User $user)
 	{
-$this->statut = self::STATUS_DRAFT;
+		$this->statut = self::STATUS_DRAFT;
 		$this->fk_user_modif = $user->id;
 
 		return $this->update($user);
 	}
 
 	/**
-	 * Mark as delivered
+	 * Mark as delivered.
 	 *
 	 * @param User $user Current user
 	 * @return int
 	 */
 	public function setDelivered(User $user)
 	{
-$this->statut = self::STATUS_DELIVERED;
+		$this->statut = self::STATUS_DELIVERED;
 		$this->fk_user_modif = $user->id;
 
 		return $this->update($user);
+	}
+
+	/**
+	 * Get status label with optional picto.
+	 *
+	 * @param int $mode Output mode
+	 * @return string
+	 */
+	public function getLibStatut($mode = 0)
+	{
+		return $this->LibStatut($this->statut, $mode);
+	}
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 * Build status label for provided status.
+	 *
+	 * @param int $status Status code
+	 * @param int $mode   Output mode
+	 * @return string
+	 */
+	public function LibStatut($status, $mode = 0)
+	{
+		// phpcs:enable
+		global $langs;
+
+		if ($status === null) {
+			return '';
+		}
+
+		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
+			$this->labelStatus = array(
+				self::STATUS_DRAFT => $langs->transnoentitiesnoconv('Draft'),
+				self::STATUS_VALIDATED => $langs->transnoentitiesnoconv('Validated'),
+				self::STATUS_DELIVERED => $langs->transnoentitiesnoconv('Delivered'),
+				self::STATUS_CLOSED => $langs->transnoentitiesnoconv('Closed'),
+			);
+			$this->labelStatusShort = array(
+				self::STATUS_DRAFT => $langs->transnoentitiesnoconv('Draft'),
+				self::STATUS_VALIDATED => $langs->transnoentitiesnoconv('Validated'),
+				self::STATUS_DELIVERED => $langs->transnoentitiesnoconv('Delivered'),
+				self::STATUS_CLOSED => $langs->transnoentitiesnoconv('Closed'),
+			);
+		}
+
+		$statusType = 'status0';
+		if ($status == self::STATUS_VALIDATED) {
+			$statusType = 'status4';
+		} elseif ($status == self::STATUS_DELIVERED) {
+			$statusType = 'status6';
+		} elseif ($status == self::STATUS_CLOSED) {
+			$statusType = 'status9';
+		}
+
+		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
 
 	/**
