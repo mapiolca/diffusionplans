@@ -58,7 +58,7 @@ if (!$res) {
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
 require_once '../lib/diffusionplans.lib.php';
-require_once '../class/diffusion.class.php';
+require_once '../class/bordereaudoc.class.php';
 
 
 /**
@@ -84,7 +84,7 @@ $modulepart = GETPOST('modulepart', 'aZ09');	// Used by actions_setmoduleoptions
 $value = GETPOST('value', 'alpha');
 $label = GETPOST('label', 'alpha');
 $scandir = GETPOST('scan_dir', 'alpha');
-$type = 'diffusion';
+$type = 'bordereaudoc';
 
 $error = 0;
 $setupnotempty = 0;
@@ -197,7 +197,7 @@ $dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
 $moduledir = 'diffusionplans';
 $myTmpObjects = array();
 // TODO Scan list of objects to fill this array
-$myTmpObjects['diffusion'] = array('label' => 'Diffusion', 'includerefgeneration' => 1, 'includedocgeneration' => 1, 'class' => 'Diffusion');
+$myTmpObjects['bordereaudoc'] = array('label' => 'Bordereaudoc', 'includerefgeneration' => 1, 'includedocgeneration' => 1, 'class' => 'Bordereaudoc');
 
 $tmpobjectkey = GETPOST('object', 'aZ09');
 if ($tmpobjectkey && !array_key_exists($tmpobjectkey, $myTmpObjects)) {
@@ -237,7 +237,7 @@ if ($action == 'updateMask') {
 
 	$className = $myTmpObjects[$tmpobjectkey]['class'];
 	$tmpobject = new $className($db);
-	'@phan-var-force Diffusion $tmpobject';
+        '@phan-var-force Bordereaudoc $tmpobject';
 	$tmpobject->initAsSpecimen();
 
 	// Search template files
@@ -245,7 +245,7 @@ if ($action == 'updateMask') {
 	$className = '';
 	$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
 	foreach ($dirmodels as $reldir) {
-		$file = dol_buildpath($reldir."core/modules/diffusionplans/doc/pdf_".$modele."_".strtolower($tmpobjectkey).".modules.php", 0);
+                $file = dol_buildpath($reldir."core/modules/bordereaudoc/pdf_".$modele."_".strtolower($tmpobjectkey).".modules.php", 0);
 		if (file_exists($file)) {
 			$className = "pdf_".$modele."_".strtolower($tmpobjectkey);
 			break;
@@ -432,7 +432,7 @@ foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 
 								$className = $myTmpObjectArray['class'];
 								$mytmpinstance = new $className($db);
-								'@phan-var-force Diffusion $mytmpinstance';
+                                                            '@phan-var-force Bordereaudoc $mytmpinstance';
 								$mytmpinstance->initAsSpecimen();
 
 								// Info

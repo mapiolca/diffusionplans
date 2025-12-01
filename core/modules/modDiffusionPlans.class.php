@@ -248,7 +248,7 @@ class modDiffusionPlans extends DolibarrModules
 		/* BEGIN MODULEBUILDER TABS */
 		$this->tabs = array();
 		$this->tabs[] = array(
-		    'data'=>'project:+diffusion:DiffusionDocuments:diffusionplans@diffusionplans:$user->hasRight(\'diffusionplans\', \'read\'):/diffusionplans/tabs/diffusionplans.php?id=__ID__',
+		    'data'=>'project:+bordereaudoc:Bordereaudoc:diffusionplans@diffusionplans:$user->hasRight(\'diffusionplans\', \'bordereaudoc\', \'read\'):/diffusionplans/bordereaudoc_list.php?fk_project=__ID__',
 		    );
 		/* END MODULEBUILDER TABS */
 		// Example:
