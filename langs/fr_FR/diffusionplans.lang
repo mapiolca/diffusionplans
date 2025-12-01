@@ -183,3 +183,6 @@ BordereaudocDownloadLink = Lien public de téléchargement
 BordereaudocNoFiles = Aucun fichier indexé pour ce bordereau.
 BordereaudocFilesUpdated = Liste des fichiers mise à jour
 MarkDelivered = Marquer comme remis
+BordereaudocMailSubject=Bordereau %s
+BordereaudocMailDefaultIntro=Veuillez trouver ci-joint le bordereau %s et les documents associés.
+BordereaudocMailDocuments=Documents disponibles

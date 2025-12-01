@@ -183,3 +183,6 @@ BordereaudocListed = Listed in the delivery slip
 BordereaudocDownloadLink = Public download link
 BordereaudocNoFiles = No file is indexed for this delivery slip.
 BordereaudocFilesUpdated = File list updated
+BordereaudocMailSubject=Delivery slip %s
+BordereaudocMailDefaultIntro=Please find below the delivery slip %s and the related documents.
+BordereaudocMailDocuments=Documents available

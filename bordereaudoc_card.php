@@ -287,41 +287,60 @@ setEventMessages($langs->trans('BordereaudocFilesUpdated'), null, 'mesgs');
 $action = 'view';
 }
 
-	if ($action === 'sendemail' && $permissiontosend && $object->id > 0) {
-		require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+if ($action === 'sendemail' && $permissiontosend && $object->id > 0) {
+require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 
-		if (empty($object->last_main_doc)) {
-			$object->generateDocument($object->model_pdf ? $object->model_pdf : 'standard', $langs);
-		}
+$model = $object->model_pdf ? $object->model_pdf : 'standard';
+if (empty($object->last_main_doc)) {
+$object->generateDocument($model, $langs);
+}
 
-		$filepath = dol_buildpath('/custom/diffusionplans/documents/'.$object->ref, 0);
-		$filename = dol_sanitizeFileName($object->ref.'.pdf');
-		$fullpath = $filepath.'/'.$filename;
+$objectref = dol_sanitizeFileName($object->ref);
+$basedir = !empty($conf->diffusionplans->multidir_output[$object->entity]) ? $conf->diffusionplans->multidir_output[$object->entity] : $conf->document_root[$object->entity];
+$fullpath = $basedir.'/'.$objectref.'/'.$objectref.'.pdf';
+if (!file_exists($fullpath)) {
+setEventMessages($langs->trans('ErrorFailedToLoadFile'), null, 'errors');
+} else {
+$recipients = array();
+$lines = $object->getRecipients(1);
+foreach ($lines as $line) {
+if (!empty($line->send_email) && !empty($line->fk_contact)) {
+$contact = new Contact($db);
+if ($contact->fetch($line->fk_contact) > 0 && !empty($contact->email)) {
+$recipients[] = $contact->email;
+}
+}
+}
 
-		$recipients = array();
-		$lines = $object->getRecipients(1);
-		foreach ($lines as $line) {
-			if (!empty($line->send_email) && !empty($line->fk_contact)) {
-				$contact = new Contact($db);
-				if ($contact->fetch($line->fk_contact) > 0 && !empty($contact->email)) {
-					$recipients[] = $contact->email;
-				}
-			}
-		}
+$recipients = array_unique($recipients);
+if (empty($recipients)) {
+setEventMessages($langs->trans('ErrorNoEMailRecipientSelected'), null, 'errors');
+} else {
+$subject = $langs->trans('BordereaudocMailSubject', $object->ref);
+$template = getDolGlobalString('DIFFUSIONPLANS_BORDEREAU_MAIL_TEMPLATE', '');
+$body = $template ? $template : $langs->trans('BordereaudocMailDefaultIntro', $object->ref);
+$body .= "\n\n".dol_string_nohtmltag($object->description, '', array(), 1);
 
-		if (empty($recipients)) {
-			setEventMessages($langs->trans('ErrorNoEMailRecipientSelected'), null, 'errors');
-		} else {
-			$subject = $langs->trans('Bordereaudoc').' '.$object->ref;
-			$body = dol_htmlentitiesbr($object->description);
-			$mailfile = new CMailFile($subject, implode(',', $recipients), $user->email, $body, array($fullpath), array($filename), array('application/pdf'));
-			if ($mailfile->sendfile()) {
-				setEventMessages($langs->trans('MailSuccessfulySent', implode(',', $recipients)), null, 'mesgs');
-			} else {
-				setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-			}
-		}
-	}
+$docs = $object->getDocumentIndex(1);
+if (!empty($docs)) {
+$body .= "\n\n".$langs->trans('BordereaudocMailDocuments')."\n";
+foreach ($docs as $docline) {
+$link = dol_buildpath('/custom/diffusionplans/public/bordereaudocdownload.php?hash='.$docline->hash, 2);
+$body .= '- '.$docline->filename.' : '.$link."\n";
+}
+}
+
+$htmlbody = nl2br(dol_htmlentitiesbr($body));
+$mailfile = new CMailFile($subject, implode(',', $recipients), $user->email, $htmlbody, array($fullpath), array(basename($fullpath)), array('application/pdf'), '', '', 0, 1);
+if ($mailfile->sendfile()) {
+setEventMessages($langs->trans('MailSuccessfulySent', implode(',', $recipients)), null, 'mesgs');
+} else {
+setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+}
+}
+}
+}
+}
 }
 
 // View
