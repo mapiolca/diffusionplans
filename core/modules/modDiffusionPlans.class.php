@@ -131,57 +131,59 @@ class modDiffusionPlans extends DolibarrModules
                        $conf->diffusioncontact->multidir_output[$entity] = $diffusionContactDir;
                }
 
-		// Name of image file used for this module.
-		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
-		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
-		// To use a supported fa-xxx css style of font awesome, use this->picto='xxx'
-		$this->picto = 'fa-paper-plane';
+			// Name of image file used for this module.
+			// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
+			// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
+			// To use a supported fa-xxx css style of font awesome, use this->picto='xxx'
+			$this->picto = 'fa-paper-plane';
 
-		// Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
-		$this->module_parts = array(
-			// Set this to 1 if module has its own trigger directory (core/triggers)
-			'triggers' => 0,
-			// Set this to 1 if module has its own login method file (core/login)
-			'login' => 0,
-			// Set this to 1 if module has its own substitution function file (core/substitutions)
-			'substitutions' => 0,
-			// Set this to 1 if module has its own menus handler directory (core/menus)
-			'menus' => 0,
-			// Set this to 1 if module overwrite template dir (core/tpl)
-			'tpl' => 0,
-			// Set this to 1 if module has its own barcode directory (core/modules/barcode)
-			'barcode' => 0,
-			// Set this to 1 if module has its own models directory (core/modules/xxx)
-			'models' => 1,
-			// Set this to 1 if module has its own printing directory (core/modules/printing)
-			'printing' => 0,
-			// Set this to 1 if module has its own theme directory (theme)
-			'theme' => 0,
-			// Set this to relative path of css file if module has its own css file
-			'css' => array(
-				//    '/diffusionplans/css/diffusionplans.css.php',
-			),
-			// Set this to relative path of js file if module must load a js on all pages
-			'js' => array(
-				'/diffusionplans/js/diffusionplans.js.php',
-			),
-			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
-			/* BEGIN MODULEBUILDER HOOKSCONTEXTS */
-			'hooks' => array(
-				//   'data' => array(
-				//       'hookcontext1',
-				//       'hookcontext2',
-				//   ),
-				//   'entity' => '0',
-			),
-			/* END MODULEBUILDER HOOKSCONTEXTS */
-			// Set this to 1 if features of module are opened to external users
-			'moduleforexternal' => 0,
-			// Set this to 1 if the module provides a website template into doctemplates/websites/website_template-mytemplate
-			'websitetemplates' => 0,
-			// Set this to 1 if the module provides a captcha driver
-			'captcha' => 0
-		);
+			// Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
+			$this->module_parts = array(
+				// Set this to 1 if module has its own trigger directory (core/triggers)
+				'triggers' => 0,
+				// Set this to 1 if module has its own login method file (core/login)
+				'login' => 0,
+				// Set this to 1 if module has its own substitution function file (core/substitutions)
+				'substitutions' => 0,
+				// Set this to 1 if module has its own menus handler directory (core/menus)
+				'menus' => 0,
+				// Set this to 1 if module overwrite template dir (core/tpl)
+				'tpl' => 0,
+				// Set this to 1 if module has its own barcode directory (core/modules/barcode)
+				'barcode' => 0,
+				// Set custom models directories (core/modules/xxx)
+				'models' => array(
+					'bordereaudoc' => array('dir' => '/diffusionplans/core/modules/bordereaudoc/'),
+				),
+				// Set this to 1 if module has its own printing directory (core/modules/printing)
+				'printing' => 0,
+				// Set this to 1 if module has its own theme directory (theme)
+				'theme' => 0,
+				// Set this to relative path of css file if module has its own css file
+				'css' => array(
+					//    '/diffusionplans/css/diffusionplans.css.php',
+				),
+				// Set this to relative path of js file if module must load a js on all pages
+				'js' => array(
+					'/diffusionplans/js/diffusionplans.js.php',
+				),
+				// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
+				/* BEGIN MODULEBUILDER HOOKSCONTEXTS */
+				'hooks' => array(
+					//   'data' => array(
+					//       'hookcontext1',
+					//       'hookcontext2',
+					//   ),
+					//   'entity' => '0',
+				),
+				/* END MODULEBUILDER HOOKSCONTEXTS */
+				// Set this to 1 if features of module are opened to external users
+				'moduleforexternal' => 0,
+				// Set this to 1 if the module provides a website template into doctemplates/websites/website_template-mytemplate
+				'websitetemplates' => 0,
+				// Set this to 1 if the module provides a captcha driver
+				'captcha' => 0
+			);
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/diffusionplans/temp","/diffusionplans/subdir");
