@@ -1446,21 +1446,19 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		return $top_shift;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
-	 *	Show footer of page. Need this->emetteur object
+	 *   	Show footer of page. Need this->emetteur object
 	 *
-	 *	@param	TCPDI|TCPDF		$pdf     		PDF
-	 *	@param	CommonObject	$object			Object to show
-	 *	@param	Translate		$outputlangs	Object lang for output
-	 *	@param	int<0,1>		$hidefreetext	1=Hide free text
-	 *	@return	int<0,1>						Return height of bottom margin including footer text
+	 *   	@param	TCPDF		$pdf     			PDF
+	 * 		@param	Propal		$object				Object to show
+	 *      @param	Translate	$outputlangs		Object lang for output
+	 *      @param	int			$hidefreetext		1=Hide free text
+	 *      @return	int								Return height of bottom margin including footer text
 	 */
 	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
 	{
-		global $conf;
-		$showdetails = !getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 0 : getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS');
-		return pdf_pagefoot($pdf, $outputlangs, 'INVOICE_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
+		$showdetails = getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS', 0);
+		return pdf_pagefoot($pdf, $outputlangs, 'PROPOSAL_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext, $this->page_largeur, $this->watermark);
 	}
 
 	/**
