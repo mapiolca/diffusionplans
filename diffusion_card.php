@@ -320,7 +320,7 @@ if ($action == 'addcontact' && $permissiontoadd) {
 	$object->ref = GETPOST('ref');
 	$object->label = GETPOST('label');
 	$object->fk_project = GETPOSTINT('projectid');
-	$object->description = GETPOST('description', 'restricthtml');
+	$object->description = GETPOST('description', 'none');
 
 	var_dump($object->fk_project);
 	//$id = $object->create($user, $db); 
@@ -413,8 +413,11 @@ if ($action == 'create') {
 	print '<tr class="field_description">';
 	print '<td class="titlefieldcreate tdtop">'.$langs->trans('Description').'</td>';
 	print '<td class="valuefieldcreate">';
-	$description = $object->getDefaultCreateValueFor('description');
-	$doleditor = new DolEditor('description', $description, '', 80, 'dolibarr_notes', 'In', false, false, !getDolGlobalString('FCKEDITOR_ENABLE_NOTE_PUBLIC') ? 0 : 1, ROWS_3, '90%');
+	$description = GETPOST('description', 'none');
+	if ($description === '') {
+		$description = $object->getDefaultCreateValueFor('description');
+	}
+	$doleditor = new DolEditor('description', $description, '', 160, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_DETAILS'), ROWS_4, '90%');
 	print $doleditor->Create(1);
 	print '</tr>';
 
@@ -582,22 +585,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         if ($descriptionFieldDef !== null) {
                 unset($object->fields['description']);
         }
-	if ($descriptionFieldDef !== null) {
-                $descValueClasses = array('valuefield', 'wordbreak');
-                if (!empty($descriptionFieldDef['cssview'])) {
-                        $descValueClasses[] = $descriptionFieldDef['cssview'];
-                }
-                $descValueClassAttr = implode(' ', array_unique(array_filter($descValueClasses)));
-
-                print '<tr>';
-                print '<td class="titlefield tdtop">'.$form->editfieldkey($descriptionFieldDef['label'], 'description', '', $object, $inlineEditable, 'textarea').'</td>';
-                print '<td class="'.$descValueClassAttr.'">'.$form->editfieldval($descriptionFieldDef['label'], 'description', $object->description, $object, $inlineEditable, 'textarea:100:6', '', null, null, '', 1).'</td>';
-                print '</tr>';
-        }
-
         // Common attributes
 	//$keyforbreak='fieldkeytoswitchonsecondcolumn';	// We change column just before this field
-	//unset($object->fields['fk_project']);				// Hide field already shown in banner
+	unset($object->fields['fk_project']);				// Hide field already shown in banner
 	//unset($object->fields['fk_soc']);					// Hide field already shown in banner
         include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
@@ -609,6 +599,37 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '</table>';
 	print '</div>';
 	print '</div>';
+
+	if ($descriptionFieldDef !== null) {
+		print '<div class="clearboth"></div>';
+		print '<table class="border centpercent tableforfield">';
+		print '<tr class="field_description">';
+		print '<td>'.$descriptionFieldDef['label'].'</td>';
+		print '<td class="valuefield wordbreak">';
+		if ($inlineEditable) {
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">';
+			print '<input type="hidden" name="token" value="'.newToken().'">';
+			print '<input type="hidden" name="action" value="update">';
+			print '<input type="hidden" name="id" value="'.$object->id.'">';
+			$doleditor = new DolEditor('description', $object->description, '', 160, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_DETAILS'), ROWS_4, '100%');
+			print $doleditor->Create(1);
+			print '<div class="center">';
+			print '<input type="submit" class="button button-save" value="'.$langs->trans('Save').'">';
+			print '</div>';
+			print '</form>';
+		} elseif (getDolGlobalString('FCKEDITOR_ENABLE_DETAILS')) {
+			if (function_exists('dol_print_html')) {
+				print dol_print_html($object->description, '1');
+			} else {
+				print $object->description;
+			}
+		} else {
+			print dol_nl2br(dol_escape_htmltag($object->description));
+		}
+		print '</td>';
+		print '</tr>';
+		print '</table>';
+	}
 
 	print '<div class="clearboth"></div>';
 
