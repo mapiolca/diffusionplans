@@ -435,7 +435,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 							if (!getDolGlobalInt('MAIN_PDF_DONOTREPEAT_HEAD')) {
 								$this->_pagehead($pdf, $object, 0, $outputlangs);
 							}
-							// $this->_pagefoot($pdf,$object,$outputlangs,1);
+							$this->_pagefoot($pdf,$object,$outputlangs,1);
 							$pdf->setTopMargin($tab_top_newpage);
 							// The only function to edit the bottom margin of current page to set it.
 							$pdf->setPageOrientation('', 1, $heightforfooter + $heightforfreetext);
