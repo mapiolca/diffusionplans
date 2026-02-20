@@ -674,13 +674,13 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$sql .= " WHERE dc.fk_diffusion = ".(int) $object->id;
 		$sql .= " ORDER BY dc.rowid ASC";
 
-		var_dump($sql);
+		var_dump($sql.'<br><br>');
 		$resql = $this->db->query($sql);
 		if (!$resql) {
 			return $result;
 
 		}
-
+		var_dump($resql);
 		while ($obj = $this->db->fetch_object($resql)) {
 			$rawSource = strtolower(trim((string) $obj->contact_source));
 			$contactId = (int) $obj->fk_contact;
