@@ -144,7 +144,7 @@ $permissiondellink = $user->hasRight('diffusionplans', 'diffusion', 'write'); //
 
 
 $upload_dir = $conf->diffusionplans->multidir_output[isset($object->entity) ? $object->entity : 1].'/diffusion';
-include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
+//include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 // EN: Manage attachment upload and deletion with Dolibarr helper to keep buttons functional.
 // FR: Gère l'envoi et la suppression des pièces jointes avec l'aide Dolibarr pour garder les boutons fonctionnels.
