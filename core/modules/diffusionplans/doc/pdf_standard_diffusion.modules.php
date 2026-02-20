@@ -692,32 +692,37 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$email = '';
 			$phone = '';
 			$mobile = '';
+			$contact = null;
 
 			if ($source === 'internal') {
-				$userclone = clone $userstatic;
-				if ($userclone->fetch($contactId) > 0) {
-					$contactName = $userclone->getFullName($outputlangs);
-					$email = (string) $userclone->email;
-					$phone = (string) $userclone->office_phone;
-					$mobile = (string) $userclone->user_mobile;
+				$contact = clone $userstatic;
+				if ($contact->fetch($contactId) <= 0) {
+					continue;
 				}
+
+				$contactName = $contact->getFullName($outputlangs);
+				$email = (string) $contact->email;
+				$phone = (string) $contact->office_phone;
+				$mobile = (string) $contact->user_mobile;
 
 				if (!empty($mysoc->name)) {
 					$thirdpartyName = (string) $mysoc->name;
 				}
 			} else {
-				$contactclone = clone $contactstatic;
-				if ($contactclone->fetch($contactId) > 0) {
-					$contactName = $contactclone->getFullName($outputlangs);
-					$email = (string) $contactclone->email;
-					$phone = !empty($contactclone->phone_pro) ? (string) $contactclone->phone_pro : (string) $contactclone->phone_perso;
-					$mobile = (string) $contactclone->phone_mobile;
+				$contact = clone $contactstatic;
+				if ($contact->fetch($contactId) <= 0) {
+					continue;
+				}
 
-					if (!empty($contactclone->socid) && $contactclone->socid > 0) {
-						$companyclone = clone $companystatic;
-						if ($companyclone->fetch($contactclone->socid) > 0) {
-							$thirdpartyName = (string) $companyclone->name;
-						}
+				$contactName = $contact->getFullName($outputlangs);
+				$email = (string) $contact->email;
+				$phone = !empty($contact->phone_pro) ? (string) $contact->phone_pro : (string) $contact->phone_perso;
+				$mobile = (string) $contact->phone_mobile;
+
+				if (!empty($contact->socid) && $contact->socid > 0) {
+					$companyclone = clone $companystatic;
+					if ($companyclone->fetch($contact->socid) > 0) {
+						$thirdpartyName = (string) $companyclone->name;
 					}
 				}
 
