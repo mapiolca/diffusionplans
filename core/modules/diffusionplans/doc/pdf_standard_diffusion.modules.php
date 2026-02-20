@@ -564,7 +564,12 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				*/
 
 				// Pagefoot
-				$this->_pagefoot($pdf, $object, $outputlangs);
+				$totalPages = method_exists($pdf, 'getNumPages') ? (int) $pdf->getNumPages() : (int) $pdf->getPage();
+				for ($pageIndex = 1; $pageIndex <= $totalPages; $pageIndex++) {
+					$pdf->setPage($pageIndex);
+					$hidePageFreeText = ($pageIndex < $totalPages ? 1 : 0);
+					$this->_pagefoot($pdf, $object, $outputlangs, $hidePageFreeText);
+				}
 				if (method_exists($pdf, 'AliasNbPages')) {
 					$pdf->AliasNbPages();  // @phan-suppress-current-line PhanUndeclaredMethod
 				}
@@ -1386,7 +1391,8 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	{
 		global $conf;
 		$showdetails = !getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 0 : getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS');
-		return pdf_pagefoot($pdf, $outputlangs, 'INVOICE_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
+		$footerBottomMargin = $this->marge_basse + 4;
+		return pdf_pagefoot($pdf, $outputlangs, 'INVOICE_FREE_TEXT', $this->emetteur, $footerBottomMargin, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
 	}
 
 	/**
