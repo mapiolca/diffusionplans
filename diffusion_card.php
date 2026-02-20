@@ -23,29 +23,6 @@
  *    \brief      Page to create/edit/view diffusion
  */
 
-
-// General defined Options
-//if (! defined('CSRFCHECK_WITH_TOKEN'))     define('CSRFCHECK_WITH_TOKEN', '1');					// Force use of CSRF protection with tokens even for GET
-//if (! defined('MAIN_AUTHENTICATION_MODE')) define('MAIN_AUTHENTICATION_MODE', 'aloginmodule');	// Force authentication handler
-//if (! defined('MAIN_LANG_DEFAULT'))        define('MAIN_LANG_DEFAULT', 'auto');					// Force LANG (language) to a particular value
-//if (! defined('MAIN_SECURITY_FORCECSP'))   define('MAIN_SECURITY_FORCECSP', 'none');				// Disable all Content Security Policies
-//if (! defined('NOBROWSERNOTIF'))     		 define('NOBROWSERNOTIF', '1');					// Disable browser notification
-//if (! defined('NOIPCHECK'))                define('NOIPCHECK', '1');						// Do not check IP defined into conf $dolibarr_main_restrict_ip
-//if (! defined('NOLOGIN'))                  define('NOLOGIN', '1');						// Do not use login - if this page is public (can be called outside logged session). This includes the NOIPCHECK too.
-//if (! defined('NOREQUIREAJAX'))            define('NOREQUIREAJAX', '1');       	  		// Do not load ajax.lib.php library
-//if (! defined('NOREQUIREDB'))              define('NOREQUIREDB', '1');					// Do not create database handler $db
-//if (! defined('NOREQUIREHTML'))            define('NOREQUIREHTML', '1');					// Do not load html.form.class.php
-//if (! defined('NOREQUIREMENU'))            define('NOREQUIREMENU', '1');					// Do not load and show top and left menu
-//if (! defined('NOREQUIRESOC'))             define('NOREQUIRESOC', '1');					// Do not load object $mysoc
-//if (! defined('NOREQUIRETRAN'))            define('NOREQUIRETRAN', '1');					// Do not load object $langs
-//if (! defined('NOREQUIREUSER'))            define('NOREQUIREUSER', '1');					// Do not load object $user
-//if (! defined('NOSCANGETFORINJECTION'))    define('NOSCANGETFORINJECTION', '1');			// Do not check injection attack on GET parameters
-//if (! defined('NOSCANPOSTFORINJECTION'))   define('NOSCANPOSTFORINJECTION', '1');			// Do not check injection attack on POST parameters
-//if (! defined('NOSESSION'))                define('NOSESSION', '1');						// On CLI mode, no need to use web sessions
-//if (! defined('NOSTYLECHECK'))             define('NOSTYLECHECK', '1');					// Do not check style html tag into posted data
-//if (! defined('NOTOKENRENEWAL'))           define('NOTOKENRENEWAL', '1');					// Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
-
-
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
@@ -171,38 +148,23 @@ include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 // EN: Manage attachment upload and deletion with Dolibarr helper to keep buttons functional.
 // FR: Gère l'envoi et la suppression des pièces jointes avec l'aide Dolibarr pour garder les boutons fonctionnels.
-if ($action === 'remove_file') {
-	if (empty($permissiontoadd)) {
-		// EN: Block removal requests when the user lacks the document permission.
-		// FR: Bloque les demandes de suppression lorsque l'utilisateur n'a pas la permission sur le document.
-		setEventMessages($langs->trans('NotEnoughPermissions'), null, 'errors');
-		$action = '';
-	} else {
-		// EN: Retrieve the requested filename and default to the generated PDF when missing.
-		// FR: Récupère le nom de fichier demandé et prend par défaut le PDF généré lorsqu'il est absent.
-		$requestedFile = GETPOST('file', 'alphanohtml', 0, null, null, 1);
-		if ($requestedFile === '' && !empty($object->ref)) {
-			$requestedFile = dol_sanitizeFileName($object->ref).'.pdf';
-		}
-		// EN: Reduce the requested file to its basename to match Dolibarr's document deletion URL.
-		// FR: Réduit le fichier demandé à son basename pour respecter l'URL de suppression Dolibarr.
-		$requestedFile = dol_sanitizeFileName(basename((string) $requestedFile));
-		if ($requestedFile !== '') {
-			// EN: Store the sanitized filename for the confirmation dialog and Dolibarr workflow.
-			// FR: Stocke le nom de fichier assaini pour la boîte de confirmation et le flux Dolibarr.
-			$_GET['file'] = $requestedFile;
-			$_REQUEST['file'] = $requestedFile;
-			$_GET['urlfile'] = $requestedFile;
-			$_REQUEST['urlfile'] = $requestedFile;
-			$action = 'deletefile';
-		} else {
-			// EN: Warn the user when no filename is provided in the deletion URL.
-			// FR: Avertit l'utilisateur lorsqu'aucun nom de fichier n'est fourni dans l'URL de suppression.
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('File')), null, 'errors');
+// Delete file in doc form
+	if ($action == 'remove_file' && $permissiontoadd) {
+		if ($object->id > 0) {
+			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+
+			$langs->load("other");
+			$upload_dir = $conf->project->multidir_output[$object->entity];
+			$file = $upload_dir.'/'.GETPOST('file');
+			$ret = dol_delete_file($file, 0, 0, 0, $object);
+			if ($ret) {
+				setEventMessages($langs->trans("FileWasRemoved", GETPOST('file')), null, 'mesgs');
+			} else {
+				setEventMessages($langs->trans("ErrorFailToDeleteFile", GETPOST('file')), null, 'errors');
+			}
 			$action = '';
 		}
 	}
-}
 
 // Security check (enable the most restrictive one)
 //if ($user->socid > 0) accessforbidden();
