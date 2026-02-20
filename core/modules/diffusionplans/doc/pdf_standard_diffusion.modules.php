@@ -635,8 +635,8 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$dir = $multidir;
 
 		return array(
-			'dir' => $dir,
-			'file' => $dir.'/'.$objectref.'.pdf',
+			'dir' => $multidir,
+			'file' => $multidir.'/'.$objectref.'.pdf',
 			'ref' => $objectref,
 		);
 	}
