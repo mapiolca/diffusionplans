@@ -394,8 +394,6 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					$tab_top = $nexY + 6;
 				}
 
-				$pdf->setPageOrientation('', 1, $heightforfooter + $heightforfreetext + $heightforinfotot);
-
 				$descriptionText = trim($object->description);
 				if ($descriptionText !== '') {
 					$pdf->SetXY($this->marge_gauche, $tab_top);
