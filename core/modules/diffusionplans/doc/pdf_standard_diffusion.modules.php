@@ -918,6 +918,15 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		);
 
 		$pdf->SetFont('', 'B', $defaultFontSize - 1);
+		$headerLineHeight = 4.5;
+		$headerRowHeight = 5;
+		for ($i = 0; $i < count($columns); $i++) {
+			$column = $columns[$i];
+			$label = $outputlangs->transnoentities($column['label']);
+			$numLines = max(1, (int) $pdf->getNumLines($outputlangs->convToOutputCharset($label), $column['width']));
+			$headerRowHeight = max($headerRowHeight, $numLines * $headerLineHeight);
+		}
+
 		$x = $this->marge_gauche;
 		for ($i = 0; $i < count($columns); $i++) {
 			$column = $columns[$i];
@@ -925,10 +934,10 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			// EN: Output the column header with the proper translation.
 			$label = $outputlangs->transnoentities($column['label']);
 			$pdf->SetXY($x, $y);
-			$pdf->MultiCell($column['width'], 5, $label, 0, $column['align'], 0, 0);
+			$pdf->MultiCell($column['width'], $headerLineHeight, $outputlangs->convToOutputCharset($label), 0, $column['align'], 0, 0, '', '', true, 0, false, true, $headerRowHeight, 'T', true);
 			$x += $column['width'];
 		}
-		$y += 5;
+		$y += $headerRowHeight;
 		$pdf->SetDrawColor(200, 200, 200);
 		$pdf->line($this->marge_gauche, $y, $this->marge_gauche + $width, $y);
 		$y += 1;
