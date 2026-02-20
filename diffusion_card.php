@@ -132,7 +132,6 @@ $diffusion_project = new Project($db);
 
 $extrafields = new ExtraFields($db);
 
-$object->dir_output = $conf->monmodule->dir_output . '/' . dol_sanitizeFileName($object->ref);
 $diroutputmassaction = $conf->diffusionplans->dir_output.'/temp/massgeneration/'.$user->id;
 $hookmanager->initHooks(array($object->element.'card', 'globalcard')); // Note that conf->hooks_modules contains array
 $soc = null;
@@ -226,13 +225,6 @@ if (empty($reshook)) {
 
 	// Actions when printing a doc from card
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
-
-	if (!empty($object->id)) {
-		// FR: Précharge les liens de contacts pour alimenter le rendu PDF.
-		// EN: Preload contact links so the PDF renderer receives the prepared data.
-		$diffusioncontactloader = new DiffusionContact($db);
-		$object->pdf_contact_links = $diffusioncontactloader->fetchDiffusionContactLinks($object->id);
-	}
 
 // Action to move up and down lines of object
 //include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';

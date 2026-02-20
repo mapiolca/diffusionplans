@@ -59,6 +59,21 @@ class Diffusion extends CommonObject
 	 */
 	public $picto = 'fa-paper-plane';
 
+	/**
+	 * @var string Module part for documents
+	 */
+	public $modulepart;
+
+	/**
+	 * @var string Output directory for documents
+	 */
+	public $dir_output;
+
+	/**
+	 * @var array<int,array<string,mixed>> Preloaded contact links for PDF generation
+	 */
+	public $pdf_contact_links = array();
+
 
 	const STATUS_DRAFT = 0;
 	const STATUS_VALIDATED = 1;

@@ -59,6 +59,16 @@ class DiffusionContact extends CommonObject
 	 */
 	public $picto = 'fa-address-book';
 
+	/**
+	 * @var string Module part for documents
+	 */
+	public $modulepart;
+
+	/**
+	 * @var string Output directory for documents
+	 */
+	public $dir_output;
+
 
 	const STATUS_DRAFT = 0;
 	const STATUS_VALIDATED = 1;
