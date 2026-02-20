@@ -927,8 +927,8 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 		// FR: Calcule des largeurs équilibrées pour la colonne Contact restaurée et les indicateurs de diffusion.
 		// EN: Compute balanced widths for the restored Contact column and the delivery status indicators.
-		$statusColumnWidth = $width * 0.07;
-		$contactColumnWidth = $width * 0.33;
+		$statusColumnWidth = $width * 0.1;
+		$contactColumnWidth = $width * 0.5;
 		$thirdpartyColumnWidth = $width - ($contactColumnWidth + (3 * $statusColumnWidth));
 
 		// FR: Déclare les colonnes alignées sur la fiche diffusion tout en supprimant la nature du contact.
