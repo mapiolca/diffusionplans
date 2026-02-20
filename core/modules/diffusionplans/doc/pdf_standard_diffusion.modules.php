@@ -674,11 +674,11 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$sql .= " WHERE dc.fk_diffusion = ".(int) $object->id;
 		$sql .= " ORDER BY dc.rowid ASC";
 
+		var_dump($sql);
 		$resql = $this->db->query($sql);
 		if (!$resql) {
 			return $result;
 
-			var_dump($result);
 		}
 
 		while ($obj = $this->db->fetch_object($resql)) {
