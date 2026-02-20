@@ -314,11 +314,11 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$pdf = pdf_getInstance($this->format);
 				'@phan-var-force TCPDI|TCPDF $pdf';
 				$default_font_size = pdf_getPDFFontSize($outputlangs); // Must be after pdf_getInstance
-				$pdf->SetAutoPageBreak(1, 0);
 
-			    $heightforinfotot = $this->estimateSummaryHeight($contactSummaries, $attachmentSummaries);
+				$heightforinfotot = $this->estimateSummaryHeight($contactSummaries, $attachmentSummaries);
 				$heightforfreetext = getDolGlobalInt('MAIN_PDF_FREETEXT_HEIGHT', 5); // Height reserved to output the free text on last page
 				$heightforfooter = $this->marge_basse + (getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 12 : 22); // Height reserved to output the footer (value include bottom margin)
+				$pdf->SetAutoPageBreak(1, $heightforfooter);
 
 				if (class_exists('TCPDF')) {
 					$pdf->setPrintHeader(false);
