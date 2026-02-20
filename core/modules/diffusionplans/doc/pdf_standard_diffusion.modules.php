@@ -1391,7 +1391,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	{
 		global $conf;
 		$showdetails = !getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 0 : getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS');
-		$footerBottomMargin = $this->marge_basse + 4;
+		$footerBottomMargin = $this->marge_basse + 10;
 		return pdf_pagefoot($pdf, $outputlangs, 'INVOICE_FREE_TEXT', $this->emetteur, $footerBottomMargin, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
 	}
 
