@@ -606,7 +606,18 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<tr class="field_description">';
 		print '<td class="titlefield tdtop">'.$descriptionFieldDef['label'].'</td>';
 		print '<td class="valuefield wordbreak">';
-		if (getDolGlobalString('FCKEDITOR_ENABLE_DETAILS')) {
+		if ($inlineEditable) {
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">';
+			print '<input type="hidden" name="token" value="'.newToken().'">';
+			print '<input type="hidden" name="action" value="update">';
+			print '<input type="hidden" name="id" value="'.$object->id.'">';
+			$doleditor = new DolEditor('description', $object->description, '', 160, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_DETAILS'), ROWS_4, '100%');
+			print $doleditor->Create(1);
+			print '<div class="center">';
+			print '<input type="submit" class="button button-save" value="'.$langs->trans('Save').'">';
+			print '</div>';
+			print '</form>';
+		} elseif (getDolGlobalString('FCKEDITOR_ENABLE_DETAILS')) {
 			if (function_exists('dol_print_html')) {
 				print dol_print_html($object->description, '1');
 			} else {
