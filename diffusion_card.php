@@ -537,7 +537,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// ------------------------------------------------------------
 	$linkback = '<a href="'.dol_buildpath('/diffusionplans/diffusion_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
+	$inlineEditable = ($permissiontoadd && $object->status == $object::STATUS_DRAFT);
+
 	$morehtmlref = '<div class="refidno">';
+	if (isset($object->fields['label'])) {
+		$morehtmlref .= $form->editfieldkey($object->fields['label']['label'], 'label', '', $object, $inlineEditable, 'string', '', 0, 1);
+		$morehtmlref .= $form->editfieldval($object->fields['label']['label'], 'label', $object->label, $object, $inlineEditable, 'string', '', null, null, '', 1);
+	}
 	if (isModEnabled('project')) {
 		$langs->load("projects");
 		$morehtmlref .= '<br>';
@@ -576,23 +582,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         if ($descriptionFieldDef !== null) {
                 unset($object->fields['description']);
         }
-
-        $inlineEditable = ($permissiontoadd && $object->status == $object::STATUS_DRAFT);
-
-        if ($labelFieldDef !== null) {
-                $valueClasses = array('valuefield');
-                if (!empty($labelFieldDef['cssview'])) {
-                        $valueClasses[] = $labelFieldDef['cssview'];
-                }
-                $valueClassAttr = implode(' ', array_unique(array_filter($valueClasses)));
-
-                print '<tr>'; // Label row
-                print '<td class="titlefield">'.$form->editfieldkey($labelFieldDef['label'], 'label', '', $object, $inlineEditable, 'string').'</td>';
-                print '<td class="'.$valueClassAttr.'">'.$form->editfieldval($labelFieldDef['label'], 'label', $object->label, $object, $inlineEditable, 'string', '', null, null, '', 1).'</td>';
-                print '</tr>';
-        }
-
-        if ($descriptionFieldDef !== null) {
+	if ($descriptionFieldDef !== null) {
                 $descValueClasses = array('valuefield', 'wordbreak');
                 if (!empty($descriptionFieldDef['cssview'])) {
                         $descValueClasses[] = $descriptionFieldDef['cssview'];
