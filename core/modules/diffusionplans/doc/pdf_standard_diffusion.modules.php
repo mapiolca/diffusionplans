@@ -564,12 +564,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				*/
 
 				// Pagefoot
-				$totalPages = method_exists($pdf, 'getNumPages') ? (int) $pdf->getNumPages() : (int) $pdf->getPage();
-				for ($pageIndex = 1; $pageIndex <= $totalPages; $pageIndex++) {
-					$pdf->setPage($pageIndex);
-					$hidePageFreeText = ($pageIndex < $totalPages ? 1 : 0);
-					$this->_pagefoot($pdf, $object, $outputlangs, $hidePageFreeText);
-				}
+				$this->_pagefoot($pdf, $object, $outputlangs);
 				if (method_exists($pdf, 'AliasNbPages')) {
 					$pdf->AliasNbPages();  // @phan-suppress-current-line PhanUndeclaredMethod
 				}
@@ -662,7 +657,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	 */
 	protected function loadDiffusionContacts($object, $outputlangs)
 	{
-		global $mysoc;
+		global $conf, $mysoc;
 
 		$result = array();
 
@@ -685,11 +680,19 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		}
 
 		while ($obj = $this->db->fetch_object($resql)) {
-			$source = (string) $obj->contact_source;
+			$rawSource = strtolower(trim((string) $obj->contact_source));
 			$contactId = (int) $obj->fk_contact;
 
-			if ($contactId <= 0 || ($source !== 'internal' && $source !== 'external')) {
+			if ($contactId <= 0) {
 				continue;
+			}
+
+			// Normalise source values (defensive: data may contain 'user'/'contact' or be empty)
+			$source = '';
+			if ($rawSource === 'internal' || $rawSource === 'user') {
+				$source = 'internal';
+			} elseif ($rawSource === 'external' || $rawSource === 'contact' || $rawSource === 'socpeople') {
+				$source = 'external';
 			}
 
 			$thirdpartyName = '';
@@ -698,13 +701,84 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$phone = '';
 			$mobile = '';
 			$contact = null;
+			$resolved = false;
 
-			if ($source === 'internal') {
+			// 1) Try direct fetch (expected case)
+			if ($source === 'internal' || $source === '') {
 				$contact = clone $userstatic;
-				if ($contact->fetch($contactId) <= 0) {
-					continue;
+				if ($contact->fetch($contactId) > 0) {
+					$source = 'internal';
+					$resolved = true;
+				}
+			}
+
+			if (!$resolved && ($source === 'external' || $source === '')) {
+				$contact = clone $contactstatic;
+				if ($contact->fetch($contactId) > 0) {
+					$source = 'external';
+					$resolved = true;
+				}
+			}
+
+			// 2) Fallback: fk_contact may actually be llx_element_contact.rowid
+			if (!$resolved) {
+				$fkSocpeople = 0;
+
+				$sql2 = "SELECT ec.fk_socpeople";
+				$sql2 .= " FROM ".MAIN_DB_PREFIX."element_contact as ec";
+				$sql2 .= " WHERE ec.rowid = ".(int) $contactId;
+
+				$resql2 = $this->db->query($sql2);
+				if ($resql2) {
+					$obj2 = $this->db->fetch_object($resql2);
+					$fkSocpeople = ($obj2 ? (int) $obj2->fk_socpeople : 0);
+					$this->db->free($resql2);
 				}
 
+				if ($fkSocpeople > 0) {
+					// Prefer external contact if it exists
+					$contact = clone $contactstatic;
+					if ($contact->fetch($fkSocpeople) > 0) {
+						$source = 'external';
+						$resolved = true;
+					} else {
+						// Try internal user linked to this socpeople (common in Dolibarr)
+						$userRowid = 0;
+
+						$sql3 = "SELECT u.rowid";
+						$sql3 .= " FROM ".MAIN_DB_PREFIX."user as u";
+						$sql3 .= " WHERE u.fk_socpeople = ".(int) $fkSocpeople;
+						if (!empty($conf->entity)) {
+							$sql3 .= " ORDER BY (u.entity = ".(int) $conf->entity.") DESC, u.rowid ASC";
+						}
+						$sql3 .= " LIMIT 1";
+
+						$resql3 = $this->db->query($sql3);
+						if ($resql3) {
+							$obj3 = $this->db->fetch_object($resql3);
+							$userRowid = ($obj3 ? (int) $obj3->rowid : 0);
+							$this->db->free($resql3);
+						}
+
+						if ($userRowid > 0) {
+							$contact = clone $userstatic;
+							if ($contact->fetch($userRowid) > 0) {
+								$source = 'internal';
+								$resolved = true;
+							}
+						}
+					}
+				}
+			}
+
+			if (!$resolved || !is_object($contact)) {
+				continue;
+			}
+
+			// Use the resolved object id (can differ from stored fk_contact when it was an element_contact rowid)
+			$resolvedId = (!empty($contact->id) ? (int) $contact->id : $contactId);
+
+			if ($source === 'internal') {
 				$contactName = $contact->getFullName($outputlangs);
 				$email = (string) $contact->email;
 				$phone = (string) $contact->office_phone;
@@ -714,11 +788,6 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					$thirdpartyName = (string) $mysoc->name;
 				}
 			} else {
-				$contact = clone $contactstatic;
-				if ($contact->fetch($contactId) <= 0) {
-					continue;
-				}
-
 				$contactName = $contact->getFullName($outputlangs);
 				$email = (string) $contact->email;
 				$phone = !empty($contact->phone_pro) ? (string) $contact->phone_pro : (string) $contact->phone_perso;
@@ -748,7 +817,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			}
 
 			$result[] = array(
-				'id' => $contactId,
+				'id' => $resolvedId,
 				'source' => $source,
 				'type_label' => $typeLabel,
 				'thirdparty_name' => $thirdpartyName,
@@ -1391,8 +1460,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	{
 		global $conf;
 		$showdetails = !getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 0 : getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS');
-		$footerBottomMargin = $this->marge_basse + 10;
-		return pdf_pagefoot($pdf, $outputlangs, 'INVOICE_FREE_TEXT', $this->emetteur, $footerBottomMargin, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
+		return pdf_pagefoot($pdf, $outputlangs, 'INVOICE_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
 	}
 
 	/**
