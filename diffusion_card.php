@@ -320,7 +320,7 @@ if ($action == 'addcontact' && $permissiontoadd) {
 	$object->ref = GETPOST('ref');
 	$object->label = GETPOST('label');
 	$object->fk_project = GETPOSTINT('projectid');
-	$object->description = GETPOST('description', 'restricthtml');
+	$object->description = GETPOST('description', 'none');
 
 	var_dump($object->fk_project);
 	//$id = $object->create($user, $db); 
@@ -413,8 +413,11 @@ if ($action == 'create') {
 	print '<tr class="field_description">';
 	print '<td class="titlefieldcreate tdtop">'.$langs->trans('Description').'</td>';
 	print '<td class="valuefieldcreate">';
-	$description = $object->getDefaultCreateValueFor('description');
-	$doleditor = new DolEditor('description', $description, '', 80, 'dolibarr_notes', 'In', false, false, !getDolGlobalString('FCKEDITOR_ENABLE_NOTE_PUBLIC') ? 0 : 1, ROWS_3, '90%');
+	$description = GETPOST('description', 'none');
+	if ($description === '') {
+		$description = $object->getDefaultCreateValueFor('description');
+	}
+	$doleditor = new DolEditor('description', $description, '', 160, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_DETAILS'), ROWS_4, '90%');
 	print $doleditor->Create(1);
 	print '</tr>';
 
@@ -537,38 +540,31 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// ------------------------------------------------------------
 	$linkback = '<a href="'.dol_buildpath('/diffusionplans/diffusion_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
+	$inlineEditable = ($permissiontoadd && $object->status == $object::STATUS_DRAFT);
+
 	$morehtmlref = '<div class="refidno">';
-	/*
-		// Ref customer
-		$morehtmlref .= $form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, $usercancreate, 'string', '', 0, 1);
-		$morehtmlref .= $form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, $usercancreate, 'string'.(getDolGlobalInt('THIRDPARTY_REF_INPUT_SIZE') ? ':'.getDolGlobalInt('THIRDPARTY_REF_INPUT_SIZE') : ''), '', null, null, '', 1);
-		// Thirdparty
-		$morehtmlref .= '<br>'.$object->thirdparty->getNomUrl(1, 'customer');
-		if (!getDolGlobalInt('MAIN_DISABLE_OTHER_LINK') && $object->thirdparty->id > 0) {
-			$morehtmlref .= ' (<a href="'.DOL_URL_ROOT.'/commande/list.php?socid='.$object->thirdparty->id.'&search_societe='.urlencode($object->thirdparty->name).'">'.$langs->trans("OtherOrders").'</a>)';
-		}
-		// Project
-		if (isModEnabled('project')) {
-			$langs->load("projects");
-			$morehtmlref .= '<br>';
-			if ($permissiontoadd) {
-				$morehtmlref .= img_picto($langs->trans("Project"), 'project', 'class="pictofixedwidth"');
-				if ($action != 'classify') {
-					$morehtmlref .= '<a class="editfielda" href="'.$_SERVER['PHP_SELF'].'?action=classify&token='.newToken().'&id='.$object->id.'">'.img_edit($langs->transnoentitiesnoconv('SetProject')).'</a> ';
-				}
-				$morehtmlref .= $form->form_project($_SERVER['PHP_SELF'].'?id='.$object->id, $object->socid, $object->fk_project, ($action == 'classify' ? 'projectid' : 'none'), 0, 0, 0, 1, '', 'maxwidth300');
-			} else {
-				if (!empty($object->fk_project)) {
-					$proj = new Project($db);
-					$proj->fetch($object->fk_project);
-					$morehtmlref .= $proj->getNomUrl(1);
-					if ($proj->title) {
-						$morehtmlref .= '<span class="opacitymedium"> - '.dol_escape_htmltag($proj->title).'</span>';
-					}
-				}
+	if (isset($object->fields['label'])) {
+		$morehtmlref .= $form->editfieldkey($object->fields['label']['label'], 'label', '', $object, $inlineEditable, 'string', '', 0, 1);
+		$morehtmlref .= $form->editfieldval($object->fields['label']['label'], 'label', $object->label, $object, $inlineEditable, 'string', '', null, null, '', 1);
+	}
+	if (isModEnabled('project')) {
+		$langs->load("projects");
+		$morehtmlref .= '<br>';
+		if ($permissiontoadd) {
+			$morehtmlref .= img_picto($langs->trans("Project"), 'project', 'class="pictofixedwidth"');
+			if ($action != 'classify') {
+				$morehtmlref .= '<a class="editfielda" href="'.$_SERVER['PHP_SELF'].'?action=classify&token='.newToken().'&id='.$object->id.'">'.img_edit($langs->transnoentitiesnoconv('SetProject')).'</a> ';
+			}
+			$morehtmlref .= $form->form_project($_SERVER['PHP_SELF'].'?id='.$object->id, $object->socid, $object->fk_project, ($action == 'classify' ? 'projectid' : 'none'), 0, 0, 0, 1, '', 'maxwidth300');
+		} elseif (!empty($object->fk_project)) {
+			$proj = new Project($db);
+			$proj->fetch($object->fk_project);
+			$morehtmlref .= img_picto($langs->trans("Project"), 'project', 'class="pictofixedwidth"').$proj->getNomUrl(1);
+			if (!empty($proj->title)) {
+				$morehtmlref .= '<span class="opacitymedium"> - '.dol_escape_htmltag($proj->title).'</span>';
 			}
 		}
-	*/
+	}
 	$morehtmlref .= '</div>';
 
 
@@ -589,38 +585,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         if ($descriptionFieldDef !== null) {
                 unset($object->fields['description']);
         }
-
-        $inlineEditable = ($permissiontoadd && $object->status == $object::STATUS_DRAFT);
-
-        if ($labelFieldDef !== null) {
-                $valueClasses = array('valuefield');
-                if (!empty($labelFieldDef['cssview'])) {
-                        $valueClasses[] = $labelFieldDef['cssview'];
-                }
-                $valueClassAttr = implode(' ', array_unique(array_filter($valueClasses)));
-
-                print '<tr>'; // Label row
-                print '<td class="titlefield">'.$form->editfieldkey($labelFieldDef['label'], 'label', '', $object, $inlineEditable, 'string').'</td>';
-                print '<td class="'.$valueClassAttr.'">'.$form->editfieldval($labelFieldDef['label'], 'label', $object->label, $object, $inlineEditable, 'string', '', null, null, '', 1).'</td>';
-                print '</tr>';
-        }
-
-        if ($descriptionFieldDef !== null) {
-                $descValueClasses = array('valuefield', 'wordbreak');
-                if (!empty($descriptionFieldDef['cssview'])) {
-                        $descValueClasses[] = $descriptionFieldDef['cssview'];
-                }
-                $descValueClassAttr = implode(' ', array_unique(array_filter($descValueClasses)));
-
-                print '<tr>';
-                print '<td class="titlefield tdtop">'.$form->editfieldkey($descriptionFieldDef['label'], 'description', '', $object, $inlineEditable, 'textarea').'</td>';
-                print '<td class="'.$descValueClassAttr.'">'.$form->editfieldval($descriptionFieldDef['label'], 'description', $object->description, $object, $inlineEditable, 'textarea:100:6', '', null, null, '', 1).'</td>';
-                print '</tr>';
-        }
-
         // Common attributes
 	//$keyforbreak='fieldkeytoswitchonsecondcolumn';	// We change column just before this field
-	//unset($object->fields['fk_project']);				// Hide field already shown in banner
+	unset($object->fields['fk_project']);				// Hide field already shown in banner
 	//unset($object->fields['fk_soc']);					// Hide field already shown in banner
         include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
@@ -632,6 +599,37 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '</table>';
 	print '</div>';
 	print '</div>';
+
+	if ($descriptionFieldDef !== null) {
+		print '<div class="clearboth"></div>';
+		print '<table class="border centpercent tableforfield">';
+		print '<tr class="field_description">';
+		print '<td>'.$descriptionFieldDef['label'].'</td>';
+		print '<td class="valuefield wordbreak">';
+		if ($inlineEditable) {
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">';
+			print '<input type="hidden" name="token" value="'.newToken().'">';
+			print '<input type="hidden" name="action" value="update">';
+			print '<input type="hidden" name="id" value="'.$object->id.'">';
+			$doleditor = new DolEditor('description', $object->description, '', 160, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_DETAILS'), ROWS_4, '100%');
+			print $doleditor->Create(1);
+			print '<div class="center">';
+			print '<input type="submit" class="button button-save" value="'.$langs->trans('Save').'">';
+			print '</div>';
+			print '</form>';
+		} elseif (getDolGlobalString('FCKEDITOR_ENABLE_DETAILS')) {
+			if (function_exists('dol_print_html')) {
+				print dol_print_html($object->description, '1');
+			} else {
+				print $object->description;
+			}
+		} else {
+			print dol_nl2br(dol_escape_htmltag($object->description));
+		}
+		print '</td>';
+		print '</tr>';
+		print '</table>';
+	}
 
 	print '<div class="clearboth"></div>';
 

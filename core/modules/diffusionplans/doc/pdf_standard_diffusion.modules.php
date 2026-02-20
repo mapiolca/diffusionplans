@@ -944,24 +944,22 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 	       for ($i = 0; $i < count($contacts); $i++) {
 		       $contact = $contacts[$i];
+		       $lineHeight = 4.5;
 		       $rowHeight = 5;
 		       for ($j = 0; $j < count($columns); $j++) {
 			       $column = $columns[$j];
 			       $text = $this->formatContactColumnValue($contact, $column, $outputlangs);
-			       // FR: Calcule la hauteur nécessaire pour gérer les textes multilignes.
-			       // EN: Compute the row height required to handle multi-line text.
-			       $numLines = $pdf->getNumLines($outputlangs->convToOutputCharset($text), $column['width']);
-			       $rowHeight = max($rowHeight, $numLines * 4.5);
+			       $text = $outputlangs->convToOutputCharset($text);
+			       $rowHeight = max($rowHeight, $pdf->getStringHeight($column['width'], $text, false, true, '', 0));
 		       }
 
 		       $x = $this->marge_gauche;
 		       for ($j = 0; $j < count($columns); $j++) {
 			       $column = $columns[$j];
 			       $text = $this->formatContactColumnValue($contact, $column, $outputlangs);
-			       // FR: Écrit chaque cellule en respectant l'alignement prévu.
-			       // EN: Write each cell while respecting the expected alignment.
+			       $text = $outputlangs->convToOutputCharset($text);
 			       $pdf->SetXY($x, $y);
-			       $pdf->MultiCell($column['width'], $rowHeight, $outputlangs->convToOutputCharset($text), 0, $column['align'], 0, 0);
+			       $pdf->MultiCell($column['width'], $lineHeight, $text, 0, $column['align'], 0, 0, '', '', true, 0, false, true, $rowHeight, 'T');
 			       $x += $column['width'];
 		       }
 			$y += $rowHeight;
