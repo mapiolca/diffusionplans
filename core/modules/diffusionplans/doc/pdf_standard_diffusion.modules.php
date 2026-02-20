@@ -549,22 +549,15 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					$bottomlasttab = $tab_top;
 				}
 
-			       // Display diffusion contacts and attachments summary
-			       $summaryStartY = max($pdf->GetY(), $bottomlasttab + 2);
-			       $availableWidth = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
-			       $afterContactsY = $this->renderContactsSection($pdf, $object, $contactSummaries, $outputlangs, $summaryStartY, $availableWidth);
-			       $this->renderAttachmentsSection($pdf, $attachmentSummaries, $outputlangs, $afterContactsY + 4, $availableWidth);
-
-				// Display payment area
-				/*
-				if ($deja_regle)
-				{
-					$posy = $this->drawPaymentsTable($pdf, $object, $posy, $outputlangs);
-				}
-				*/
+				// Display diffusion contacts and attachments summary
+				$summaryStartY = max($pdf->GetY(), $bottomlasttab + 2);
+				$availableWidth = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
+				$afterContactsY = $this->renderContactsSection($pdf, $object, $contactSummaries, $outputlangs, $summaryStartY, $availableWidth);
+				$this->renderAttachmentsSection($pdf, $attachmentSummaries, $outputlangs, $afterContactsY + 4, $availableWidth);
 
 				// Pagefoot
 				$this->_pagefoot($pdf, $object, $outputlangs);
+
 				if (method_exists($pdf, 'AliasNbPages')) {
 					$pdf->AliasNbPages();  // @phan-suppress-current-line PhanUndeclaredMethod
 				}
@@ -593,7 +586,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				return 0;
 			}
 		} else {
-			$this->error = $langs->transnoentities("ErrorConstantNotDefined", "FAC_OUTPUTDIR");
+			$this->error = $langs->transnoentities("ErrorConstantNotDefined", "DIFFUSION_OUTPUTDIR");
 			return 0;
 		}
 	}
@@ -639,7 +632,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			return null;
 		}
 
-		$dir = $multidir.'/'.$objectref;
+		$dir = $multidir;
 
 		return array(
 			'dir' => $dir,
@@ -1462,7 +1455,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	{
 		global $conf;
 		$showdetails = !getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 0 : getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS');
-		return pdf_pagefoot($pdf, $outputlangs, 'DIFFUSION_FREE_TEXT', $this->emetteur, $this->marge_basse+10, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext, $this->page_largeur, $this->watermark);
+		return pdf_pagefoot($pdf, $outputlangs, 'DIFFUSION_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext, $this->page_largeur, $this->watermark);
 
 	}
 
