@@ -1052,7 +1052,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		if (!empty($column['status'])) {
 			// FR: Affiche une coche lorsque la méthode est activée.
 			// EN: Show a check mark when the delivery method is enabled.
-			return !empty($contact[$key]) ? $outputlangs->convToOutputCharset('Yes') : '';
+			return !empty($contact[$key]) ? $outputlangs->transnoentities("Yes") : $outputlangs->transnoentities("No");
 		}
 
 
