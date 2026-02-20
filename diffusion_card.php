@@ -350,7 +350,6 @@ if ($action == 'addcontact' && $permissiontoadd) {
 	$object->fk_project = GETPOSTINT('projectid');
 	$object->description = GETPOST('description', 'none');
 
-	var_dump($object->fk_project);
 	//$id = $object->create($user, $db); 
 }
 
