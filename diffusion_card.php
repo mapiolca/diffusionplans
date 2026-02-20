@@ -150,6 +150,7 @@ include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 // FR: Gère l'envoi et la suppression des pièces jointes avec l'aide Dolibarr pour garder les boutons fonctionnels.
 // Delete file in doc form
 	if ($action == 'remove_file' && $permissiontoadd) {
+		var_dump('TEST');
 		if ($object->id > 0) {
 			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
