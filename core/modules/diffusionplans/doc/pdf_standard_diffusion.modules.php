@@ -114,7 +114,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		global $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "bills"));
+		$langs->loadLangs(array("main", "project", "diffusion@diffusion"));
 
 		$this->db = $db;
 		$this->name = "standard";
@@ -344,31 +344,13 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$pdf->SetSubject($outputlangs->transnoentities("PdfTitle"));
 				$pdf->SetCreator("Dolibarr ".DOL_VERSION);
 				$pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
-				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref)." ".$outputlangs->transnoentities("PdfTitle")." ".$outputlangs->convToOutputCharset($object->thirdparty->name));
+				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref)." ".$outputlangs->transnoentities("Diffusion")." ".$outputlangs->convToOutputCharset($object->thirdparty->name));
 				if (getDolGlobalString('MAIN_DISABLE_PDF_COMPRESSION')) {
 					$pdf->SetCompression(false);
 				}
 
-				// Set certificate
-				$cert = empty($user->conf->CERTIFICATE_CRT) ? '' : $user->conf->CERTIFICATE_CRT;
-				// If user has no certificate, we try to take the company one
-				if (!$cert) {
-					$cert = getDolGlobalString('CERTIFICATE_CRT');
-				}
-				// If a certificate is found
-				if ($cert) {
-					$info = array(
-						'Name' => $this->emetteur->name,
-						'Location' => getCountry($this->emetteur->country_code, ''),
-						'Reason' => 'DIFFUSION',
-						'ContactInfo' => $this->emetteur->email
-					);
-					$pdf->setSignature($cert, $cert, $this->emetteur->name, '', 2, $info);
-				}
-
 				// @phan-suppress-next-line PhanPluginSuspiciousParamOrder
 				$pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite); // Left, Top, Right
-
 
 				// New page
 				$pdf->AddPage();
@@ -376,33 +358,22 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					$pdf->useTemplate($tplidx);
 				}
 				$pagenb++;
-
-				$top_shift = $this->_pagehead($pdf, $object, 1, $outputlangs, $outputlangsbis);
+				$top_shift = $this->_pagehead($pdf, $object, 1, $outputlangs, (is_object($outputlangsbis) ? $outputlangsbis : null));
 				$pdf->SetFont('', '', $default_font_size - 1);
 				$pdf->MultiCell(0, 3, ''); // Set interline to 3
 				$pdf->SetTextColor(0, 0, 0);
 
-				$tab_top = 90 + $top_shift;
-				$tab_top_newpage = (!getDolGlobalInt('MAIN_PDF_DONOTREPEAT_HEAD') ? 42 + $top_shift : 10);
-
-				$tab_height = $this->page_hauteur - $tab_top - $heightforfooter - $heightforfreetext;
-
-				$tab_height_newpage = 150;
-				if (!getDolGlobalInt('MAIN_PDF_DONOTREPEAT_HEAD')) {
-					$tab_height_newpage -= $top_shift;
-				}
-
-				$nexY = $tab_top - 1;
+				$tab_top = 90;
+				$tab_top_newpage = (!getDolGlobalInt('MAIN_PDF_DONOTREPEAT_HEAD') ? 42 : 10);
 
 				// Display notes
 				$notetoshow = empty($object->note_public) ? '' : $object->note_public;
+
 				// Extrafields in note
 				$extranote = $this->getExtrafieldsInHtml($object, $outputlangs);
 				if (!empty($extranote)) {
 					$notetoshow = dol_concatdesc($notetoshow, $extranote);
 				}
-
-				$pagenb = $pdf->getPage();
 				if ($notetoshow) {
 					$tab_top -= 2;
 
