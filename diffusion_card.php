@@ -150,13 +150,11 @@ $upload_dir = $conf->diffusionplans->multidir_output[isset($object->entity) ? $o
 // FR: Gère l'envoi et la suppression des pièces jointes avec l'aide Dolibarr pour garder les boutons fonctionnels.
 // Delete file in doc form
 	if ($action == 'remove_file' && $permissiontoadd) {
-		var_dump('TEST');
 		if ($object->id > 0) {
-			var_dump($object->id);
 			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 			$langs->load("other");
-			$upload_dir = $conf->diffusionplans->multidir_output[isset($object->entity) ? $object->entity : 1].'/'.$object->element.'/'.$objref;
+			//$upload_dir = $conf->diffusionplans->multidir_output[isset($object->entity) ? $object->entity : 1].'/'.$object->element.'/'.$objref;
 			$file = $upload_dir.'/'.GETPOST('file');
 			var_dump($file);
 			$ret = dol_delete_file($file, 0, 0, 0, $object);
