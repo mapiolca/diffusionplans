@@ -604,9 +604,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<td class="titlefield tdtop">'.$descriptionFieldDef['label'].'</td>';
 		print '<td class="valuefield wordbreak">';
 		if (getDolGlobalString('FCKEDITOR_ENABLE_DETAILS')) {
-			print dol_print_html($object->description, '1');
+			if (function_exists('dol_print_html')) {
+				print dol_print_html($object->description, '1');
+			} else {
+				print $object->description;
+			}
 		} else {
-			print dol_nl2br($object->description);
+			print dol_nl2br(dol_escape_htmltag($object->description));
 		}
 		print '</td>';
 		print '</tr>';
