@@ -143,7 +143,7 @@ $permissionnote = $user->hasRight('diffusionplans', 'diffusion', 'write'); // Us
 $permissiondellink = $user->hasRight('diffusionplans', 'diffusion', 'write'); // Used by the include of actions_dellink.inc.php
 
 
-$upload_dir = $conf->diffusionplans->multidir_output[isset($object->entity) ? $object->entity : 1].'/diffusion';
+$upload_dir = $conf->diffusionplans->multidir_output[isset($object->entity) ? $object->entity : 1];
 //include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 // EN: Manage attachment upload and deletion with Dolibarr helper to keep buttons functional.
