@@ -158,7 +158,7 @@ $upload_dir = $conf->diffusionplans->multidir_output[isset($object->entity) ? $o
 			$langs->load("other");
 			$upload_dir = $conf->project->multidir_output[$object->entity];
 			$file = $upload_dir.'/'.GETPOST('file');
-			var_dump($object->id);
+			var_dump($file);
 			$ret = dol_delete_file($file, 0, 0, 0, $object);
 			if ($ret) {
 				setEventMessages($langs->trans("FileWasRemoved", GETPOST('file')), null, 'mesgs');
