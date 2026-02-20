@@ -604,7 +604,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<div class="clearboth"></div>';
 		print '<table class="border centpercent tableforfield">';
 		print '<tr class="field_description">';
-		print '<td class="titlefield tdtop">'.$descriptionFieldDef['label'].'</td>';
+		print '<td>'.$descriptionFieldDef['label'].'</td>';
 		print '<td class="valuefield wordbreak">';
 		if ($inlineEditable) {
 			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">';
