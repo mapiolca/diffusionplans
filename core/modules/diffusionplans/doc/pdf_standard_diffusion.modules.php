@@ -318,7 +318,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 			       $heightforinfotot = $this->estimateSummaryHeight($contactSummaries, $attachmentSummaries);
 				$heightforfreetext = getDolGlobalInt('MAIN_PDF_FREETEXT_HEIGHT', 5); // Height reserved to output the free text on last page
-				$heightforfooter = $this->marge_basse + (getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 12 : 22); // Height reserved to output the footer (value include bottom margin)
+				$heightforfooter = $this->marge_basse + (getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 22 : 32); // Height reserved to output the footer (value include bottom margin)
 
 				if (class_exists('TCPDF')) {
 					$pdf->setPrintHeader(false);
@@ -435,7 +435,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 							if (!getDolGlobalInt('MAIN_PDF_DONOTREPEAT_HEAD')) {
 								$this->_pagehead($pdf, $object, 0, $outputlangs);
 							}
-							$this->_pagefoot($pdf,$object,$outputlangs,1);
+							// $this->_pagefoot($pdf,$object,$outputlangs,1);
 							$pdf->setTopMargin($tab_top_newpage);
 							// The only function to edit the bottom margin of current page to set it.
 							$pdf->setPageOrientation('', 1, $heightforfooter + $heightforfreetext);
@@ -1446,19 +1446,22 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		return $top_shift;
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
-	 *   	Show footer of page. Need this->emetteur object
+	 *	Show footer of page. Need this->emetteur object
 	 *
-	 *   	@param	TCPDF		$pdf     			PDF
-	 * 		@param	Propal		$object				Object to show
-	 *      @param	Translate	$outputlangs		Object lang for output
-	 *      @param	int			$hidefreetext		1=Hide free text
-	 *      @return	int								Return height of bottom margin including footer text
+	 *	@param	TCPDI|TCPDF		$pdf     		PDF
+	 *	@param	CommonObject	$object			Object to show
+	 *	@param	Translate		$outputlangs	Object lang for output
+	 *	@param	int<0,1>		$hidefreetext	1=Hide free text
+	 *	@return	int<0,1>						Return height of bottom margin including footer text
 	 */
 	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
 	{
-		$showdetails = getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS', 0);
-		return pdf_pagefoot($pdf, $outputlangs, 'PROPOSAL_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext, $this->page_largeur, $this->watermark);
+		global $conf;
+		$showdetails = !getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS') ? 0 : getDolGlobalInt('MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS');
+		return pdf_pagefoot($pdf, $outputlangs, 'DIFFUSION_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext, $this->page_largeur, $this->watermark);
+
 	}
 
 	/**
