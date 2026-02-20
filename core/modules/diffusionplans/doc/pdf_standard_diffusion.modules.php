@@ -669,7 +669,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$contactstatic = new Contact($this->db);
 		$userstatic = new User($this->db);
 
-		$sql = "SELECT dc.rowid, dc.fk_contact, dc.contact_source, dc.mail_status, dc.letter_status, dc.hand_status, dc.type_label";
+		$sql = "SELECT dc.rowid, dc.fk_contact, dc.contact_source, dc.mail_status, dc.letter_status, dc.hand_status";
 		$sql .= " FROM ".MAIN_DB_PREFIX."diffusionplans_diffusioncontact as dc";
 		$sql .= " WHERE dc.fk_diffusion = ".(int) $object->id;
 		$sql .= " ORDER BY dc.rowid ASC";
