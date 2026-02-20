@@ -461,31 +461,6 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 							//$posyafter = $tab_top_newpage;
 						}
 
-
-						// apply note frame to previous pages
-						$i = $pageposbeforenote;
-						while ($i < $pageposafternote) {
-							$pdf->setPage($i);
-
-
-							$pdf->SetDrawColor(128, 128, 128);
-							// Draw note frame
-							if ($i > $pageposbeforenote) {
-								$height_note = $this->page_hauteur - ($tab_top_newpage + $heightforfooter);
-								$pdf->Rect($this->marge_gauche, $tab_top_newpage - 1, $tab_width, $height_note + 1);
-							} else {
-								$height_note = $this->page_hauteur - ($tab_top + $heightforfooter);
-								$pdf->Rect($this->marge_gauche, $tab_top - 1, $tab_width, $height_note + 1);
-							}
-
-							// Add footer
-							$this->_pagefoot($pdf, $object, $outputlangs, 1);
-							$pdf->setPageOrientation('', 1, 0); // The only function to edit the bottom margin of current page to set it.
-							
-
-							$i++;
-						}
-
 						// apply note frame to last page
 						$pdf->setPage($pageposafternote);
 						if (!empty($tplidx)) {
