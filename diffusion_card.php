@@ -582,19 +582,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         if ($descriptionFieldDef !== null) {
                 unset($object->fields['description']);
         }
-	if ($descriptionFieldDef !== null) {
-                $descValueClasses = array('valuefield', 'wordbreak');
-                if (!empty($descriptionFieldDef['cssview'])) {
-                        $descValueClasses[] = $descriptionFieldDef['cssview'];
-                }
-                $descValueClassAttr = implode(' ', array_unique(array_filter($descValueClasses)));
-
-                print '<tr>';
-                print '<td class="titlefield tdtop">'.$form->editfieldkey($descriptionFieldDef['label'], 'description', '', $object, $inlineEditable, 'textarea').'</td>';
-                print '<td class="'.$descValueClassAttr.'">'.$form->editfieldval($descriptionFieldDef['label'], 'description', $object->description, $object, $inlineEditable, 'textarea:100:6', '', null, null, '', 1).'</td>';
-                print '</tr>';
-        }
-
         // Common attributes
 	//$keyforbreak='fieldkeytoswitchonsecondcolumn';	// We change column just before this field
 	unset($object->fields['fk_project']);				// Hide field already shown in banner
@@ -609,6 +596,22 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '</table>';
 	print '</div>';
 	print '</div>';
+
+	if ($descriptionFieldDef !== null) {
+		print '<div class="clearboth"></div>';
+		print '<table class="border centpercent tableforfield">';
+		print '<tr class="field_description">';
+		print '<td class="titlefield tdtop">'.$descriptionFieldDef['label'].'</td>';
+		print '<td class="valuefield wordbreak">';
+		if (getDolGlobalString('FCKEDITOR_ENABLE_DETAILS')) {
+			print dol_print_html($object->description, '1');
+		} else {
+			print dol_nl2br($object->description);
+		}
+		print '</td>';
+		print '</tr>';
+		print '</table>';
+	}
 
 	print '<div class="clearboth"></div>';
 
