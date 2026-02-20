@@ -421,8 +421,13 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$afterContactsY = $this->renderContactsSection($pdf, $object, $contactSummaries, $outputlangs, $summaryStartY, $availableWidth);
 				$this->renderAttachmentsSection($pdf, $attachmentSummaries, $outputlangs, $afterContactsY + 4, $availableWidth);
 
-				// Pagefoot
-				$this->_pagefoot($pdf, $object, $outputlangs);
+				// EN: Print footer on each generated page (including auto-created pages for long description).
+				// FR: Imprimer le pied de page sur chaque page générée (y compris celles créées automatiquement pour une description longue).
+				$nbpagesgenerated = $pdf->getNumPages();
+				for ($pageid = 1; $pageid <= $nbpagesgenerated; $pageid++) {
+					$pdf->setPage($pageid);
+					$this->_pagefoot($pdf, $object, $outputlangs);
+				}
 
 				if (method_exists($pdf, 'AliasNbPages')) {
 					$pdf->AliasNbPages();  // @phan-suppress-current-line PhanUndeclaredMethod
