@@ -677,6 +677,8 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$resql = $this->db->query($sql);
 		if (!$resql) {
 			return $result;
+
+			var_dump($result);
 		}
 
 		while ($obj = $this->db->fetch_object($resql)) {
