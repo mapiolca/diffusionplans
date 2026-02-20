@@ -320,7 +320,7 @@ if ($action == 'addcontact' && $permissiontoadd) {
 	$object->ref = GETPOST('ref');
 	$object->label = GETPOST('label');
 	$object->fk_project = GETPOSTINT('projectid');
-	$object->description = GETPOST('description', 'restricthtml');
+	$object->description = GETPOST('description', 'none');
 
 	var_dump($object->fk_project);
 	//$id = $object->create($user, $db); 
@@ -413,7 +413,7 @@ if ($action == 'create') {
 	print '<tr class="field_description">';
 	print '<td class="titlefieldcreate tdtop">'.$langs->trans('Description').'</td>';
 	print '<td class="valuefieldcreate">';
-	$description = GETPOST('description', 'restricthtml');
+	$description = GETPOST('description', 'none');
 	if ($description === '') {
 		$description = $object->getDefaultCreateValueFor('description');
 	}
