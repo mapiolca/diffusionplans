@@ -413,8 +413,11 @@ if ($action == 'create') {
 	print '<tr class="field_description">';
 	print '<td class="titlefieldcreate tdtop">'.$langs->trans('Description').'</td>';
 	print '<td class="valuefieldcreate">';
-	$description = $object->getDefaultCreateValueFor('description');
-	$doleditor = new DolEditor('description', $description, '', 80, 'dolibarr_notes', 'In', false, false, !getDolGlobalString('FCKEDITOR_ENABLE_NOTE_PUBLIC') ? 0 : 1, ROWS_3, '90%');
+	$description = GETPOST('description', 'restricthtml');
+	if ($description === '') {
+		$description = $object->getDefaultCreateValueFor('description');
+	}
+	$doleditor = new DolEditor('description', $description, '', 160, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_DETAILS'), ROWS_4, '90%');
 	print $doleditor->Create(1);
 	print '</tr>';
 
