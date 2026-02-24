@@ -176,7 +176,7 @@ class modDiffusionPlans extends DolibarrModules
 			),
 			/* END MODULEBUILDER HOOKSCONTEXTS */
 			// Set this to 1 if features of module are opened to external users
-			'moduleforexternal' => 0,
+			'moduleforexternal' => 1,
 			// Set this to 1 if the module provides a website template into doctemplates/websites/website_template-mytemplate
 			'websitetemplates' => 0,
 			// Set this to 1 if the module provides a captcha driver
