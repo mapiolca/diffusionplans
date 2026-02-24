@@ -770,7 +770,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 		// Documents
 
-		$object->element = "diffusion";
+		$object->element = "diffusionplans_diffusion"; //$object->element = "diffusion";
 		if ($includedocgeneration) {
 			$objref = dol_sanitizeFileName($object->ref);
 			$relativepath = $objref.'/'.$objref.'.pdf';
@@ -871,3 +871,4 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 // End of page
 llxFooter();
 $db->close();
+
