@@ -771,18 +771,56 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$pdf->SetXY($this->marge_gauche, $startY);
 		$lineHeight = 4;
 		$pageBottomLimit = $this->page_hauteur - $heightforfooter;
+		$descriptionText = trim((string) $descriptionText);
 
-		$sanitizedDescription = trim((string) $descriptionText);
-		if (dol_textishtml($sanitizedDescription)) {
-			// Convert common block-level HTML tags into line breaks before stripping tags.
-			$sanitizedDescription = preg_replace('/<\s*li[^>]*>/i', "- ", $sanitizedDescription);
-			$sanitizedDescription = preg_replace('/<\s*\/\s*(p|div|li|tr|h[1-6])\s*>/i', "\n", $sanitizedDescription);
-			$sanitizedDescription = preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $sanitizedDescription);
-			$sanitizedDescription = html_entity_decode($sanitizedDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-			$sanitizedDescription = strip_tags($sanitizedDescription);
+		if ($descriptionText === '') {
+			return $pdf->GetY();
 		}
 
-		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", $sanitizedDescription);
+		if (dol_textishtml($descriptionText)) {
+			$descriptionHtml = convertBackOfficeMediasLinksToPublicLinks($descriptionText);
+			$blocks = preg_split('/(?<=<\/\s*(p|div|ul|ol|li|table|tr|h[1-6]|blockquote)\s*>)/i', $descriptionHtml, -1, PREG_SPLIT_NO_EMPTY);
+			if (empty($blocks)) {
+				$blocks = array($descriptionHtml);
+			}
+
+			for ($i = 0; $i < count($blocks); $i++) {
+				$blockHtml = trim($blocks[$i]);
+				if ($blockHtml === '') {
+					continue;
+				}
+
+				$startPage = $pdf->getPage();
+				$startBlockY = $pdf->GetY();
+				$pdf->startTransaction();
+				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $startBlockY, $blockHtml, 0, 1, false, true, 'L', true);
+				$endPage = $pdf->getPage();
+				$endBlockY = $pdf->GetY();
+				$pdf = $pdf->rollbackTransaction(true);
+
+				$requiredHeight = ($endPage > $startPage) ? ($pageBottomLimit - $startBlockY + 1) : max($lineHeight, $endBlockY - $startBlockY);
+				if (($pdf->GetY() + $requiredHeight) > $pageBottomLimit) {
+					$pdf->AddPage();
+					if (!empty($tplidx)) {
+						$pdf->useTemplate($tplidx);
+					}
+					$pagenb++;
+					if ($repeatPageHeadOnExtraPages) {
+						$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
+						$pdf->SetXY($this->marge_gauche, $startYNewPage);
+					} else {
+						$pdf->SetXY($this->marge_gauche, $this->marge_haute + 2);
+					}
+					$pdf->SetFont('', '', $defaultFontSize);
+				}
+
+				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $pdf->GetY(), $blockHtml, 0, 1, false, true, 'L', true);
+			}
+
+			return $pdf->GetY();
+		}
+
+		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", $descriptionText);
 		$lines = explode("\n", $sanitizedDescription);
 
 		for ($i = 0; $i < count($lines); $i++) {
