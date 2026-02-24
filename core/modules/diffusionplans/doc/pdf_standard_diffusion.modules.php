@@ -397,7 +397,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$descriptionText = trim($object->description);
 				$availableWidth = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
 				if ($descriptionText !== '') {
-					$bottomlasttab = $this->renderDescriptionWithPagination($pdf, $object, $outputlangs, $descriptionText, $tab_top, $tab_top_newpage, $availableWidth, $heightforfooter, $default_font_size, $tplidx, $pagenb, (is_object($outputlangsbis) ? $outputlangsbis : null), false);
+					$bottomlasttab = $this->renderDescriptionWithPagination($pdf, $object, $outputlangs, $descriptionText, $tab_top, $tab_top_newpage, $availableWidth, $heightforfooter, $default_font_size, $tplidx, $pagenb, (is_object($outputlangsbis) ? $outputlangsbis : null), true);
 				} else {
 					$bottomlasttab = $tab_top;
 				}
@@ -1265,10 +1265,10 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 			$hautcadre = getDolGlobalInt('MAIN_PDF_USE_ISO_LOCATION') ? 38 : 40;
 			$widthrecbox = getDolGlobalInt('MAIN_PDF_USE_ISO_LOCATION') ? 92 : 82;
-
+			$hideAddressFrames = ($pdf->getPage() > 1);
 
 			// Show sender frame
-			if (!getDolGlobalString('MAIN_PDF_NO_SENDER_FRAME')) {
+			if (!$hideAddressFrames && !getDolGlobalString('MAIN_PDF_NO_SENDER_FRAME')) {
 				$pdf->SetTextColor(0, 0, 0);
 				$pdf->SetFont('', '', $default_font_size - 2);
 				$pdf->SetXY($posx, $posy - 5);
@@ -1329,7 +1329,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			}
 
 			// Show recipient frame
-			if (!getDolGlobalString('MAIN_PDF_NO_RECIPENT_FRAME')) {
+			if (!$hideAddressFrames && !getDolGlobalString('MAIN_PDF_NO_RECIPENT_FRAME')) {
 				$pdf->SetTextColor(0, 0, 0);
 				$pdf->SetFont('', '', $default_font_size - 2);
 				$pdf->SetXY($posx + 2, $posy - 5);
