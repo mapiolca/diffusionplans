@@ -68,6 +68,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 dol_include_once('/diffusionplans/class/diffusion.class.php');
 dol_include_once('/diffusionplans/class/diffusioncontact.class.php');
 dol_include_once('/diffusionplans/lib/diffusionplans_diffusion.lib.php');
+dol_include_once('/diffusionplans/core/modules/diffusionplans/modules_diffusion.php');
 
 /**
  * @var Conf $conf
