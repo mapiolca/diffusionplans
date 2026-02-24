@@ -772,6 +772,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$lineHeight = 4;
 		$pageBottomLimit = $this->page_hauteur - $heightforfooter;
 		$descriptionText = trim((string) $descriptionText);
+		$descriptionText = str_replace(array("\\r\\n", "\\n", "\\r"), "\n", $descriptionText);
 
 		if ($descriptionText === '') {
 			return $pdf->GetY();
@@ -821,7 +822,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$pdf->SetAutoPageBreak(true, 0);
 			}
 
-			return min($pdf->GetY(), $pageBottomLimit);
+			return $pdf->GetY();
 		}
 
 		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", $descriptionText);
