@@ -47,7 +47,7 @@ class Diffusion extends CommonObject
 	/**
 	 * @var string 	Name of table without prefix where object is stored. This is also the key used for extrafields management (so extrafields know the link to the parent table).
 	 */
-	public $table_element = 'diffusion';
+	public $table_element = 'diffusionplans_diffusion';
 
 	/**
 	 * @var string 	If permission must be checkec with hasRight('diffusionplans', 'read') and not hasright('mymodyle', 'diffusion', 'read'), you can uncomment this line
@@ -1407,4 +1407,5 @@ class DiffusionLine extends CommonObjectLine
 		$this->isextrafieldmanaged = 0;
 	}
 }
+
 
