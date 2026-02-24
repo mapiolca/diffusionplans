@@ -771,7 +771,18 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$pdf->SetXY($this->marge_gauche, $startY);
 		$lineHeight = 4;
 		$pageBottomLimit = $this->page_hauteur - $heightforfooter;
-		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", trim((string) $descriptionText));
+
+		$sanitizedDescription = trim((string) $descriptionText);
+		if (dol_textishtml($sanitizedDescription)) {
+			// Convert common block-level HTML tags into line breaks before stripping tags.
+			$sanitizedDescription = preg_replace('/<\s*li[^>]*>/i', "- ", $sanitizedDescription);
+			$sanitizedDescription = preg_replace('/<\s*\/\s*(p|div|li|tr|h[1-6])\s*>/i', "\n", $sanitizedDescription);
+			$sanitizedDescription = preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $sanitizedDescription);
+			$sanitizedDescription = html_entity_decode($sanitizedDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+			$sanitizedDescription = strip_tags($sanitizedDescription);
+		}
+
+		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", $sanitizedDescription);
 		$lines = explode("\n", $sanitizedDescription);
 
 		for ($i = 0; $i < count($lines); $i++) {
