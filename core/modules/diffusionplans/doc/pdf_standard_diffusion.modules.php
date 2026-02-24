@@ -779,7 +779,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 		if (dol_textishtml($descriptionText)) {
 			$descriptionHtml = convertBackOfficeMediasLinksToPublicLinks($descriptionText);
-			$blocks = preg_split('/(?<=<\/\s*(p|div|ul|ol|li|table|tr|h[1-6]|blockquote)\s*>)/i', $descriptionHtml, -1, PREG_SPLIT_NO_EMPTY);
+			$blocks = preg_split('/(?:(?<=<\/\s*(p|div|ul|ol|li|table|tr|h[1-6]|blockquote)\s*>)|(?=<\s*br\s*\/?\s*>))/i', $descriptionHtml, -1, PREG_SPLIT_NO_EMPTY);
 			if (empty($blocks)) {
 				$blocks = array($descriptionHtml);
 			}
@@ -790,16 +790,18 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					continue;
 				}
 
-				$startPage = $pdf->getPage();
 				$startBlockY = $pdf->GetY();
-				$pdf->startTransaction();
-				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $startBlockY, $blockHtml, 0, 1, false, true, 'L', true);
-				$endPage = $pdf->getPage();
-				$endBlockY = $pdf->GetY();
-				$pdf = $pdf->rollbackTransaction(true);
+				$remainingHeight = $pageBottomLimit - $startBlockY;
 
-				$requiredHeight = ($endPage > $startPage) ? ($pageBottomLimit - $startBlockY + 1) : max($lineHeight, $endBlockY - $startBlockY);
-				if (($pdf->GetY() + $requiredHeight) > $pageBottomLimit) {
+				// Measure block height with manual page break disabled to keep deterministic coordinates.
+				$pdf->startTransaction();
+				$pdf->SetAutoPageBreak(false, 0);
+				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $startBlockY, $blockHtml, 0, 1, false, true, 'L', true);
+				$requiredHeight = max($lineHeight, $pdf->GetY() - $startBlockY);
+				$pdf = $pdf->rollbackTransaction(true);
+				$pdf->SetAutoPageBreak(true, 0);
+
+				if ($requiredHeight > $remainingHeight) {
 					$pdf->AddPage();
 					if (!empty($tplidx)) {
 						$pdf->useTemplate($tplidx);
@@ -814,10 +816,12 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					$pdf->SetFont('', '', $defaultFontSize);
 				}
 
+				$pdf->SetAutoPageBreak(false, 0);
 				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $pdf->GetY(), $blockHtml, 0, 1, false, true, 'L', true);
+				$pdf->SetAutoPageBreak(true, 0);
 			}
 
-			return $pdf->GetY();
+			return min($pdf->GetY(), $pageBottomLimit);
 		}
 
 		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", $descriptionText);
