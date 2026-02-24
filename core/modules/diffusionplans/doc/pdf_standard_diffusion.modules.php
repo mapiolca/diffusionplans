@@ -397,7 +397,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$descriptionText = trim($object->description);
 				$availableWidth = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
 				if ($descriptionText !== '') {
-					$bottomlasttab = $this->renderDescriptionWithPagination($pdf, $object, $outputlangs, $descriptionText, $tab_top, $tab_top_newpage, $availableWidth, $heightforfooter, $default_font_size, $tplidx, $pagenb, (is_object($outputlangsbis) ? $outputlangsbis : null));
+					$bottomlasttab = $this->renderDescriptionWithPagination($pdf, $object, $outputlangs, $descriptionText, $tab_top, $tab_top_newpage, $availableWidth, $heightforfooter, $default_font_size, $tplidx, $pagenb, (is_object($outputlangsbis) ? $outputlangsbis : null), false);
 				} else {
 					$bottomlasttab = $tab_top;
 				}
@@ -762,9 +762,10 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	 * @param int|false $tplidx Background template index
 	 * @param int $pagenb Current page number (incremented when new pages are added)
 	 * @param ?Translate $outputlangsbis Secondary language
+	 * @param bool $repeatPageHeadOnExtraPages Repeat page header on extra pages
 	 * @return float
 	 */
-	protected function renderDescriptionWithPagination(&$pdf, $object, $outputlangs, $descriptionText, $startY, $startYNewPage, $width, $heightforfooter, $defaultFontSize, $tplidx, &$pagenb, $outputlangsbis = null)
+	protected function renderDescriptionWithPagination(&$pdf, $object, $outputlangs, $descriptionText, $startY, $startYNewPage, $width, $heightforfooter, $defaultFontSize, $tplidx, &$pagenb, $outputlangsbis = null, $repeatPageHeadOnExtraPages = true)
 	{
 		$pdf->SetFont('', '', $defaultFontSize);
 		$pdf->SetXY($this->marge_gauche, $startY);
@@ -789,9 +790,13 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					$pdf->useTemplate($tplidx);
 				}
 				$pagenb++;
-				$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
+				if ($repeatPageHeadOnExtraPages) {
+					$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
+					$pdf->SetXY($this->marge_gauche, $startYNewPage);
+				} else {
+					$pdf->SetXY($this->marge_gauche, $this->marge_haute + 2);
+				}
 				$pdf->SetFont('', '', $defaultFontSize);
-				$pdf->SetXY($this->marge_gauche, $startYNewPage);
 			}
 
 			if ($line === '') {
