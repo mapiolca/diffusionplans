@@ -163,3 +163,5 @@ MarkAsSent = Mark as sent
 
 Sent = Sent
 Validated = Validated
+MAIN_MAIL_ENABLED_USER_DEST_SELECT = Enable user recipients selection in email sending
+MAIN_MAIL_ENABLED_USER_DEST_SELECTHelp = Show, in the email form, a multi-select list of active users with an email address.

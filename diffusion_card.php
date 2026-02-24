@@ -822,6 +822,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		$sql = 'SELECT DISTINCT dc.fk_contact';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc';
 		$sql .= ' WHERE dc.fk_diffusion = '.((int) $object->id);
+		$sql .= " AND dc.contact_source = 'external'";
 		$sql .= ' AND dc.mail_status = 1';
 
 		$resql = $db->query($sql);
