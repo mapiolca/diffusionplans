@@ -817,7 +817,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 			$pagenb = max($pagenb, $pageposafterdesc);
 			$pdf->setPage($pageposafterdesc);
-			$pdf->setPageOrientation('', true, $heightforfooter);
+			$pdf->setPageOrientation('', true, 0);
 			return $posyafter;
 		}
 
