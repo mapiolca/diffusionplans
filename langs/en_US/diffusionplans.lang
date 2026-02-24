@@ -159,3 +159,7 @@ methodHand = Hand delivered
 methodLetter = Send by letter
 methodMail = Send by email
 or = or
+MarkAsSent = Mark as sent
+
+Sent = Sent
+Validated = Validated

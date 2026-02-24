@@ -127,9 +127,9 @@ class DiffusionContact extends CommonObject
 		"fk_contact" => array("type" => "integer", "label" => "fk_contact", "enabled" => "1", 'position' => 2, 'notnull' => 0, "visible" => "0",),
                 "fk_diffusion" => array("type" => "integer", "label" => "fk_diffusion", "enabled" => "1", 'position' => 1, 'notnull' => 0, "visible" => "0",),
                 "contact_source" => array("type" => "varchar(128)", "label" => "ContactSource", "enabled" => "1", 'position' => 2, 'notnull' => 1, "visible" => "0"),
-                "mail_status" => array("type" => "integer", "label" => "method_mail", "enabled" => "1", 'position' => 3, 'notnull' => 1, "visible" => "0", "default" => "0", "arrayofkeyval" => array("0" => "D&eacute;sactiv&eacute;", "1" => "Actif"),),
-		"letter_status" => array("type" => "integer", "label" => "method_letter", "enabled" => "1", 'position' => 4, 'notnull' => 1, "visible" => "0", "default" => "0", "arrayofkeyval" => array("0" => "D&eacute;sactiv&eacute;", "1" => "Actif"),),
-		"hand_status" => array("type" => "integer", "label" => "method_hand", "enabled" => "1", 'position' => 5, 'notnull' => 1, "visible" => "0", "default" => "0", "arrayofkeyval" => array("0" => "D&eacute;sactiv&eacute;", "1" => "Actif"),),
+                "mail_status" => array("type" => "integer", "label" => "method_mail", "enabled" => "1", 'position' => 3, 'notnull' => 1, "visible" => "0", "default" => "0", "arrayofkeyval" => array("0" => "D&eacute;sactiv&eacute;", "1" => "Valid&eacute;"),),
+		"letter_status" => array("type" => "integer", "label" => "method_letter", "enabled" => "1", 'position' => 4, 'notnull' => 1, "visible" => "0", "default" => "0", "arrayofkeyval" => array("0" => "D&eacute;sactiv&eacute;", "1" => "Valid&eacute;"),),
+		"hand_status" => array("type" => "integer", "label" => "method_hand", "enabled" => "1", 'position' => 5, 'notnull' => 1, "visible" => "0", "default" => "0", "arrayofkeyval" => array("0" => "D&eacute;sactiv&eacute;", "1" => "Valid&eacute;"),),
 		"fk_user_modif" => array("type" => "integer:user:user/class/user.class.php", "label" => "UserModif", "enabled" => "1", 'position' => 511, 'notnull' => 0, "visible" => "0",),
 	);
 	public $rowid;

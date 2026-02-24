@@ -233,6 +233,16 @@ include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 	$autocopy = 'MAIN_MAIL_AUTOCOPY_DIFFUSION_TO';
 	$trackid = 'diffusion'.$object->id;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
+
+	if ($action == 'set_sent' && $permissiontoadd) {
+		$result = $object->setSent($user);
+		if ($result < 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+		} else {
+			header('Location: '.$_SERVER['PHP_SELF'].'?id='.$object->id);
+			exit;
+		}
+	}
 }
 
 /*
@@ -691,6 +701,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			// Back to draft
 			if ($object->status == $object::STATUS_VALIDATED) {
 				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
+				print dolGetButtonAction('', $langs->trans('MarkAsSent'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=set_sent&token='.newToken(), '', $permissiontoadd);
 			}
 
 			// Modify
