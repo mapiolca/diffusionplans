@@ -1280,18 +1280,19 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			}
 
 			// Show sender name
-			if (!getDolGlobalString('MAIN_PDF_HIDE_SENDER_NAME')) {
+			if (!$hideAddressFrames && !getDolGlobalString('MAIN_PDF_HIDE_SENDER_NAME')) {
 				$pdf->SetXY($posx + 2, $posy + 3);
 				$pdf->SetFont('', 'B', $default_font_size);
 				$pdf->MultiCell($widthrecbox - 2, 4, $outputlangs->convToOutputCharset($this->emetteur->name), 0, $ltrdirection);
 				$posy = $pdf->getY();
 			}
-
+		
 			// Show sender information
-			$pdf->SetXY($posx + 2, $posy);
-			$pdf->SetFont('', '', $default_font_size - 1);
-			$pdf->MultiCell($widthrecbox - 2, 4, $carac_emetteur, 0, $ltrdirection);
-
+			if (!$hideAddressFrames) {
+				$pdf->SetXY($posx + 2, $posy);
+				$pdf->SetFont('', '', $default_font_size - 1);
+				$pdf->MultiCell($widthrecbox - 2, 4, $carac_emetteur, 0, $ltrdirection);
+			}
 			// If BILLING contact defined, we use it
 			$usecontact = false;
 			$arrayidcontact = $object->getIdContact('external', 'BILLING');
@@ -1338,18 +1339,22 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			}
 
 			// Show recipient name
-			$pdf->SetXY($posx + 2, $posy + 3);
-			$pdf->SetFont('', 'B', $default_font_size);
-			// @phan-suppress-next-line PhanPluginSuspiciousParamOrder
-			$pdf->MultiCell($widthrecbox, 2, $carac_client_name, 0, $ltrdirection);
+			if (!$hideAddressFrames) {
+				$pdf->SetXY($posx + 2, $posy + 3);
+				$pdf->SetFont('', 'B', $default_font_size);
+				// @phan-suppress-next-line PhanPluginSuspiciousParamOrder
+				$pdf->MultiCell($widthrecbox, 2, $carac_client_name, 0, $ltrdirection);
+			}
 
 			$posy = $pdf->getY();
 
 			// Show recipient information
-			$pdf->SetFont('', '', $default_font_size - 1);
-			$pdf->SetXY($posx + 2, $posy);
-			// @phan-suppress-next-line PhanPluginSuspiciousParamOrder
-			$pdf->MultiCell($widthrecbox, 4, $carac_client, 0, $ltrdirection);
+			if (!$hideAddressFrames) {
+				$pdf->SetFont('', '', $default_font_size - 1);
+				$pdf->SetXY($posx + 2, $posy);
+				// @phan-suppress-next-line PhanPluginSuspiciousParamOrder
+				$pdf->MultiCell($widthrecbox, 4, $carac_client, 0, $ltrdirection);
+			}
 		}
 
 		$pdf->SetTextColor(0, 0, 0);
