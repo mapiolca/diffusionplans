@@ -783,8 +783,9 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$pageposbeforedesc = $pdf->getPage();
 			$posybefore = $pdf->GetY();
 
+			$pdf->setTopMargin($startYNewPage);
 			$pdf->startTransaction();
-			$pdf->setPageOrientation('', true, $heightforfooter);
+			$pdf->SetAutoPageBreak(true, $heightforfooter);
 			$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
 			$pageposafterdesc = $pdf->getPage();
 			$posyafter = $pdf->GetY();
@@ -802,11 +803,11 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 						$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
 					}
 					$pdf->setTopMargin($startYNewPage);
-					$pdf->setPageOrientation('', true, $heightforfooter);
 				}
 
 				$pdf->setPage($pageposbeforedesc);
-				$pdf->setPageOrientation('', true, $heightforfooter);
+				$pdf->setTopMargin($startYNewPage);
+				$pdf->SetAutoPageBreak(true, $heightforfooter);
 				$pdf->SetFont('', '', $defaultFontSize);
 				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
 				$pageposafterdesc = $pdf->getPage();
@@ -817,7 +818,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 			$pagenb = max($pagenb, $pageposafterdesc);
 			$pdf->setPage($pageposafterdesc);
-			$pdf->setPageOrientation('', true, 0);
+			$pdf->SetAutoPageBreak(true, 0);
 			return $posyafter;
 		}
 
