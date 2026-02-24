@@ -395,34 +395,23 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				}
 
 				$descriptionText = trim($object->description);
+				$availableWidth = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
 				if ($descriptionText !== '') {
-					$pdf->SetXY($this->marge_gauche, $tab_top);
-					$pdf->SetFont('', '', $default_font_size);
-					$pdf->writeHTMLCell(
-						$this->page_largeur - $this->marge_gauche - $this->marge_droite,
-						0,
-						$this->marge_gauche,
-						$tab_top,
-						dol_htmlentitiesbr($descriptionText),
-						0,
-						1,
-						false,
-						true,
-						'L'
-					);
-					$bottomlasttab = $pdf->GetY();
+					$bottomlasttab = $this->renderDescriptionWithPagination($pdf, $object, $outputlangs, $descriptionText, $tab_top, $tab_top_newpage, $availableWidth, $heightforfooter, $default_font_size, $tplidx, $pagenb, (is_object($outputlangsbis) ? $outputlangsbis : null));
 				} else {
 					$bottomlasttab = $tab_top;
 				}
 
 				// Display diffusion contacts and attachments summary
 				$summaryStartY = max($pdf->GetY(), $bottomlasttab + 2);
-				$availableWidth = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
 				$afterContactsY = $this->renderContactsSection($pdf, $object, $contactSummaries, $outputlangs, $summaryStartY, $availableWidth);
 				$this->renderAttachmentsSection($pdf, $attachmentSummaries, $outputlangs, $afterContactsY + 4, $availableWidth);
 
-				// Pagefoot
-				$this->_pagefoot($pdf, $object, $outputlangs);
+				$nbpagesgenerated = $pdf->getNumPages();
+				for ($pageid = 1; $pageid <= $nbpagesgenerated; $pageid++) {
+					$pdf->setPage($pageid);
+					$this->_pagefoot($pdf, $object, $outputlangs);
+				}
 
 				if (method_exists($pdf, 'AliasNbPages')) {
 					$pdf->AliasNbPages();  // @phan-suppress-current-line PhanUndeclaredMethod
@@ -756,6 +745,63 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		// FR: Retourne une hauteur minimale confortable pour les deux sections combinées.
 		// EN: Return a comfortable minimal height for the combined sections.
 		return max(50, $contactsHeight + $attachmentsHeight + $padding);
+	}
+
+	/**
+	 * Render description with manual pagination to preserve footer space.
+	 *
+	 * @param TCPDF|TCPDI $pdf PDF handler
+	 * @param Diffusion $object Diffusion object
+	 * @param Translate $outputlangs Output language handler
+	 * @param string $descriptionText Description content
+	 * @param float $startY Start position on first page
+	 * @param float $startYNewPage Start position on new pages
+	 * @param float $width Available width
+	 * @param float $heightforfooter Reserved height for footer area
+	 * @param int $defaultFontSize Font size
+	 * @param int|false $tplidx Background template index
+	 * @param int $pagenb Current page number (incremented when new pages are added)
+	 * @param ?Translate $outputlangsbis Secondary language
+	 * @return float
+	 */
+	protected function renderDescriptionWithPagination(&$pdf, $object, $outputlangs, $descriptionText, $startY, $startYNewPage, $width, $heightforfooter, $defaultFontSize, $tplidx, &$pagenb, $outputlangsbis = null)
+	{
+		$pdf->SetFont('', '', $defaultFontSize);
+		$pdf->SetXY($this->marge_gauche, $startY);
+		$lineHeight = 4;
+		$pageBottomLimit = $this->page_hauteur - $heightforfooter;
+		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", trim((string) $descriptionText));
+		$lines = explode("\n", $sanitizedDescription);
+
+		for ($i = 0; $i < count($lines); $i++) {
+			$line = $lines[$i];
+			if ($line === '') {
+				$requiredHeight = $lineHeight;
+			} else {
+				$encodedLine = $outputlangs->convToOutputCharset(dol_string_nohtmltag($line));
+				$numLines = max(1, (int) $pdf->getNumLines($encodedLine, $width));
+				$requiredHeight = $numLines * $lineHeight;
+			}
+
+			if (($pdf->GetY() + $requiredHeight) > $pageBottomLimit) {
+				$pdf->AddPage();
+				if (!empty($tplidx)) {
+					$pdf->useTemplate($tplidx);
+				}
+				$pagenb++;
+				$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
+				$pdf->SetFont('', '', $defaultFontSize);
+				$pdf->SetXY($this->marge_gauche, $startYNewPage);
+			}
+
+			if ($line === '') {
+				$pdf->MultiCell($width, $lineHeight, '', 0, 'L', 0, 1);
+			} else {
+				$pdf->MultiCell($width, $lineHeight, $outputlangs->convToOutputCharset(dol_string_nohtmltag($line)), 0, 'L', 0, 1);
+			}
+		}
+
+		return $pdf->GetY();
 	}
 
        /**
