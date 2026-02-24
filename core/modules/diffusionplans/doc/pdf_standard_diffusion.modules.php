@@ -771,7 +771,56 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		$pdf->SetXY($this->marge_gauche, $startY);
 		$lineHeight = 4;
 		$pageBottomLimit = $this->page_hauteur - $heightforfooter;
-		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", trim((string) $descriptionText));
+		$descriptionText = trim((string) $descriptionText);
+		$descriptionText = str_replace(array("\\r\\n", "\\n", "\\r"), "\n", $descriptionText);
+
+		if ($descriptionText === '') {
+			return $pdf->GetY();
+		}
+
+		if (dol_textishtml($descriptionText)) {
+			$descriptionHtml = convertBackOfficeMediasLinksToPublicLinks($descriptionText);
+			$pageposbeforedesc = $pdf->getPage();
+			$posybefore = $pdf->GetY();
+
+			$pdf->startTransaction();
+			$pdf->SetAutoPageBreak(true, $heightforfooter);
+			$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
+			$pageposafterdesc = $pdf->getPage();
+			$posyafter = $pdf->GetY();
+
+			if ($pageposafterdesc > $pageposbeforedesc) {
+				$pdf = $pdf->rollbackTransaction(true);
+
+				while ($pagenb < $pageposafterdesc) {
+					$pdf->AddPage();
+					$pagenb++;
+					if (!empty($tplidx)) {
+						$pdf->useTemplate($tplidx);
+					}
+					if ($repeatPageHeadOnExtraPages) {
+						$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
+					}
+					$pdf->setTopMargin($startYNewPage);
+				}
+
+				$pdf->setPage($pageposbeforedesc);
+				$pdf->SetAutoPageBreak(true, $heightforfooter);
+				$pdf->SetFont('', '', $defaultFontSize);
+				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
+				$pageposafterdesc = $pdf->getPage();
+				$posyafter = $pdf->GetY();
+			} else {
+				$pdf->commitTransaction();
+			}
+
+			$pagenb = max($pagenb, $pageposafterdesc);
+			$pdf->setPage($pageposafterdesc);
+			$pdf->SetAutoPageBreak(true, 0);
+			return $posyafter;
+		}
+
+		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", $descriptionText);
 		$lines = explode("\n", $sanitizedDescription);
 
 		for ($i = 0; $i < count($lines); $i++) {
