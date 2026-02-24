@@ -780,7 +780,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 		if (dol_textishtml($descriptionText)) {
 			$descriptionHtml = convertBackOfficeMediasLinksToPublicLinks($descriptionText);
-			$blocks = preg_split('/(?:(?<=<\/\s*(p|div|ul|ol|li|table|tr|h[1-6]|blockquote)\s*>)|(?=<\s*br\s*\/?\s*>))/i', $descriptionHtml, -1, PREG_SPLIT_NO_EMPTY);
+			$blocks = preg_split('/(?<=<\/\s*(p|div|ul|ol|li|table|tr|h[1-6]|blockquote)\s*>)/i', $descriptionHtml, -1, PREG_SPLIT_NO_EMPTY);
 			if (empty($blocks)) {
 				$blocks = array($descriptionHtml);
 			}
@@ -801,6 +801,29 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$requiredHeight = max($lineHeight, $pdf->GetY() - $startBlockY);
 				$pdf = $pdf->rollbackTransaction(true);
 				$pdf->SetAutoPageBreak(true, 0);
+
+				$maxBlockHeightOnFreshPage = $pageBottomLimit - $startYNewPage;
+				if ($requiredHeight > $maxBlockHeightOnFreshPage) {
+					if ($pdf->GetY() > $startYNewPage) {
+						$pdf->AddPage();
+						if (!empty($tplidx)) {
+							$pdf->useTemplate($tplidx);
+						}
+						$pagenb++;
+						if ($repeatPageHeadOnExtraPages) {
+							$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
+							$pdf->SetXY($this->marge_gauche, $startYNewPage);
+						} else {
+							$pdf->SetXY($this->marge_gauche, $this->marge_haute + 2);
+						}
+						$pdf->SetFont('', '', $defaultFontSize);
+					}
+					$pdf->SetAutoPageBreak(true, $heightforfooter);
+					$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $pdf->GetY(), $blockHtml, 0, 1, false, true, 'L', true);
+					$pdf->SetAutoPageBreak(true, 0);
+					$pagenb = max($pagenb, $pdf->getPage());
+					continue;
+				}
 
 				if ($requiredHeight > $remainingHeight) {
 					$pdf->AddPage();
