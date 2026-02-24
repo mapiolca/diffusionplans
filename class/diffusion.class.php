@@ -77,6 +77,7 @@ class Diffusion extends CommonObject
 
 	const STATUS_DRAFT = 0;
 	const STATUS_VALIDATED = 1;
+	const STATUS_SENT = 6;
 	const STATUS_CANCELED = 9;
 
 	/**
@@ -140,7 +141,7 @@ class Diffusion extends CommonObject
 		"last_main_doc" => array("type" => "varchar(255)", "label" => "LastMainDoc", "enabled" => "1", 'position' => 600, 'notnull' => 0, "visible" => "0",),
 		"import_key" => array("type" => "varchar(14)", "label" => "ImportId", "enabled" => "1", 'position' => 1000, 'notnull' => -1, "visible" => "-2",),
 		"model_pdf" => array("type" => "varchar(255)", "label" => "Model pdf", "enabled" => "1", 'position' => 1010, 'notnull' => -1, "visible" => "0",),
-		"status" => array("type" => "integer", "label" => "Status", "enabled" => "1", 'position' => 2000, 'notnull' => 1, "visible" => "1", "index" => "1", "arrayofkeyval" => array("0" => "Brouillon", "1" => "Valid&eacute;", "9" => "Annul&eacute;"), "validate" => "1",),
+		"status" => array("type" => "integer", "label" => "Status", "enabled" => "1", 'position' => 2000, 'notnull' => 1, "visible" => "1", "index" => "1", "arrayofkeyval" => array("0" => "Brouillon", "1" => "Valid&eacute;", "6" => "Envoy&eacute;", "9" => "Annul&eacute;"), "validate" => "1",),
 	);
 	public $rowid;
 	public $ref;
@@ -818,6 +819,23 @@ class Diffusion extends CommonObject
 	}
 
 	/**
+	 *	Set sent status
+	 *
+	 *	@param	User		$user		Object user that modify
+	 *  @param	int<0,1>	$notrigger	1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int<-1,1>				Return integer <0 if KO, 0=Nothing done, >0 if OK
+	 */
+	public function setSent($user, $notrigger = 0)
+	{
+		// Protection
+		if ($this->status != self::STATUS_VALIDATED) {
+			return 0;
+		}
+
+		return $this->setStatusCommon($user, self::STATUS_SENT, $notrigger, 'DIFFUSIONPLANS_DIFFUSION_SENT');
+	}
+
+	/**
 	 *	Set cancel status
 	 *
 	 *	@param	User		$user		Object user that modify
@@ -1101,16 +1119,18 @@ class Diffusion extends CommonObject
 			global $langs;
 			//$langs->load("diffusionplans@diffusionplans");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+			$this->labelStatus[self::STATUS_SENT] = $langs->transnoentitiesnoconv('Sent');
 			$this->labelStatus[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
 			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
+			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+			$this->labelStatusShort[self::STATUS_SENT] = $langs->transnoentitiesnoconv('Sent');
 			$this->labelStatusShort[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
 		}
 
 		$statusType = 'status'.$status;
 		//if ($status == self::STATUS_VALIDATED) $statusType = 'status1';
-		if ($status == self::STATUS_CANCELED) {
+		if ($status == self::STATUS_SENT || $status == self::STATUS_CANCELED) {
 			$statusType = 'status6';
 		}
 

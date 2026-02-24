@@ -159,3 +159,7 @@ methodHand = Remis en main propre
 methodLetter = Envoyer par courrier
 methodMail = Envoyer par e-mail
 or = ou
+MarkAsSent = Marquer comme envoyé
+
+Sent = Envoyé
+Validated = Validé
