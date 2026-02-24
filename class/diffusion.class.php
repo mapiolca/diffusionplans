@@ -42,7 +42,7 @@ class Diffusion extends CommonObject
 	/**
 	 * @var string 	ID to identify managed object.
 	 */
-	public $element = 'diffusionplans_diffusion';
+	public $element = 'diffusion';
 
 	/**
 	 * @var string 	Name of table without prefix where object is stored. This is also the key used for extrafields management (so extrafields know the link to the parent table).
@@ -1407,6 +1407,7 @@ class DiffusionLine extends CommonObjectLine
 		$this->isextrafieldmanaged = 0;
 	}
 }
+
 
 
 
