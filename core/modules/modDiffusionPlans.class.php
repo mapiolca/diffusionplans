@@ -147,6 +147,10 @@ class modDiffusionPlans extends DolibarrModules
 			'substitutions' => 0,
 			// Set this to 1 if module has its own menus handler directory (core/menus)
 			'menus' => 0,
+			// Set this to a list of directory names that should be registered as external module storage roots
+			'dir' => array(
+				'output' => 'diffusionplans',
+			),
 			// Set this to 1 if module overwrite template dir (core/tpl)
 			'tpl' => 0,
 			// Set this to 1 if module has its own barcode directory (core/modules/barcode)
