@@ -189,6 +189,10 @@ $item->cssClass = 'minwidth500';
 // End of definition of parameters
 */
 
+// Setup conf for enabling user recipients selector into email pre-send form
+$item = $formSetup->newItem('MAIN_MAIL_ENABLED_USER_DEST_SELECT')->setAsYesNo();
+$item->helpText = $langs->transnoentities('MAIN_MAIL_ENABLED_USER_DEST_SELECTHelp');
+
 $setupnotempty += count($formSetup->items);
 
 
