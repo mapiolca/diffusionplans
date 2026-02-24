@@ -163,3 +163,5 @@ MarkAsSent = Marquer comme envoyé
 
 Sent = Envoyé
 Validated = Validé
+MAIN_MAIL_ENABLED_USER_DEST_SELECT = Activer la sélection des utilisateurs destinataires dans l'envoi d'e-mail
+MAIN_MAIL_ENABLED_USER_DEST_SELECTHelp = Permet d'afficher, dans le formulaire d'envoi, un sélecteur multivalué des utilisateurs actifs ayant une adresse e-mail.
