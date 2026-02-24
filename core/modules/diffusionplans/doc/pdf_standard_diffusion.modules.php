@@ -783,6 +783,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$pageposbeforedesc = $pdf->getPage();
 			$posybefore = $pdf->GetY();
 
+			$pdf->setTopMargin($startYNewPage);
 			$pdf->startTransaction();
 			$pdf->SetAutoPageBreak(true, $heightforfooter);
 			$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
