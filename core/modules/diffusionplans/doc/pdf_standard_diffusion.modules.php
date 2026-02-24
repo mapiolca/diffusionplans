@@ -1323,7 +1323,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$pdf->SetTextColor(0, 0, 0);
 				$pdf->SetFont('', '', $default_font_size - 2);
 				$pdf->SetXY($posx, $posy - 5);
-				$pdf->MultiCell($widthrecbox, 5, $outputlangs->transnoentities("BillFrom").":", 0, $ltrdirection);
+				$pdf->MultiCell($widthrecbox, 5, $outputlangs->transnoentities("SentFrom").":", 0, $ltrdirection);
 				$pdf->SetXY($posx, $posy);
 				$pdf->SetFillColor(230, 230, 230);
 				$pdf->MultiCell($widthrecbox, $hautcadre, "", 0, 'R', 1);
@@ -1385,7 +1385,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$pdf->SetTextColor(0, 0, 0);
 				$pdf->SetFont('', '', $default_font_size - 2);
 				$pdf->SetXY($posx + 2, $posy - 5);
-				$pdf->MultiCell($widthrecbox, 5, $outputlangs->transnoentities("To").":", 0, $ltrdirection);
+				$pdf->MultiCell($widthrecbox, 5, $outputlangs->transnoentities("SentTo").":", 0, $ltrdirection);
 				$pdf->Rect($posx, $posy, $widthrecbox, $hautcadre);
 			}
 
