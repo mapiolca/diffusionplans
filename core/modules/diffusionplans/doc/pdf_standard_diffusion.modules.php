@@ -780,72 +780,45 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 		if (dol_textishtml($descriptionText)) {
 			$descriptionHtml = convertBackOfficeMediasLinksToPublicLinks($descriptionText);
-			$blocks = preg_split('/(?<=<\/\s*(p|div|ul|ol|li|table|tr|h[1-6]|blockquote)\s*>)/i', $descriptionHtml, -1, PREG_SPLIT_NO_EMPTY);
-			if (empty($blocks)) {
-				$blocks = array($descriptionHtml);
-			}
+			$pageposbeforedesc = $pdf->getPage();
+			$posybefore = $pdf->GetY();
 
-			for ($i = 0; $i < count($blocks); $i++) {
-				$blockHtml = trim($blocks[$i]);
-				if ($blockHtml === '') {
-					continue;
-				}
+			$pdf->startTransaction();
+			$pdf->setPageOrientation('', true, $heightforfooter);
+			$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
+			$pageposafterdesc = $pdf->getPage();
+			$posyafter = $pdf->GetY();
 
-				$startBlockY = $pdf->GetY();
-				$remainingHeight = $pageBottomLimit - $startBlockY;
-
-				// Measure block height with manual page break disabled to keep deterministic coordinates.
-				$pdf->startTransaction();
-				$pdf->SetAutoPageBreak(false, 0);
-				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $startBlockY, $blockHtml, 0, 1, false, true, 'L', true);
-				$requiredHeight = max($lineHeight, $pdf->GetY() - $startBlockY);
+			if ($pageposafterdesc > $pageposbeforedesc) {
 				$pdf = $pdf->rollbackTransaction(true);
-				$pdf->SetAutoPageBreak(true, 0);
 
-				$maxBlockHeightOnFreshPage = $pageBottomLimit - $startYNewPage;
-				if ($requiredHeight > $maxBlockHeightOnFreshPage) {
-					if ($pdf->GetY() > $startYNewPage) {
-						$pdf->AddPage();
-						if (!empty($tplidx)) {
-							$pdf->useTemplate($tplidx);
-						}
-						$pagenb++;
-						if ($repeatPageHeadOnExtraPages) {
-							$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
-							$pdf->SetXY($this->marge_gauche, $startYNewPage);
-						} else {
-							$pdf->SetXY($this->marge_gauche, $this->marge_haute + 2);
-						}
-						$pdf->SetFont('', '', $defaultFontSize);
-					}
-					$pdf->SetAutoPageBreak(true, $heightforfooter);
-					$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $pdf->GetY(), $blockHtml, 0, 1, false, true, 'L', true);
-					$pdf->SetAutoPageBreak(true, 0);
-					$pagenb = max($pagenb, $pdf->getPage());
-					continue;
-				}
-
-				if ($requiredHeight > $remainingHeight) {
+				while ($pagenb < $pageposafterdesc) {
 					$pdf->AddPage();
+					$pagenb++;
 					if (!empty($tplidx)) {
 						$pdf->useTemplate($tplidx);
 					}
-					$pagenb++;
 					if ($repeatPageHeadOnExtraPages) {
 						$this->_pagehead($pdf, $object, $pagenb, $outputlangs, $outputlangsbis);
-						$pdf->SetXY($this->marge_gauche, $startYNewPage);
-					} else {
-						$pdf->SetXY($this->marge_gauche, $this->marge_haute + 2);
 					}
-					$pdf->SetFont('', '', $defaultFontSize);
+					$pdf->setTopMargin($startYNewPage);
+					$pdf->setPageOrientation('', true, $heightforfooter);
 				}
 
-				$pdf->SetAutoPageBreak(false, 0);
-				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $pdf->GetY(), $blockHtml, 0, 1, false, true, 'L', true);
-				$pdf->SetAutoPageBreak(true, 0);
+				$pdf->setPage($pageposbeforedesc);
+				$pdf->setPageOrientation('', true, $heightforfooter);
+				$pdf->SetFont('', '', $defaultFontSize);
+				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
+				$pageposafterdesc = $pdf->getPage();
+				$posyafter = $pdf->GetY();
+			} else {
+				$pdf->commitTransaction();
 			}
 
-			return $pdf->GetY();
+			$pagenb = max($pagenb, $pageposafterdesc);
+			$pdf->setPage($pageposafterdesc);
+			$pdf->setPageOrientation('', true, 0);
+			return $posyafter;
 		}
 
 		$sanitizedDescription = preg_replace('/\r\n|\r/', "\n", $descriptionText);
