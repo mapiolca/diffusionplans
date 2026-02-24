@@ -262,7 +262,7 @@ print '</div>';
 
 print dol_get_fiche_end();
 
-$modulepart = 'diffusionplans';
+$modulepart = 'diffusionplans-diffusion';
 $param = '&id='.$object->id;
 //$relativepathwithnofile='diffusion/' . dol_sanitizeFileName($object->id).'/';
 $relativepathwithnofile = 'diffusion/'.dol_sanitizeFileName($object->ref).'/';
