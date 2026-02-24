@@ -805,6 +805,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				}
 
 				$pdf->setPage($pageposbeforedesc);
+				$pdf->setTopMargin($startYNewPage);
 				$pdf->SetAutoPageBreak(true, $heightforfooter);
 				$pdf->SetFont('', '', $defaultFontSize);
 				$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $posybefore, $descriptionHtml, 0, 1, false, true, 'L', true);
