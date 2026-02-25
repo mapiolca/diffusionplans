@@ -167,3 +167,4 @@ MAIN_MAIL_ENABLED_USER_DEST_SELECT = Enable user recipients selection in email s
 MAIN_MAIL_ENABLED_USER_DEST_SELECTHelp = Show, in the email form, a multi-select list of active users with an email address.
 DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD = Automatically create a public consultation link for generated or uploaded files
 DIFFUSION_ALLOW_EXTERNAL_DOWNLOADHelp = When enabled, generated or uploaded files on Diffusion will receive a public share link automatically.
+DiffusionAttachmentPublicLink = public link

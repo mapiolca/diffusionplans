@@ -7,3 +7,4 @@ MAIN_MAIL_ENABLED_USER_DEST_SELECT = Abilitare la selezione degli utenti destina
 MAIN_MAIL_ENABLED_USER_DEST_SELECTHelp = Mostra nel modulo email una selezione multipla degli utenti attivi con indirizzo email.
 DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD = Crea automaticamente un link pubblico di consultazione per i file generati o caricati
 DIFFUSION_ALLOW_EXTERNAL_DOWNLOADHelp = Se attivato, i file generati o caricati in una diffusione riceveranno automaticamente un link pubblico di condivisione.
+DiffusionAttachmentPublicLink = link pubblico
