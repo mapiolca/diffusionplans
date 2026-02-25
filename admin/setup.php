@@ -193,6 +193,10 @@ $item->cssClass = 'minwidth500';
 $item = $formSetup->newItem('MAIN_MAIL_ENABLED_USER_DEST_SELECT')->setAsYesNo();
 $item->helpText = $langs->transnoentities('MAIN_MAIL_ENABLED_USER_DEST_SELECTHelp');
 
+// Setup conf for enabling automatic external share link creation on generated/uploaded files
+$item = $formSetup->newItem('DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD')->setAsYesNo();
+$item->helpText = $langs->transnoentities('DIFFUSION_ALLOW_EXTERNAL_DOWNLOADHelp');
+
 $setupnotempty += count($formSetup->items);
 
 
