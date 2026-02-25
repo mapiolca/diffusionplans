@@ -738,8 +738,13 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				continue;
 			}
 
-			$suffix = '_courrier_'.(!empty($contact['id']) ? (int) $contact['id'] : dol_sanitizeFileName((string) $contact['contact_name']));
-			$targetFile = $baseDir.'/'.$baseName.$suffix.'.pdf';
+			$contactFullName = trim((!empty($contact['lastname']) ? (string) $contact['lastname'] : '').' '.(!empty($contact['firstname']) ? (string) $contact['firstname'] : ''));
+			if ($contactFullName === '') {
+				$contactFullName = !empty($contact['contact_name']) ? (string) $contact['contact_name'] : 'Contact';
+			}
+			$thirdpartyName = !empty($contact['thirdparty_name']) ? (string) $contact['thirdparty_name'] : 'Tiers';
+			$fileLabel = (string) $object->ref.' - '.$outputlangs->transnoentities('DiffusionLetterFileWord').' '.$thirdpartyName.' - '.$contactFullName;
+			$targetFile = $baseDir.'/'.dol_sanitizeFileName($fileLabel).'.pdf';
 			$this->createLetterPdfCopy($mainFile, $targetFile, $recipient, $outputlangs);
 			dolChmod($targetFile);
 			$object->indexFile($targetFile, 0);
@@ -1536,7 +1541,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 			$top_shift = $pdf->getY() - $current_y;
 		}
 
-		if ($showaddress) {
+		if (1) {
 			// Sender properties
 			$carac_emetteur = pdf_build_address($outputlangs, $this->emetteur, $object->thirdparty, '', 0, 'source', $object);
 
@@ -1578,6 +1583,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$pdf->SetFont('', '', $default_font_size - 1);
 				$pdf->MultiCell($widthrecbox - 2, 4, $carac_emetteur, 0, $ltrdirection);
 			}
+			if ($showaddress) {
 			// If BILLING contact defined, we use it
 			$usecontact = false;
 			$arrayidcontact = $object->getIdContact('external', 'BILLING');
@@ -1639,6 +1645,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				$pdf->SetXY($posx + 2, $posy);
 				// @phan-suppress-next-line PhanPluginSuspiciousParamOrder
 				$pdf->MultiCell($widthrecbox, 4, $carac_client, 0, $ltrdirection);
+			}
 			}
 		}
 

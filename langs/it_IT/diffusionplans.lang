@@ -12,3 +12,4 @@ DIFFUSION_HIDE_NOSTATUS_CONTACT = Nascondi i contatti senza stato di invio nel P
 DIFFUSION_HIDE_NOSTATUS_CONTACTHelp = Se attivato, i contatti senza stato di invio Mail, Lettera e Mano attivo vengono nascosti nell'elenco contatti del PDF standard_diffusion.
 DIFFUSION_GENERATE_LETTER = Genera un PDF lettera separato per contatto
 DIFFUSION_GENERATE_LETTERHelp = Se attivato, standard_diffusion genera un PDF aggiuntivo per ogni contatto con stato Lettera o Mano attivo, con riquadro destinatario compilato.
+DiffusionLetterFileWord = Courrier

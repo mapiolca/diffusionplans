@@ -12,3 +12,4 @@ DIFFUSION_HIDE_NOSTATUS_CONTACT = Kontakte ohne Versandstatus im Standard-Diffus
 DIFFUSION_HIDE_NOSTATUS_CONTACTHelp = Wenn aktiviert, werden Kontakte ohne aktivierten Versandstatus für Mail, Brief und Hand in der Kontaktliste des PDFs standard_diffusion ausgeblendet.
 DIFFUSION_GENERATE_LETTER = Ein separates Brief-PDF pro Kontakt erzeugen
 DIFFUSION_GENERATE_LETTERHelp = Wenn aktiviert, erzeugt standard_diffusion ein zusätzliches PDF pro Kontakt mit aktivem Brief- oder Hand-Status und ausgefülltem Empfängerfeld.
+DiffusionLetterFileWord = Courrier
