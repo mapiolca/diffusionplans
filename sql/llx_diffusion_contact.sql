@@ -14,10 +14,15 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 
--- BEGIN MODULEBUILDER INDEXES
-ALTER TABLE llx_diffusionplans_diffusioncontact ADD INDEX idx_diffusionplans_diffusioncontact_rowid (rowid);
--- END MODULEBUILDER INDEXES
-
---ALTER TABLE llx_diffusionplans_diffusioncontact ADD UNIQUE INDEX uk_diffusionplans_diffusioncontact_fieldxy(fieldx, fieldy);
-
---ALTER TABLE llx_diffusionplans_diffusioncontact ADD CONSTRAINT llx_diffusionplans_diffusioncontact_fk_field FOREIGN KEY (fk_field) REFERENCES llx_diffusionplans_myotherobject(rowid);
+CREATE TABLE llx_diffusion_contact(
+	-- BEGIN MODULEBUILDER FIELDS
+	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
+	fk_contact integer, 
+	fk_diffusion integer, 
+	mail_status integer NOT NULL, 
+	letter_status integer NOT NULL, 
+	hand_status integer NOT NULL, 
+	fk_user_modif integer, 
+	contact_source varchar(128) NOT NULL
+	-- END MODULEBUILDER FIELDS
+) ENGINE=innodb;

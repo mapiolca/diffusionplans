@@ -47,7 +47,7 @@ class DiffusionContact extends CommonObject
 	/**
 	 * @var string 	Name of table without prefix where object is stored. This is also the key used for extrafields management (so extrafields know the link to the parent table).
 	 */
-	public $table_element = 'diffusionplans_diffusioncontact';
+	public $table_element = 'diffusion_contact';
 
 	/**
 	 * @var string 	If permission must be checkec with hasRight('diffusionplans', 'read') and not hasright('mymodyle', 'diffusioncontact', 'read'), you can uncomment this line
@@ -148,7 +148,7 @@ class DiffusionContact extends CommonObject
 	// /**
 	//  * @var string    Name of subtable line
 	//  */
-	// public $table_element_line = 'diffusionplans_diffusioncontactline';
+	// public $table_element_line = 'diffusion_contactline';
 
 	// /**
 	//  * @var string    Field with ID of parent key if this object has a parent
@@ -170,7 +170,7 @@ class DiffusionContact extends CommonObject
 	//  *               If name matches '@ClassNAme:FilePathClass;ParentFkFieldName' it will
 	//  *               call method deleteByParentField(parentId, ParentFkFieldName) to fetch and delete child object
 	//  */
-	// protected $childtablesoncascade = array('diffusionplans_diffusioncontactdet');
+	// protected $childtablesoncascade = array('diffusion_contactdet');
 
 	// /**
 	//  * @var DiffusionContactLine[]     Array of subtable lines
@@ -303,7 +303,7 @@ class DiffusionContact extends CommonObject
 
 		$this->db->begin();
 
-		$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact';
+		$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'diffusion_contact';
 		$sql .= ' WHERE fk_diffusion = '.$diffusionId;
 		$sql .= ' AND fk_contact = '.$contactId;
 		$sql .= " AND contact_source = '".$this->db->escape($source)."'";
@@ -323,7 +323,7 @@ class DiffusionContact extends CommonObject
 		if ($existing) {
 			$this->id = (int) $existing->rowid;
 
-			$updateSql = 'UPDATE '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact';
+			$updateSql = 'UPDATE '.MAIN_DB_PREFIX.'diffusion_contact';
 			$updateSql .= ' SET fk_user_modif = '.((int) $user->id);
 			$updateSql .= ' WHERE rowid = '.$this->id;
 
@@ -340,7 +340,7 @@ class DiffusionContact extends CommonObject
 			return 1;
 		}
 
-		$insertSql = 'INSERT INTO '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact';
+		$insertSql = 'INSERT INTO '.MAIN_DB_PREFIX.'diffusion_contact';
 		$insertSql .= ' (fk_diffusion, fk_contact, contact_source, mail_status, letter_status, hand_status, fk_user_modif)';
 		$insertSql .= ' VALUES (';
 		$insertSql .= $diffusionId.',';
@@ -357,7 +357,7 @@ class DiffusionContact extends CommonObject
 			return -1;
 		}
 
-		$this->id = (int) $this->db->last_insert_id(MAIN_DB_PREFIX.'diffusionplans_diffusioncontact');
+		$this->id = (int) $this->db->last_insert_id(MAIN_DB_PREFIX.'diffusion_contact');
 
 		if (!$notrigger) {
 			include_once DOL_DOCUMENT_ROOT.'/core/class/interfaces.class.php';
@@ -419,7 +419,7 @@ class DiffusionContact extends CommonObject
 			$sql .= ' sp.phone_mobile as contact_phone_mobile,';
 			$sql .= ' sp.fk_soc as contact_fk_soc,';
 			$sql .= ' s.nom as company_name';
-			$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc';
+			$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusion_contact as dc';
 			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."element_contact as ec ON ec.element = 'diffusion'";
 			$sql .= ' AND ec.fk_element = dc.fk_diffusion';
 			$sql .= " AND ((dc.contact_source = 'internal' AND ec.source = 'internal' AND ec.fk_user = dc.fk_contact)";
@@ -490,7 +490,7 @@ class DiffusionContact extends CommonObject
                         return -1;
                 }
 
-                $sql = 'DELETE FROM '.MAIN_DB_PREFIX."diffusionplans_diffusioncontact";
+                $sql = 'DELETE FROM '.MAIN_DB_PREFIX."diffusion_contact";
                 $sql .= ' WHERE fk_diffusion = '.$diffusionId;
                 $sql .= ' AND fk_contact = '.$contactId;
                 $sql .= " AND contact_source = '".$this->db->escape($source)."'";
@@ -629,12 +629,12 @@ class DiffusionContact extends CommonObject
 		global $langs, $user, $conf, $object, $entry;
 
 		$element = "diffusioncontact";
-		$table_element = "diffusionplans_diffusioncontact";
+		$table_element = "diffusion_contact";
 		$module = "diffusionplans";
 
 		$this->db->begin();
 
-		$sql = "SELECT * FROM `".MAIN_DB_PREFIX."diffusionplans_diffusioncontact`" ;
+		$sql = "SELECT * FROM `".MAIN_DB_PREFIX."diffusion_contact`" ;
 		$sql.= " WHERE `fk_contact`='".$entry->contact_id."'";
 		$sql.= " AND `fk_diffusion`='".$object->id."'";
 		$sql.= " AND `contact_source`='".$entry->source."'";
