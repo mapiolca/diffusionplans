@@ -798,45 +798,48 @@ class DiffusionContact extends CommonObject
 	 */
 	public function update(User $user, $notrigger = 0)
 	{
-		global $langs, $user, $conf, $object, $field, $value, $id, $db;
+		global $langs, $conf, $object, $field, $value, $id;
 
 		$error = 0;
 
-			dol_syslog(__METHOD__, LOG_DEBUG);
+		dol_syslog(__METHOD__, LOG_DEBUG);
 
-		$sql = "UPDATE ".MAIN_DB_PREFIX."$object->table_element" ;
-        $sql.= " SET ".$field." = ".(int) $value."";
-        $sql.= " , fk_user_modif = ".$user->id;
-        $sql.= " WHERE rowid = ".(int) $id;
+		$sql = "UPDATE ".MAIN_DB_PREFIX."$object->table_element";
+		$sql .= " SET ".$field." = ".((int) $value);
+		$sql .= " , fk_user_modif = ".((int) $user->id);
+		$sql .= " WHERE rowid = ".((int) $id);
 
-        dol_syslog("DiffusionContact::update sql=".$sql);
+		dol_syslog("DiffusionContact::update sql=".$sql);
 
-        $resql = $this->db->query($sql);
+		$this->db->begin();
+		$resql = $this->db->query($sql);
 
-        if ($resql)
-        {
-            // Appel des triggers
-            include_once DOL_DOCUMENT_ROOT . '/core/class/interfaces.class.php';
-            $interface=new Interfaces($db);
-            $result2=$interface->run_triggers('DIFFUSIONCONTACT_UPDATELINE',$this,$user,$langs,$conf);
-            if ($result2 < 0) { $error++; $db->errors=$interface->errors; }
-            // Fin appel triggers
+		if ($resql) {
+			// Trigger call
+			include_once DOL_DOCUMENT_ROOT.'/core/class/interfaces.class.php';
+			$interface = new Interfaces($this->db);
+			$result2 = $interface->run_triggers('DIFFUSIONCONTACT_UPDATELINE', $this, $user, $langs, $conf);
+			if ($result2 < 0) {
+				$error++;
+				$this->errors = $interface->errors;
+			}
+			// End trigger call
+		}
 
-            $db->commit();
-            return $resql;
-        }
-        else
-        {
-            $db->error=$this->db->lasterror();
-            dol_syslog("DiffusionContact::updateLine ".$this->error, LOG_ERR);
-            $db->rollback();
+		if (!$error && $resql) {
+			$this->db->commit();
+			return 1;
+		}
 
-            return -1;
-        }
+		$this->error = $this->db->lasterror();
+		dol_syslog("DiffusionContact::update ".$this->error, LOG_ERR);
+		$this->db->rollback();
 
+		return -1;
 
 		//return $this->updateCommon($user, $notrigger);
 	}
+
 
 	/**
 	 * Delete object in database
