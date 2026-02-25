@@ -13,3 +13,5 @@ DIFFUSION_HIDE_NOSTATUS_CONTACTHelp = Wenn aktiviert, werden Kontakte ohne aktiv
 DIFFUSION_GENERATE_LETTER = Ein separates Brief-PDF pro Kontakt erzeugen
 DIFFUSION_GENERATE_LETTERHelp = Wenn aktiviert, erzeugt standard_diffusion ein zusätzliches PDF pro Kontakt mit aktivem Brief- oder Hand-Status und ausgefülltem Empfängerfeld.
 DiffusionLetterFileWord = Courrier
+DiffusionEvenementAgendaChangementStatut = Diffusion %s - Status geändert: %s
+DiffusionEvenementAgendaChangementStatutNote = Automatisches Ereignis nach Statusänderung (%s) für Diffusion %s erstellt.

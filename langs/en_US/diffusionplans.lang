@@ -173,3 +173,5 @@ DIFFUSION_HIDE_NOSTATUS_CONTACTHelp = If enabled, contacts without Mail, Letter 
 DIFFUSION_GENERATE_LETTER = Generate one PDF letter per contact
 DIFFUSION_GENERATE_LETTERHelp = If enabled, standard_diffusion generates one additional PDF per contact with Letter or Hand status enabled, with the recipient frame filled.
 DiffusionLetterFileWord = Courrier
+DiffusionEvenementAgendaChangementStatut = Diffusion %s - status changed: %s
+DiffusionEvenementAgendaChangementStatutNote = Automatic event created after status change (%s) for diffusion %s.
