@@ -47,7 +47,7 @@ class Diffusion extends CommonObject
 	/**
 	 * @var string 	Name of table without prefix where object is stored. This is also the key used for extrafields management (so extrafields know the link to the parent table).
 	 */
-	public $table_element = 'diffusionplans_diffusion';
+	public $table_element = 'diffusion';
 
 	/**
 	 * @var string 	If permission must be checkec with hasRight('diffusionplans', 'read') and not hasright('mymodyle', 'diffusion', 'read'), you can uncomment this line
@@ -300,9 +300,9 @@ class Diffusion extends CommonObject
 
 		$this->db->begin();
 
-		//$sql.= "SELECT 'rowid' FROM ".MAIN_DB_PREFIX."diffusionplans_diffusion";
+		//$sql.= "SELECT 'rowid' FROM ".MAIN_DB_PREFIX."diffusion";
 
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."diffusionplans_diffusion";
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."diffusion";
         $sql.= " (";
         if ($this->label) {
         	$sql.= " `label`,";
@@ -314,7 +314,8 @@ class Diffusion extends CommonObject
         	$sql.= " `description`,";
         }
         $sql.= " `date_creation`,";
-        $sql.= " `fk_user_creat`";
+        $sql.= " `fk_user_creat`,";
+        $sql.= " `status`";
         $sql.= ')';
         $sql.= " VALUES (";
         if ($this->label) {
@@ -327,16 +328,17 @@ class Diffusion extends CommonObject
         	$sql.= " '".$this->description."', ";
         }
         $sql.= " '".date("Y-m-d H:i:s")."',";
-        $sql.= " '".$user->id."'";
+        $sql.= " '".$user->id."',";
+        $sql.= " " . ((isset($this->status) && $this->status !== '') ? ((int) $this->status) : self::STATUS_DRAFT);
         $sql.= ')';
 
         dol_syslog("Diffusion::insert sql=".$sql);
 
 	    $resql = $this->db->query($sql);
 
-	    $last_id = $this->db->last_insert_id("'".MAIN_DB_PREFIX."diffusionplans_diffusion'", 'rowid');
+	    $last_id = $this->db->last_insert_id("'".MAIN_DB_PREFIX."diffusion'", 'rowid');
 
-	    $id = "UPDATE ".MAIN_DB_PREFIX."diffusionplans_diffusion SET ref = '(PROV".$last_id.")' WHERE rowid = ".$last_id;
+	    $id = "UPDATE ".MAIN_DB_PREFIX."diffusion SET ref = '(PROV".$last_id.")' WHERE rowid = ".$last_id;
 
 	    $result = $db->query($id);
 

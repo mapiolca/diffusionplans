@@ -15,5 +15,5 @@
 
 
 -- BEGIN MODULEBUILDER INDEXES
-ALTER TABLE llx_diffusionplans_diffusion_extrafields ADD UNIQUE INDEX uk_diffusion_fk_object(fk_object);
+ALTER TABLE llx_diffusion_extrafields ADD UNIQUE INDEX uk_diffusion_fk_object(fk_object);
 -- END MODULEBUILDER INDEXES

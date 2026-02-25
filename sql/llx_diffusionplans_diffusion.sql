@@ -14,7 +14,7 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 
-CREATE TABLE llx_diffusionplans_diffusion(
+CREATE TABLE llx_diffusion(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	ref varchar(128) DEFAULT '(PROV)' NOT NULL, 
@@ -28,6 +28,6 @@ CREATE TABLE llx_diffusionplans_diffusion(
 	last_main_doc varchar(255), 
 	import_key varchar(14), 
 	model_pdf varchar(255), 
-	status integer NOT NULL
+	status integer DEFAULT 0 NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

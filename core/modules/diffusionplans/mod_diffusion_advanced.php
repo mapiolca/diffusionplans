@@ -143,7 +143,7 @@ class mod_diffusion_advanced extends ModeleNumRefDiffusion
 
 		$date = $object->date_creation;
 
-		$numFinal = get_next_value($db, $mask, 'diffusionplans_diffusion', 'ref', '', '', $date);
+		$numFinal = get_next_value($db, $mask, 'diffusion', 'ref', '', '', $date);
 
 		return  $numFinal;
 	}
