@@ -83,9 +83,10 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 		$actioncomm->label = $langs->trans('DiffusionEvenementAgendaChangementStatut', $object->ref, $object->getLibStatut(0));
 		$actioncomm->note_private = $langs->trans('DiffusionEvenementAgendaChangementStatutNote', $action, $object->ref);
 		$actioncomm->datep = dol_now();
+		$actioncomm->datep2 = dol_now();
 		$actioncomm->percentage = -1;
 		$actioncomm->fk_element = (int) $object->id;
-		$actioncomm->elementtype = 'diffusion';
+		$actioncomm->elementtype = 'diffusion@diffusionplans';
 		$actioncomm->fk_project = !empty($object->fk_project) ? (int) $object->fk_project : 0;
 		$actioncomm->fk_user_action = !empty($user->id) ? (int) $user->id : 0;
 		$actioncomm->userownerid = !empty($user->id) ? (int) $user->id : 0;
