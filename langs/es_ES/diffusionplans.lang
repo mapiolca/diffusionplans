@@ -13,3 +13,5 @@ DIFFUSION_HIDE_NOSTATUS_CONTACTHelp = Si está activado, los contactos sin estad
 DIFFUSION_GENERATE_LETTER = Generar un PDF de carta por contacto
 DIFFUSION_GENERATE_LETTERHelp = Si está activado, standard_diffusion genera un PDF adicional por contacto con estado Carta o Mano activo, con el recuadro de destinatario completado.
 DiffusionLetterFileWord = Courrier
+DiffusionEvenementAgendaChangementStatut = Difusión %s - estado cambiado: %s
+DiffusionEvenementAgendaChangementStatutNote = Evento automático creado tras el cambio de estado (%s) para la difusión %s.
