@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/triggers/dolibarrtriggers.class.php';
 /**
  * Triggers class for DiffusionPlans
  */
-class InterfaceDiffusionPlansDiffusionsTriggers extends DolibarrTriggers
+class InterfaceDiffusionsTriggers extends DolibarrTriggers
 {
 	/**
 	 * Constructor
