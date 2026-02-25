@@ -91,7 +91,7 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 			$actioncomm->socid = (int) $object->fk_soc;
 		}
 
-		$result = $actioncomm->add($user);
+		$result = $actioncomm->create($user);
 		if ($result < 0) {
 			$this->error = $actioncomm->error;
 			$this->errors = $actioncomm->errors;
