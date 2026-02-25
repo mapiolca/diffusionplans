@@ -538,8 +538,8 @@ class modDiffusionPlans extends DolibarrModules
 		//$this->export_examplevalues_array[$r] = array('t.field' => 'Example');
 		//$this->export_help_array[$r] = array('t.field' => 'FieldDescHelp');
 		$this->export_sql_start[$r]='SELECT DISTINCT ';
-		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusion as t';
-		//$this->export_sql_end[$r]  .=' LEFT JOIN '.MAIN_DB_PREFIX.'diffusionplans_diffusion_line as tl ON tl.fk_diffusion = t.rowid';
+		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'diffusion as t';
+		//$this->export_sql_end[$r]  .=' LEFT JOIN '.MAIN_DB_PREFIX.'diffusion_line as tl ON tl.fk_diffusion = t.rowid';
 		$this->export_sql_end[$r] .=' WHERE 1 = 1';
 		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('diffusion').')';
 		$r++; */
@@ -553,7 +553,7 @@ class modDiffusionPlans extends DolibarrModules
 		$this->import_code[$r] = $this->rights_class.'_'.$r;
 		$this->import_label[$r] = 'DiffusionLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
 		$this->import_icon[$r] = $this->picto;
-		$this->import_tables_array[$r] = array('t' => MAIN_DB_PREFIX.'diffusionplans_diffusion', 'extra' => MAIN_DB_PREFIX.'diffusionplans_diffusion_extrafields');
+		$this->import_tables_array[$r] = array('t' => MAIN_DB_PREFIX.'diffusion', 'extra' => MAIN_DB_PREFIX.'diffusion_extrafields');
 		$this->import_tables_creator_array[$r] = array('t' => 'fk_user_author'); // Fields to store import user id
 		$import_sample = array();
 		$keyforclass = 'Diffusion'; $keyforclassfile='/diffusionplans/class/diffusion.class.php'; $keyforelement='diffusion@diffusionplans';
@@ -561,7 +561,7 @@ class modDiffusionPlans extends DolibarrModules
 		$import_extrafield_sample = array();
 		$keyforselect='diffusion'; $keyforaliasextra='extra'; $keyforelement='diffusion@diffusionplans';
 		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinimport.inc.php';
-		$this->import_fieldshidden_array[$r] = array('extra.fk_object' => 'lastrowid-'.MAIN_DB_PREFIX.'diffusionplans_diffusion');
+		$this->import_fieldshidden_array[$r] = array('extra.fk_object' => 'lastrowid-'.MAIN_DB_PREFIX.'diffusion');
 		$this->import_regex_array[$r] = array();
 		$this->import_examplevalues_array[$r] = array_merge($import_sample, $import_extrafield_sample);
 		$this->import_updatekeys_array[$r] = array('t.ref' => 'Ref');
