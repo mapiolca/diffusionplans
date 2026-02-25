@@ -197,6 +197,12 @@ $item->helpText = $langs->transnoentities('MAIN_MAIL_ENABLED_USER_DEST_SELECTHel
 $item = $formSetup->newItem('DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD')->setAsYesNo();
 $item->helpText = $langs->transnoentities('DIFFUSION_ALLOW_EXTERNAL_DOWNLOADHelp');
 
+$item = $formSetup->newItem('DIFFUSION_HIDE_NOSTATUS_CONTACT')->setAsYesNo();
+$item->helpText = $langs->transnoentities('DIFFUSION_HIDE_NOSTATUS_CONTACTHelp');
+
+$item = $formSetup->newItem('DIFFUSION_GENERATE_LETTER')->setAsYesNo();
+$item->helpText = $langs->transnoentities('DIFFUSION_GENERATE_LETTERHelp');
+
 $setupnotempty += count($formSetup->items);
 
 
