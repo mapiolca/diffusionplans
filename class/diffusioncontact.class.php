@@ -800,8 +800,6 @@ class DiffusionContact extends CommonObject
 	{
 		global $langs, $conf, $object, $field, $value, $id;
 
-		$error = 0;
-
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$sql = "UPDATE ".MAIN_DB_PREFIX."$object->table_element";
@@ -812,30 +810,31 @@ class DiffusionContact extends CommonObject
 		dol_syslog("DiffusionContact::update sql=".$sql);
 
 		$this->db->begin();
-		$resql = $this->db->query($sql);
 
-		if ($resql) {
+		try {
+			$resql = $this->db->query($sql);
+			if (!$resql) {
+				throw new Exception($this->db->lasterror());
+			}
+
 			// Trigger call
 			include_once DOL_DOCUMENT_ROOT.'/core/class/interfaces.class.php';
 			$interface = new Interfaces($this->db);
 			$result2 = $interface->run_triggers('DIFFUSIONCONTACT_UPDATELINE', $this, $user, $langs, $conf);
 			if ($result2 < 0) {
-				$error++;
 				$this->errors = $interface->errors;
+				throw new Exception(!empty($interface->error) ? $interface->error : implode(', ', $this->errors));
 			}
 			// End trigger call
-		}
 
-		if (!$error && $resql) {
 			$this->db->commit();
 			return 1;
+		} catch (Exception $e) {
+			$this->error = $e->getMessage();
+			dol_syslog("DiffusionContact::update ".$this->error, LOG_ERR);
+			$this->db->rollback();
+			return -1;
 		}
-
-		$this->error = $this->db->lasterror();
-		dol_syslog("DiffusionContact::update ".$this->error, LOG_ERR);
-		$this->db->rollback();
-
-		return -1;
 
 		//return $this->updateCommon($user, $notrigger);
 	}
