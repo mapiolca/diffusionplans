@@ -820,7 +820,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// Presend form
 	if ($action == 'presend' && !GETPOSTISSET('receiver')) {
 		$sql = 'SELECT DISTINCT dc.fk_contact';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusion_contact as dc';
 		$sql .= ' WHERE dc.fk_diffusion = '.((int) $object->id);
 		$sql .= " AND dc.contact_source = 'external'";
 		$sql .= ' AND dc.mail_status = 1';
@@ -841,7 +841,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	if ($action == 'presend' && getDolGlobalInt('MAIN_MAIL_ENABLED_USER_DEST_SELECT') && !GETPOSTISSET('receiveruser')) {
 		$sql = 'SELECT DISTINCT dc.fk_contact';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusionplans_diffusioncontact as dc';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'diffusion_contact as dc';
 		$sql .= ' WHERE dc.fk_diffusion = '.((int) $object->id);
 		$sql .= " AND dc.contact_source = 'internal'";
 		$sql .= ' AND dc.mail_status = 1';

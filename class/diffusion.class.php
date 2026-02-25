@@ -164,7 +164,7 @@ class Diffusion extends CommonObject
 	// /**
 	//  * @var string    Name of subtable line
 	//  */
-	//public $table_element_line = 'diffusionplans_diffusioncontact';
+	//public $table_element_line = 'diffusion_contact';
 
 	// /**
 	//  * @var string    Field with ID of parent key if this object has a parent
@@ -186,7 +186,7 @@ class Diffusion extends CommonObject
 	//  *               If name matches '@ClassNAme:FilePathClass;ParentFkFieldName' it will
 	//  *               call method deleteByParentField(parentId, ParentFkFieldName) to fetch and delete child object
 	//  */
-	//protected $childtablesoncascade = array('diffusionplans_diffusioncontact');
+	//protected $childtablesoncascade = array('diffusion_contact');
 
 	// /**
 	//  * @var DiffusionLine[]     Array of subtable lines
@@ -610,7 +610,7 @@ class Diffusion extends CommonObject
 
 		$error=0;
 
-        $sql = "DELETE FROM ".MAIN_DB_PREFIX."diffusionplans_diffusioncontact" ;
+        $sql = "DELETE FROM ".MAIN_DB_PREFIX."diffusion_contact" ;
         $sql.= " WHERE fk_diffusion=".$object->id;
         //$sql.= " AND fk_contact='".$contactid."'";
         //$sql.= " AND contact_source='".GETPOST('source', 'aZ09')."'";
