@@ -62,10 +62,10 @@ class InterfaceDiffusionPlansDiffusionPlansTriggers extends DolibarrTriggers
 
 		$actions = array(
 			'DIFFUSION_VALIDATE',
-			'DIFFUSION_DIFFUSION_UNVALIDATE',
-			'DIFFUSION_DIFFUSION_SENT',
-			'DIFFUSION_DIFFUSION_CANCEL',
-			'DIFFUSION_DIFFUSION_REOPEN'
+			'DIFFUSION_UNVALIDATE',
+			'DIFFUSION_SENT',
+			'DIFFUSION_CANCEL',
+			'DIFFUSION_REOPEN'
 		);
 
 		if (!in_array($action, $actions, true)) {
