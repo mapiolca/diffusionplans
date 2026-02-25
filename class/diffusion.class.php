@@ -314,7 +314,8 @@ class Diffusion extends CommonObject
         	$sql.= " `description`,";
         }
         $sql.= " `date_creation`,";
-        $sql.= " `fk_user_creat`";
+        $sql.= " `fk_user_creat`,";
+        $sql.= " `status`";
         $sql.= ')';
         $sql.= " VALUES (";
         if ($this->label) {
@@ -327,7 +328,8 @@ class Diffusion extends CommonObject
         	$sql.= " '".$this->description."', ";
         }
         $sql.= " '".date("Y-m-d H:i:s")."',";
-        $sql.= " '".$user->id."'";
+        $sql.= " '".$user->id."',";
+        $sql.= " " . ((isset($this->status) && $this->status !== '') ? ((int) $this->status) : self::STATUS_DRAFT);
         $sql.= ')';
 
         dol_syslog("Diffusion::insert sql=".$sql);

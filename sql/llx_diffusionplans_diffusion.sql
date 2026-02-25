@@ -28,6 +28,6 @@ CREATE TABLE llx_diffusion(
 	last_main_doc varchar(255), 
 	import_key varchar(14), 
 	model_pdf varchar(255), 
-	status integer NOT NULL
+	status integer DEFAULT 0 NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
