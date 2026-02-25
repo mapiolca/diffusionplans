@@ -16,7 +16,7 @@
  */
 
 /**
- * \file		core/triggers/interface_99_modDiffusionPlans_DiffusionPlansTriggers.class.php
+ * \file		core/triggers/interface_99_modDiffusionPlans_DiffusionsTriggers.class.php
  * \ingroup	diffusionplans
  * \brief		Triggers for DiffusionPlans module
  */
@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/triggers/dolibarrtriggers.class.php';
 /**
  * Triggers class for DiffusionPlans
  */
-class InterfaceDiffusionPlansDiffusionPlansTriggers extends DolibarrTriggers
+class InterfaceDiffusionPlansDiffusionsTriggers extends DolibarrTriggers
 {
 	/**
 	 * Constructor
