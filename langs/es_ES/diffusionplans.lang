@@ -5,3 +5,5 @@ Sent = Enviado
 Validated = Validado
 MAIN_MAIL_ENABLED_USER_DEST_SELECT = Activar la selección de usuarios destinatarios en el envío de correo
 MAIN_MAIL_ENABLED_USER_DEST_SELECTHelp = Muestra en el formulario de correo una selección múltiple de usuarios activos con dirección de correo.
+DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD = Crear automáticamente un enlace público de consulta para archivos generados o subidos
+DIFFUSION_ALLOW_EXTERNAL_DOWNLOADHelp = Si está activado, los archivos generados o subidos en una difusión recibirán automáticamente un enlace público de compartición.

@@ -1286,6 +1286,49 @@ class Diffusion extends CommonObject
 	}
 
 	/**
+	 * Index a file into the ECM database and auto-create a public share link when enabled.
+	 *
+	 * @param	string	$destfull				Full path of file to index
+	 * @param	int		$update_main_doc_field	Update field main_doc field into the table of the object.
+	 * @return	int							Return integer <0 if KO, >0 if OK
+	 */
+	public function indexFile($destfull, $update_main_doc_field)
+	{
+		global $user;
+
+		$result = parent::indexFile($destfull, $update_main_doc_field);
+		if ($result <= 0 || !getDolGlobalInt('DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD')) {
+			return $result;
+		}
+
+		$upload_dir = dirname($destfull);
+		$destfile = basename($destfull);
+		$rel_dir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $upload_dir);
+
+		if (preg_match('/[\\/]temp[\\/]|[\\/]thumbs|\.meta$/', $rel_dir)) {
+			return $result;
+		}
+
+		$filename = basename($destfile);
+		$rel_dir = preg_replace('/[\\/]$/', '', $rel_dir);
+		$rel_dir = preg_replace('/^[\\/]/', '', $rel_dir);
+
+		require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
+		$ecmfile = new EcmFiles($this->db);
+		$fetchResult = $ecmfile->fetch(0, '', ($rel_dir ? $rel_dir.'/' : '').$filename);
+		if ($fetchResult > 0 && empty($ecmfile->share)) {
+			require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
+			$ecmfile->share = getRandomPassword(true);
+			$updateResult = $ecmfile->update($user);
+			if ($updateResult < 0) {
+				setEventMessages($ecmfile->error, $ecmfile->errors, 'warnings');
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 *  Create a document onto disk according to template module.
 	 *
 	 *  @param	string		$modele			Force template to use ('' to not force)
