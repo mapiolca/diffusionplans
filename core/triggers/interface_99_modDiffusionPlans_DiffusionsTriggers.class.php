@@ -70,7 +70,7 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 			return 0;
 		}
 
-		if (!is_object($object) || empty($object->element) || $object->element !== 'diffusion') {
+		if (!is_object($object) || empty($object->id)) {
 			return 0;
 		}
 
@@ -85,7 +85,7 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 		$actioncomm->datep = dol_now();
 		$actioncomm->percentage = -1;
 		$actioncomm->fk_element = (int) $object->id;
-		$actioncomm->elementtype = $object->element;
+		$actioncomm->elementtype = 'diffusion';
 		$actioncomm->fk_project = !empty($object->fk_project) ? (int) $object->fk_project : 0;
 		$actioncomm->fk_user_action = !empty($user->id) ? (int) $user->id : 0;
 		$actioncomm->userownerid = !empty($user->id) ? (int) $user->id : 0;
