@@ -172,6 +172,32 @@ if (empty($object->id)) {
 
 include DOL_DOCUMENT_ROOT.'/core/actions_linkedfiles.inc.php';
 
+if (GETPOST('sendit', 'alpha') && !empty($permissiontoadd) && getDolGlobalInt('DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD')) {
+	$relUploadDir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $upload_dir);
+	if (!preg_match('/[\\/]temp[\\/]|[\\/]thumbs|\.meta$/', $relUploadDir)) {
+		$relUploadDir = preg_replace('/[\\/]$/', '', $relUploadDir);
+		$relUploadDir = preg_replace('/^[\\/]/', '', $relUploadDir);
+
+		require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
+		require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
+
+		$sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."ecm_files";
+		$sql .= " WHERE src_object_type = '".$db->escape($object->table_element)."'";
+		$sql .= " AND src_object_id = ".((int) $object->id);
+		$sql .= " AND filepath = '".$db->escape($relUploadDir)."'";
+		$sql .= " AND (share IS NULL OR share = '')";
+		$resql = $db->query($sql);
+		if ($resql) {
+			while ($objFile = $db->fetch_object($resql)) {
+				$ecmfile = new EcmFiles($db);
+				if ($ecmfile->fetch((int) $objFile->rowid) > 0 && empty($ecmfile->share)) {
+					$ecmfile->share = getRandomPassword(true);
+					$ecmfile->update($user);
+				}
+			}
+		}
+	}
+}
 
 /*
  * View

@@ -103,6 +103,11 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	 */
 	public $cols;
 
+	/**
+	 * @var array<string,string> Recipient override used for letter copies
+	 */
+	public $recipient_override = array();
+
 
 	/**
 	 *	Constructor
@@ -296,7 +301,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 		       if (file_exists($dir)) {
 			       $contactSummaries = $this->loadDiffusionContacts($object, $outputlangs);
-			       $attachmentSummaries = $this->loadDiffusionAttachments($dir, $currentPdfName);
+			       $attachmentSummaries = $this->loadDiffusionAttachments($object, $dir, $currentPdfName);
 				// Add pdfgeneration hook
 				if (!is_object($hookmanager)) {
 					include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
@@ -358,7 +363,7 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 					$pdf->useTemplate($tplidx);
 				}
 				$pagenb++;
-				$top_shift = $this->_pagehead($pdf, $object, 1, $outputlangs, (is_object($outputlangsbis) ? $outputlangsbis : null));
+				$top_shift = $this->_pagehead($pdf, $object, 0, $outputlangs, (is_object($outputlangsbis) ? $outputlangsbis : null));
 				$pdf->SetFont('', '', $default_font_size - 1);
 				$pdf->MultiCell(0, 3, ''); // Set interline to 3
 				$pdf->SetTextColor(0, 0, 0);
@@ -432,6 +437,10 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				}
 
 				dolChmod($file);
+
+				if (getDolGlobalInt('DIFFUSION_GENERATE_LETTER')) {
+					$this->generateLetterCopiesFromMainPdf($file, $object, $contactSummaries, $outputlangs);
+				}
 
 				$this->result = array('fullpath' => $file);
 
@@ -528,6 +537,10 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 
 		}
 		while ($obj = $this->db->fetch_object($resql)) {
+			if (getDolGlobalInt('DIFFUSION_HIDE_NOSTATUS_CONTACT') && (int) $obj->mail_status !== 1 && (int) $obj->letter_status !== 1 && (int) $obj->hand_status !== 1) {
+				continue;
+			}
+
 			$rawSource = strtolower(trim((string) $obj->contact_source));
 			$contactId = (int) $obj->fk_contact;
 
@@ -670,6 +683,12 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 				'type_label' => $typeLabel,
 				'thirdparty_name' => $thirdpartyName,
 				'contact_name' => $contactName,
+				'firstname' => !empty($contact->firstname) ? (string) $contact->firstname : '',
+				'lastname' => !empty($contact->lastname) ? (string) $contact->lastname : '',
+				'address' => !empty($contact->address) ? (string) $contact->address : '',
+				'zip' => !empty($contact->zip) ? (string) $contact->zip : '',
+				'town' => !empty($contact->town) ? (string) $contact->town : '',
+				'country' => !empty($contact->country) ? (string) $contact->country : (!empty($contact->country_code) ? (string) $contact->country_code : ''),
 				'email' => $email,
 				'phone' => $phone,
 				'mobile' => $mobile,
@@ -685,29 +704,243 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 	}
 
 	/**
+	 * Generate one letter PDF copy per contact with letter/hand status enabled.
+	 *
+	 * @param string $mainFile Main generated PDF path
+	 * @param Diffusion $object Diffusion object
+	 * @param array<int,array<string,mixed>> $contacts Contacts summary
+	 * @param Translate $outputlangs Output language handler
+	 * @return void
+	 */
+	protected function generateLetterCopiesFromMainPdf($mainFile, $object, array $contacts, $outputlangs)
+	{
+		if (empty($mainFile) || !is_readable($mainFile)) {
+			return;
+		}
+
+		$recipientContacts = array();
+		foreach ($contacts as $contact) {
+			if (!empty($contact['letter_status']) || !empty($contact['hand_status'])) {
+				$recipientContacts[] = $contact;
+			}
+		}
+
+		if (empty($recipientContacts)) {
+			return;
+		}
+
+		$baseDir = dirname($mainFile);
+		$baseName = pathinfo($mainFile, PATHINFO_FILENAME);
+
+		foreach ($recipientContacts as $contact) {
+			$recipient = $this->buildRecipientOverrideFromContact($contact, $outputlangs);
+			if (empty($recipient['name']) && empty($recipient['address'])) {
+				continue;
+			}
+
+			$suffix = '_courrier_'.(!empty($contact['id']) ? (int) $contact['id'] : dol_sanitizeFileName((string) $contact['contact_name']));
+			$targetFile = $baseDir.'/'.$baseName.$suffix.'.pdf';
+			$this->createLetterPdfCopy($mainFile, $targetFile, $recipient, $outputlangs);
+			dolChmod($targetFile);
+			$object->indexFile($targetFile, 0);
+		}
+	}
+
+	/**
+	 * Build recipient data from a contact summary line.
+	 *
+	 * @param array<string,mixed> $contact Contact summary data
+	 * @param Translate $outputlangs Output language handler
+	 * @return array{name:string,address:string}
+	 */
+	protected function buildRecipientOverrideFromContact(array $contact, $outputlangs)
+	{
+		$nameParts = array();
+		if (!empty($contact['thirdparty_name'])) {
+			$nameParts[] = (string) $contact['thirdparty_name'];
+		}
+		if (!empty($contact['contact_name'])) {
+			$nameParts[] = (string) $contact['contact_name'];
+		}
+
+		$addressLines = array();
+		if (!empty($contact['address'])) {
+			$addressLines[] = (string) $contact['address'];
+		}
+		$zipTown = trim((!empty($contact['zip']) ? $contact['zip'] : '').' '.(!empty($contact['town']) ? $contact['town'] : ''));
+		if ($zipTown !== '') {
+			$addressLines[] = $zipTown;
+		}
+		if (!empty($contact['country'])) {
+			$addressLines[] = (string) $contact['country'];
+		}
+
+		return array(
+			'name' => $outputlangs->convToOutputCharset(implode("\n", $nameParts)),
+			'address' => $outputlangs->convToOutputCharset(implode("\n", $addressLines)),
+		);
+	}
+
+	/**
+	 * Create one PDF copy with recipient frame filled for postal/hand delivery.
+	 *
+	 * @param string $sourceFile Source PDF file path
+	 * @param string $targetFile Target PDF file path
+	 * @param array{name:string,address:string} $recipient Recipient data
+	 * @param Translate $outputlangs Output language handler
+	 * @return void
+	 */
+	protected function createLetterPdfCopy($sourceFile, $targetFile, array $recipient, $outputlangs)
+	{
+		$pdf = pdf_getInstance($this->format);
+		if (class_exists('TCPDF')) {
+			$pdf->setPrintHeader(false);
+			$pdf->setPrintFooter(false);
+		}
+		$pdf->SetFont(pdf_getPDFFont($outputlangs));
+
+		$pageCount = $pdf->setSourceFile($sourceFile);
+		for ($pageId = 1; $pageId <= $pageCount; $pageId++) {
+			$templateId = $pdf->importPage($pageId);
+			$templateSize = $pdf->getTemplateSize($templateId);
+			$orientation = ($templateSize['width'] > $templateSize['height']) ? 'L' : 'P';
+			$pdf->AddPage($orientation, array($templateSize['width'], $templateSize['height']));
+			$pdf->useTemplate($templateId);
+
+			if ($pageId === 1) {
+				$this->drawRecipientFrameOnLetterCopy($pdf, $recipient, $outputlangs);
+			}
+		}
+
+		$pdf->Output($targetFile, 'F');
+	}
+
+	/**
+	 * Draw recipient frame and content on first page.
+	 *
+	 * @param TCPDF|TCPDI $pdf PDF handler
+	 * @param array{name:string,address:string} $recipient Recipient data
+	 * @param Translate $outputlangs Output language handler
+	 * @return void
+	 */
+	protected function drawRecipientFrameOnLetterCopy(&$pdf, array $recipient, $outputlangs)
+	{
+		$defaultFontSize = pdf_getPDFFontSize($outputlangs);
+		$widthRecBox = getDolGlobalInt('MAIN_PDF_USE_ISO_LOCATION') ? 92 : 100;
+		if ($this->page_largeur < 210) {
+			$widthRecBox = 84;
+		}
+		$heightRecBox = getDolGlobalInt('MAIN_PDF_USE_ISO_LOCATION') ? 38 : 40;
+		$posY = getDolGlobalInt('MAIN_PDF_USE_ISO_LOCATION') ? 40 : 42;
+		$posX = $this->page_largeur - $this->marge_droite - $widthRecBox;
+		if (getDolGlobalInt('MAIN_INVERT_SENDER_RECIPIENT')) {
+			$posX = $this->marge_gauche;
+		}
+
+		if (!getDolGlobalString('MAIN_PDF_NO_RECIPENT_FRAME')) {
+			$pdf->SetTextColor(0, 0, 0);
+			$pdf->SetFont('', '', $defaultFontSize - 2);
+			$pdf->SetXY($posX + 2, $posY - 5);
+			$pdf->MultiCell($widthRecBox, 5, $outputlangs->transnoentities('SentTo').':', 0, 'L');
+			$pdf->Rect($posX, $posY, $widthRecBox, $heightRecBox);
+		}
+
+		$pdf->SetXY($posX + 2, $posY + 3);
+		$pdf->SetFont('', 'B', $defaultFontSize);
+		$pdf->MultiCell($widthRecBox - 4, 3, $recipient['name'], 0, 'L');
+
+		$pdf->SetFont('', '', $defaultFontSize - 1);
+		$pdf->SetXY($posX + 2, $pdf->getY() + 1);
+		$pdf->MultiCell($widthRecBox - 4, 3.5, $recipient['address'], 0, 'L');
+	}
+
+	/**
 	 * List attachments stored in the diffusion directory.
 	 *
+	 * @param Diffusion $object Diffusion object
 	 * @param string $dir Absolute directory path
 	 * @param string $currentPdfName Generated PDF file name
 	 * @return array<int,array<string,mixed>>
 	 */
-	protected function loadDiffusionAttachments($dir, $currentPdfName)
+	protected function loadDiffusionAttachments($object, $dir, $currentPdfName)
 	{
 		$attachments = array();
+		$shareByFilename = array();
 
 		if (empty($dir)) {
 			return $attachments;
 		}
 
-		$fileList = dol_dir_list($dir, 'files', 0, '', '(\\.meta$|\\.tmp$|\\.preview\\.png$)', 'name', SORT_ASC, 1);
+		if (getDolGlobalInt('DIFFUSION_ALLOW_EXTERNAL_DOWNLOAD') && !empty($object->id)) {
+			$shareByFilename = $this->getSharedLinksByFilename($object, $dir);
+		}
+
+		$fileList = dol_dir_list($dir, 'files', 0, '', '(\.meta$|\.tmp$|\.preview\.png$)', 'name', SORT_ASC, 1);
 		foreach ($fileList as $fileinfo) {
 			if (!empty($currentPdfName) && dol_strtolower($fileinfo['name']) == dol_strtolower($currentPdfName)) {
 				continue;
+			}
+
+			$key = dol_strtolower((string) $fileinfo['name']);
+			if (!empty($shareByFilename[$key])) {
+				$fileinfo['public_share_link'] = $shareByFilename[$key];
 			}
 			$attachments[] = $fileinfo;
 		}
 
 		return $attachments;
+	}
+
+	/**
+	 * Get public shared links indexed by lowercase filename.
+	 *
+	 * @param Diffusion $object Diffusion object
+	 * @param string $dir Absolute directory path
+	 * @return array<string,string>
+	 */
+	protected function getSharedLinksByFilename($object, $dir)
+	{
+		$links = array();
+		$relativeDir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', (string) $dir);
+		$relativeDir = preg_replace('/[\/]$/', '', (string) $relativeDir);
+		$relativeDir = preg_replace('/^[\/]/', '', (string) $relativeDir);
+
+		$sql = "SELECT filename, share";
+		$sql .= " FROM ".MAIN_DB_PREFIX."ecm_files";
+		$sql .= " WHERE src_object_type = '".$this->db->escape($object->table_element)."'";
+		$sql .= " AND src_object_id = ".((int) $object->id);
+		$sql .= " AND filepath = '".$this->db->escape($relativeDir)."'";
+		$sql .= " AND share IS NOT NULL AND share <> ''";
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			while ($obj = $this->db->fetch_object($resql)) {
+				if (!empty($obj->filename) && !empty($obj->share)) {
+					$links[dol_strtolower((string) $obj->filename)] = $this->buildPublicShareUrl((string) $obj->share);
+				}
+			}
+			$this->db->free($resql);
+		}
+
+		return $links;
+	}
+
+	/**
+	 * Build public URL from a share token.
+	 *
+	 * @param string $shareToken Share token
+	 * @return string
+	 */
+	protected function buildPublicShareUrl($shareToken)
+	{
+		global $dolibarr_main_url_root;
+
+		$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim((string) $dolibarr_main_url_root));
+		$urlwithroot = $urlwithouturlroot.DOL_URL_ROOT;
+		if (empty($urlwithroot)) {
+			$urlwithroot = DOL_URL_ROOT;
+		}
+
+		return $urlwithroot.'/document.php?hashp='.urlencode($shareToken);
 	}
 
 	/**
@@ -1052,18 +1285,19 @@ class pdf_standard_diffusion extends ModelePDFDiffusion
 		       return $pdf->GetY();
 	       }
 
-	       for ($i = 0; $i < count($attachments); $i++) {
-		       $fileinfo = $attachments[$i];
-		       // FR: Construit une description avec le nom du fichier et sa taille formatée.
-		       // EN: Build a description containing the file name and its formatted size.
-		       $sizeLabel = dol_print_size(isset($fileinfo['size']) ? $fileinfo['size'] : 0, 1, 1, 0, $outputlangs);
-		       $lineLabel = $outputlangs->transnoentities('DiffusionAttachmentLine', $fileinfo['name'], $sizeLabel);
-		       $pdf->SetXY($this->marge_gauche, $y);
-		       // FR: Préfixe chaque élément avec une puce pour faciliter la lecture.
-		       // EN: Prefix each entry with a bullet to ease readability.
-		       $pdf->MultiCell($width, 5, '- '.$outputlangs->convToOutputCharset($lineLabel), 0, 'L');
-		       $y = $pdf->GetY();
-	       }
+		for ($i = 0; $i < count($attachments); $i++) {
+			$fileinfo = $attachments[$i];
+			$sizeLabel = dol_print_size(isset($fileinfo['size']) ? $fileinfo['size'] : 0, 1, 1, 0, $outputlangs);
+			$lineLabel = $outputlangs->transnoentities('DiffusionAttachmentLine', $fileinfo['name'], $sizeLabel);
+			$lineToDisplay = '- '.dol_escape_htmltag($lineLabel);
+			if (!empty($fileinfo['public_share_link'])) {
+				$lineToDisplay = '- '.dol_escape_htmltag($fileinfo['name']).' - '.dol_escape_htmltag($outputlangs->transnoentities('DiffusionAttachmentPublicLink')).' : <a href="'.dol_escape_htmltag((string) $fileinfo['public_share_link']).'">'.dol_escape_htmltag((string) $fileinfo['public_share_link']).'</a>';
+			}
+			$pdf->SetXY($this->marge_gauche, $y);
+			$pdf->writeHTMLCell($width, 0, $this->marge_gauche, $y, $outputlangs->convToOutputCharset($lineToDisplay), 0, 1, false, true, 'L', true);
+			$y = $pdf->GetY();
+		}
+
 
 		return $y;
 	}
