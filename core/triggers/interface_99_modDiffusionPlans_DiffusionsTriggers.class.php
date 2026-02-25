@@ -57,6 +57,7 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 	public function runTrigger($action, $object, $user, $langs, $conf)
 	{
 		if (!is_object($object) || empty($object->element) || $object->element !== 'diffusion') {
+			var_dump($object->element);
 			return 0;
 		}
 
