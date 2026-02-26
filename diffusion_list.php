@@ -204,6 +204,9 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
 $enablepermissioncheck = getDolGlobalInt('DIFFUSIONPLANS_ENABLE_PERMISSION_CHECK');
+if (getDolGlobalString('DIFFUSIONPLANS_ENABLE_PERMISSION_CHECK') === '') {
+	$enablepermissioncheck = 1;
+}
 if ($enablepermissioncheck) {
 	$permissiontoread = $user->hasRight('diffusionplans', 'diffusion', 'read');
 	$permissiontoadd = $user->hasRight('diffusionplans', 'diffusion', 'write');
