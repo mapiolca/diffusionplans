@@ -140,7 +140,7 @@ class modDiffusionPlans extends DolibarrModules
 		// Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
 		$this->module_parts = array(
 			// Set this to 1 if module has its own trigger directory (core/triggers)
-			'triggers' => 0,
+			'triggers' => 1,
 			// Set this to 1 if module has its own login method file (core/login)
 			'login' => 0,
 			// Set this to 1 if module has its own substitution function file (core/substitutions)
@@ -226,8 +226,12 @@ class modDiffusionPlans extends DolibarrModules
 		$i = 0;
 		$this->const = array(
 			$i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON', 'chaine', 'mod_diffusion_standard', '', 0, 'current'],
-            $i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/diffusionplans/diffusion/', '', 0, 'current'],
-            $i++ => ['DIFFUSIONPLANS_DIFFUSION_DEFAULT_MODEL', 'chaine', 'standard_diffusion', '', 0, 'current'],
+			$i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/diffusionplans/diffusion/', '', 0, 'current'],
+			$i++ => ['DIFFUSIONPLANS_DIFFUSION_DEFAULT_MODEL', 'chaine', 'standard_diffusion', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO_DIFFUSION_VALIDATE', 'yesno', '1', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO_DIFFUSION_UNVALIDATE', 'yesno', '1', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO_DIFFUSION_SENT', 'yesno', '1', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO_DIFFUSION_CANCEL', 'yesno', '1', '', 0, 'current'],
 		);
 
 		// Some keys to add into the overwriting translation tables
@@ -616,6 +620,15 @@ class modDiffusionPlans extends DolibarrModules
 
 		$sql = array();
 
+		// Register trigger codes into agenda auto-actions dictionary
+		$sql = array_merge($sql, array(
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_VALIDATE', 'Validate diffusion', 'diffusionplans', 2000)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_UNVALIDATE', 'Unvalidate diffusion', 'diffusionplans', 2001)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_SENT', 'Sent diffusion', 'diffusionplans', 2002)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_CANCEL', 'Cancel diffusion', 'diffusionplans', 2003)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_REOPEN', 'Reopen diffusion', 'diffusionplans', 2004)"
+		));
+
 		// Document templates
 		$moduledir = dol_sanitizeFileName('diffusionplans');
 		$myTmpObjects = array();
@@ -660,7 +673,9 @@ class modDiffusionPlans extends DolibarrModules
 	 */
 	public function remove($options = '')
 	{
-		$sql = array();
+		$sql = array(
+			"DELETE FROM ".MAIN_DB_PREFIX."c_action_trigger WHERE element = 'diffusionplans' AND code IN ('DIFFUSION_VALIDATE','DIFFUSION_UNVALIDATE','DIFFUSION_SENT','DIFFUSION_CANCEL','DIFFUSION_REOPEN')"
+		);
 		return $this->_remove($sql, $options);
 	}
 }
