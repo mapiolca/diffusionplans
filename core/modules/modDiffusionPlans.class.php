@@ -622,11 +622,11 @@ class modDiffusionPlans extends DolibarrModules
 
 		// Register trigger codes into agenda auto-actions dictionary
 		$sql = array_merge($sql, array(
-			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_VALIDATE', 'Validate diffusion', 'diffusionplans', 2000)",
-			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_UNVALIDATE', 'Unvalidate diffusion', 'diffusionplans', 2001)",
-			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_SENT', 'Sent diffusion', 'diffusionplans', 2002)",
-			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_CANCEL', 'Cancel diffusion', 'diffusionplans', 2003)",
-			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, element, rang) VALUES ('DIFFUSION_REOPEN', 'Reopen diffusion', 'diffusionplans', 2004)"
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, elementtype, rang) VALUES ('DIFFUSION_VALIDATE', 'Validate diffusion', 'diffusionplans', 2000)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, elementtype, rang) VALUES ('DIFFUSION_UNVALIDATE', 'Unvalidate diffusion', 'diffusionplans', 2001)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, elementtype, rang) VALUES ('DIFFUSION_SENT', 'Sent diffusion', 'diffusionplans', 2002)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, elementtype, rang) VALUES ('DIFFUSION_CANCEL', 'Cancel diffusion', 'diffusionplans', 2003)",
+			"INSERT IGNORE INTO ".MAIN_DB_PREFIX."c_action_trigger (code, label, elementtype, rang) VALUES ('DIFFUSION_REOPEN', 'Reopen diffusion', 'diffusionplans', 2004)"
 		));
 
 		// Document templates
@@ -674,7 +674,7 @@ class modDiffusionPlans extends DolibarrModules
 	public function remove($options = '')
 	{
 		$sql = array(
-			"DELETE FROM ".MAIN_DB_PREFIX."c_action_trigger WHERE element = 'diffusionplans' AND code IN ('DIFFUSION_VALIDATE','DIFFUSION_UNVALIDATE','DIFFUSION_SENT','DIFFUSION_CANCEL','DIFFUSION_REOPEN')"
+			"DELETE FROM ".MAIN_DB_PREFIX."c_action_trigger WHERE elementtype = 'diffusionplans' AND code IN ('DIFFUSION_VALIDATE','DIFFUSION_UNVALIDATE','DIFFUSION_SENT','DIFFUSION_CANCEL','DIFFUSION_REOPEN')"
 		);
 		return $this->_remove($sql, $options);
 	}
