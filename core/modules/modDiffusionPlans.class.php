@@ -226,8 +226,12 @@ class modDiffusionPlans extends DolibarrModules
 		$i = 0;
 		$this->const = array(
 			$i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON', 'chaine', 'mod_diffusion_standard', '', 0, 'current'],
-            $i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/diffusionplans/diffusion/', '', 0, 'current'],
-            $i++ => ['DIFFUSIONPLANS_DIFFUSION_DEFAULT_MODEL', 'chaine', 'standard_diffusion', '', 0, 'current'],
+			$i++ => ['DIFFUSIONPLANS_DIFFUSION_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/diffusionplans/diffusion/', '', 0, 'current'],
+			$i++ => ['DIFFUSIONPLANS_DIFFUSION_DEFAULT_MODEL', 'chaine', 'standard_diffusion', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO__DIFFUSION_VALIDATE', 'yesno', '1', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO__DIFFUSION_UNVALIDATE', 'yesno', '1', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO__DIFFUSION_SENT', 'yesno', '1', '', 0, 'current'],
+			$i++ => ['MAIN_AGENDA_ACTIONAUTO__DIFFUSION_CANCEL', 'yesno', '1', '', 0, 'current'],
 		);
 
 		// Some keys to add into the overwriting translation tables

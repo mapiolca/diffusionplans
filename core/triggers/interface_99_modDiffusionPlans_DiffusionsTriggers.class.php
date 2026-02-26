@@ -70,6 +70,16 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 			return 0;
 		}
 
+		$actionAutoConstByTrigger = array(
+			'DIFFUSION_VALIDATE' => 'MAIN_AGENDA_ACTIONAUTO__DIFFUSION_VALIDATE',
+			'DIFFUSION_UNVALIDATE' => 'MAIN_AGENDA_ACTIONAUTO__DIFFUSION_UNVALIDATE',
+			'DIFFUSION_SENT' => 'MAIN_AGENDA_ACTIONAUTO__DIFFUSION_SENT',
+			'DIFFUSION_CANCEL' => 'MAIN_AGENDA_ACTIONAUTO__DIFFUSION_CANCEL'
+		);
+		if (isset($actionAutoConstByTrigger[$action]) && !getDolGlobalInt($actionAutoConstByTrigger[$action])) {
+			return 0;
+		}
+
 		if (!is_object($object) || empty($object->id)) {
 			return 0;
 		}
