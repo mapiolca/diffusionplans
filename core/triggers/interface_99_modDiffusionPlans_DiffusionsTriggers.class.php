@@ -78,12 +78,24 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 
 		$langs->load('diffusionplans@diffusionplans');
 
+		$targetStatusByAction = array(
+			'DIFFUSION_VALIDATE' => 1,
+			'DIFFUSION_UNVALIDATE' => 0,
+			'DIFFUSION_SENT' => 6,
+			'DIFFUSION_CANCEL' => 9,
+			'DIFFUSION_REOPEN' => 1
+		);
+		$targetStatusLabel = $object->getLibStatut(0);
+		if (isset($targetStatusByAction[$action])) {
+			$targetStatusLabel = $object->LibStatut($targetStatusByAction[$action], 0);
+		}
+
 		$actioncomm = new ActionComm($this->db);
 		$actioncomm->type_code = 'AC_OTH';
-		$actioncomm->label = $langs->trans('DiffusionEvenementAgendaChangementStatut', $object->ref, $object->getLibStatut(0));
+		$actioncomm->label = $langs->trans('DiffusionEvenementAgendaChangementStatut', $object->ref, $targetStatusLabel);
 		$actioncomm->note_private = $langs->trans('DiffusionEvenementAgendaChangementStatutNote', $action, $object->ref);
 		$actioncomm->datep = dol_now();
-		$actioncomm->datep2 = dol_now();
+		$actioncomm->datef = dol_now();
 		$actioncomm->percentage = -1;
 		$actioncomm->fk_element = (int) $object->id;
 		$actioncomm->elementtype = 'diffusion@diffusionplans';
