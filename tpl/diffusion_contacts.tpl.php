@@ -353,25 +353,37 @@ foreach ($list as $entry) {
 	print '<td class="norap" data-mail_status="' . ((int) $diffusioncontactstatic->id) . '">' ;
 	if ($permission && $object->status == $object::STATUS_DRAFT) {
 		print ajax_diffusion_onoff($diffusioncontactstatic, 'mail_status', 'mail_status', 'Enabled', 'Disabled', $input = array(), $morecss = '', $htmlname = '', $forcenoajax, $moreparam = '');
-	}else{
-		print '<div id="set_'.$htmlname.'_'.$object->id.'" class=" '.($diffusioncontactstatic->mail_status == 1 ? 'hideobject' : '').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Disabled'), 'switch_off', '', 0, 0, 0, '', $cssswitchoff).'</div>';
-		print '<div id="del_'.$htmlname.'_'.$object->id.'" class=" '.($diffusioncontactstatic->mail_status == 1 ? '' : 'hideobject').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Enabled'), 'switch_on', '', 0, 0, 0, '', $cssswitchon).'</div>';
+	} else {
+		$htmlname = 'mail_status';
+		$morecss = '';
+		$cssswitchoff = '';
+		$cssswitchon = '';
+		print '<div id="set_'.$htmlname.'_'.$diffusioncontactstatic->id.'" class=" '.($diffusioncontactstatic->mail_status == 1 ? 'hideobject' : '').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Disabled'), 'switch_off', '', 0, 0, 0, '', $cssswitchoff).'</div>';
+		print '<div id="del_'.$htmlname.'_'.$diffusioncontactstatic->id.'" class=" '.($diffusioncontactstatic->mail_status == 1 ? '' : 'hideobject').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Enabled'), 'switch_on', '', 0, 0, 0, '', $cssswitchon).'</div>';
 	}
 	print '</td>';
 	print '<td class="norap" data-letter_status="' . ((int) $diffusioncontactstatic->id) . '">' ;
 	if ($permission && $object->status == $object::STATUS_DRAFT) {
 		print ajax_diffusion_onoff($diffusioncontactstatic, 'letter_status', 'letter_status', 'Enabled', 'Disabled', $input = array(), $morecss = '', $htmlname = '', $forcenoajax, $moreparam = '');
-	}else{
-		print '<div id="set_'.$htmlname.'_'.$object->id.'" class=" '.($diffusioncontactstatic->letter_status == 1 ? 'hideobject' : '').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Disabled'), 'switch_off', '', 0, 0, 0, '', $cssswitchoff).'</div>';
-		print '<div id="del_'.$htmlname.'_'.$object->id.'" class=" '.($diffusioncontactstatic->letter_status == 1 ? '' : 'hideobject').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Enabled'), 'switch_on', '', 0, 0, 0, '', $cssswitchon).'</div>';
+	} else {
+		$htmlname = 'letter_status';
+		$morecss = '';
+		$cssswitchoff = '';
+		$cssswitchon = '';
+		print '<div id="set_'.$htmlname.'_'.$diffusioncontactstatic->id.'" class=" '.($diffusioncontactstatic->letter_status == 1 ? 'hideobject' : '').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Disabled'), 'switch_off', '', 0, 0, 0, '', $cssswitchoff).'</div>';
+		print '<div id="del_'.$htmlname.'_'.$diffusioncontactstatic->id.'" class=" '.($diffusioncontactstatic->letter_status == 1 ? '' : 'hideobject').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Enabled'), 'switch_on', '', 0, 0, 0, '', $cssswitchon).'</div>';
 	}
 	print '</td>';
 	print '<td class="norap" data-hand_status="' . ((int) $diffusioncontactstatic->id) . '">' ;
 	if ($permission && $object->status == $object::STATUS_DRAFT) {
 		print ajax_diffusion_onoff($diffusioncontactstatic, 'hand_status', 'hand_status', 'Enabled', 'Disabled', $input = array(), $morecss = '', $htmlname = '', $forcenoajax, $moreparam = '');
-	}else{
-		print '<div id="set_'.$htmlname.'_'.$object->id.'" class=" '.($diffusioncontactstatic->hand_status == 1 ? 'hideobject' : '').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Disabled'), 'switch_off', '', 0, 0, 0, '', $cssswitchoff).'</div>';
-		print '<div id="del_'.$htmlname.'_'.$object->id.'" class=" '.($diffusioncontactstatic->hand_status == 1 ? '' : 'hideobject').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Enabled'), 'switch_on', '', 0, 0, 0, '', $cssswitchon).'</div>';
+	} else {
+		$htmlname = 'hand_status';
+		$morecss = '';
+		$cssswitchoff = '';
+		$cssswitchon = '';
+		print '<div id="set_'.$htmlname.'_'.$diffusioncontactstatic->id.'" class=" '.($diffusioncontactstatic->hand_status == 1 ? 'hideobject' : '').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Disabled'), 'switch_off', '', 0, 0, 0, '', $cssswitchoff).'</div>';
+		print '<div id="del_'.$htmlname.'_'.$diffusioncontactstatic->id.'" class=" '.($diffusioncontactstatic->hand_status == 1 ? '' : 'hideobject').($morecss ? ' '.$morecss : '').'">'.img_picto($langs->trans('Enabled'), 'switch_on', '', 0, 0, 0, '', $cssswitchon).'</div>';
 	}
 	print '</td>';
 

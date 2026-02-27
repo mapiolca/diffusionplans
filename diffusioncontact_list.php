@@ -201,18 +201,10 @@ $object->fields = dol_sort_array($object->fields, 'position');
 //$arrayfields['anotherfield'] = array('type'=>'integer', 'label'=>'AnotherField', 'checked'=>1, 'enabled'=>1, 'position'=>90, 'csslist'=>'right');
 $arrayfields = dol_sort_array($arrayfields, 'position');
 
-// There is several ways to check permission.
-// Set $enablepermissioncheck to 1 to enable a minimum low level of checks
-$enablepermissioncheck = getDolGlobalInt('DIFFUSIONPLANS_ENABLE_PERMISSION_CHECK');
-if ($enablepermissioncheck) {
-	$permissiontoread = $user->hasRight('diffusionplans', 'diffusioncontact', 'read');
-	$permissiontoadd = $user->hasRight('diffusionplans', 'diffusioncontact', 'write');
-	$permissiontodelete = $user->hasRight('diffusionplans', 'diffusioncontact', 'delete');
-} else {
-	$permissiontoread = 1;
-	$permissiontoadd = 1;
-	$permissiontodelete = 1;
-}
+// EN: Always enforce rights to keep list behavior consistent with card access.
+$permissiontoread = $user->hasRight('diffusionplans', 'diffusioncontact', 'read');
+$permissiontoadd = $user->hasRight('diffusionplans', 'diffusioncontact', 'write');
+$permissiontodelete = $user->hasRight('diffusionplans', 'diffusioncontact', 'delete');
 
 // Security check (enable the most restrictive one)
 if ($user->socid > 0) {
