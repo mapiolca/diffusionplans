@@ -63,7 +63,14 @@ $value = GETPOSTINT('value');
 $format = 'int';
 
 // Load object according to $id and $element
-$object = fetchObjectByElement($id, $element);
+// For module objects without entity field, avoid generic fetchObjectByElement() fallback
+// that may force a SQL filter on dbt.entity with some Dolibarr versions.
+if (preg_match('/^diffusioncontact(@diffusionplans)?$/', $element)) {
+	$object = new DiffusionContact($db);
+	$object->fetch($id);
+} else {
+	$object = fetchObjectByElement($id, $element);
+}
 //var_dump($id, $element);
 //var_dump(is_object($object));
 if (!is_object($object)) {

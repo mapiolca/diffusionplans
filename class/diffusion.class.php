@@ -817,7 +817,7 @@ class Diffusion extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'DIFFUSIONPLANS_DIFFUSION_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'DIFFUSION_UNVALIDATE');
 	}
 
 	/**
@@ -834,7 +834,7 @@ class Diffusion extends CommonObject
 			return 0;
 		}
 
-		return $this->setStatusCommon($user, self::STATUS_SENT, $notrigger, 'DIFFUSIONPLANS_DIFFUSION_SENT');
+		return $this->setStatusCommon($user, self::STATUS_SENT, $notrigger, 'DIFFUSION_SENT');
 	}
 
 	/**
@@ -858,7 +858,7 @@ class Diffusion extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'DIFFUSIONPLANS_DIFFUSION_CANCEL');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'DIFFUSION_CANCEL');
 	}
 
 	/**
@@ -882,7 +882,7 @@ class Diffusion extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIFFUSIONPLANS_DIFFUSION_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIFFUSION_REOPEN');
 	}
 
 	/**
