@@ -70,6 +70,10 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 			return 0;
 		}
 
+		if (!isModEnabled('agenda')) {
+			return 0;
+		}
+
 		$actionAutoConstByTrigger = array(
 			'DIFFUSION_VALIDATE' => 'MAIN_AGENDA_ACTIONAUTO_DIFFUSION_VALIDATE',
 			'DIFFUSION_UNVALIDATE' => 'MAIN_AGENDA_ACTIONAUTO_DIFFUSION_UNVALIDATE',
