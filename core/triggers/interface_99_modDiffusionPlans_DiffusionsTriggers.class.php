@@ -80,6 +80,11 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 			return 0;
 		}
 
+		// Avoid duplicate automatic agenda events when core agenda auto-action is active.
+		if (isModEnabled('agenda') && getDolGlobalInt('MAIN_AGENDA_ACTIONAUTO_'.$action)) {
+			return 0;
+		}
+
 		if (!is_object($object) || empty($object->id)) {
 			return 0;
 		}
