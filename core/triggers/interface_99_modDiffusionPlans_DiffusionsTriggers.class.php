@@ -64,74 +64,12 @@ class InterfaceDiffusionsTriggers extends DolibarrTriggers
 			'DIFFUSION_REOPEN'
 		);
 
-		// Trigger manager executes all trigger classes for all actions.
-		// For example, ActionComm::create() launched below will fire ACTION_* triggers with element='action'.
 		if (!in_array($action, $actions, true)) {
 			return 0;
 		}
 
-		if (!isModEnabled('agenda')) {
-			return 0;
-		}
-
-		$actionAutoConstByTrigger = array(
-			'DIFFUSION_VALIDATE' => 'MAIN_AGENDA_ACTIONAUTO_DIFFUSION_VALIDATE',
-			'DIFFUSION_UNVALIDATE' => 'MAIN_AGENDA_ACTIONAUTO_DIFFUSION_UNVALIDATE',
-			'DIFFUSION_SENT' => 'MAIN_AGENDA_ACTIONAUTO_DIFFUSION_SENT',
-			'DIFFUSION_CANCEL' => 'MAIN_AGENDA_ACTIONAUTO_DIFFUSION_CANCEL'
-		);
-		if (isset($actionAutoConstByTrigger[$action]) && !getDolGlobalInt($actionAutoConstByTrigger[$action])) {
-			return 0;
-		}
-
-		// Avoid duplicate automatic agenda events when core agenda auto-action is active.
-		if (isModEnabled('agenda') && getDolGlobalInt('MAIN_AGENDA_ACTIONAUTO_'.$action)) {
-			return 0;
-		}
-
-		if (!is_object($object) || empty($object->id)) {
-			return 0;
-		}
-
-		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-
-		$langs->load('diffusionplans@diffusionplans');
-
-		$targetStatusByAction = array(
-			'DIFFUSION_VALIDATE' => 1,
-			'DIFFUSION_UNVALIDATE' => 0,
-			'DIFFUSION_SENT' => 6,
-			'DIFFUSION_CANCEL' => 9,
-			'DIFFUSION_REOPEN' => 1
-		);
-		$targetStatusLabel = $object->getLibStatut(0);
-		if (isset($targetStatusByAction[$action])) {
-			$targetStatusLabel = $object->LibStatut($targetStatusByAction[$action], 0);
-		}
-
-		$actioncomm = new ActionComm($this->db);
-		$actioncomm->type_code = 'AC_OTH';
-		$actioncomm->label = $langs->trans('DiffusionEvenementAgendaChangementStatut', $object->ref, $targetStatusLabel);
-		$actioncomm->note_private = $langs->trans('DiffusionEvenementAgendaChangementStatutNote', $action, $object->ref);
-		$actioncomm->datep = dol_now();
-		$actioncomm->datef = dol_now();
-		$actioncomm->percentage = -1;
-		$actioncomm->fk_element = (int) $object->id;
-		$actioncomm->elementtype = 'diffusion@diffusionplans';
-		$actioncomm->fk_project = !empty($object->fk_project) ? (int) $object->fk_project : 0;
-		$actioncomm->fk_user_action = !empty($user->id) ? (int) $user->id : 0;
-		$actioncomm->userownerid = !empty($user->id) ? (int) $user->id : 0;
-		if (property_exists($object, 'fk_soc') && !empty($object->fk_soc)) {
-			$actioncomm->socid = (int) $object->fk_soc;
-		}
-
-		$result = $actioncomm->create($user);
-		if ($result < 0) {
-			$this->error = $actioncomm->error;
-			$this->errors = $actioncomm->errors;
-			return -1;
-		}
-
+		// Agenda auto-events are intentionally handled by core Agenda module
+		// through MAIN_AGENDA_ACTIONAUTO_<TRIGGERCODE> constants.
 		return 0;
 	}
 }
