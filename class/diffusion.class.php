@@ -669,7 +669,7 @@ class Diffusion extends CommonObject
 	 */
 	public function validate($user, $notrigger = 0)
 	{
-		global $conf;
+		global $conf, $langs;
 
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -726,6 +726,9 @@ class Diffusion extends CommonObject
 			}
 
 			if (!$error && !$notrigger) {
+				$langs->load('diffusionplans@diffusionplans');
+				$this->actionmsg2 = $langs->transnoentities('DiffusionValidatedInDolibarr', ($this->newref ? $this->newref : $this->ref));
+				$this->actionmsg = $this->actionmsg2;
 				// Call trigger
 				$result = $this->call_trigger('DIFFUSION_VALIDATE', $user);
 				if ($result < 0) {
@@ -817,6 +820,10 @@ class Diffusion extends CommonObject
 		 return -1;
 		 }*/
 
+		global $langs;
+		$langs->load('diffusionplans@diffusionplans');
+		$this->actionmsg2 = $langs->transnoentities('DiffusionUnvalidatedInDolibarr', $this->ref);
+		$this->actionmsg = $this->actionmsg2;
 		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'DIFFUSION_UNVALIDATE');
 	}
 
@@ -834,6 +841,10 @@ class Diffusion extends CommonObject
 			return 0;
 		}
 
+		global $langs;
+		$langs->load('diffusionplans@diffusionplans');
+		$this->actionmsg2 = $langs->transnoentities('DiffusionSentInDolibarr', $this->ref);
+		$this->actionmsg = $this->actionmsg2;
 		return $this->setStatusCommon($user, self::STATUS_SENT, $notrigger, 'DIFFUSION_SENT');
 	}
 
@@ -858,6 +869,10 @@ class Diffusion extends CommonObject
 		 return -1;
 		 }*/
 
+		global $langs;
+		$langs->load('diffusionplans@diffusionplans');
+		$this->actionmsg2 = $langs->transnoentities('DiffusionCanceledInDolibarr', $this->ref);
+		$this->actionmsg = $this->actionmsg2;
 		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'DIFFUSION_CANCEL');
 	}
 
@@ -882,6 +897,10 @@ class Diffusion extends CommonObject
 		 return -1;
 		 }*/
 
+		global $langs;
+		$langs->load('diffusionplans@diffusionplans');
+		$this->actionmsg2 = $langs->transnoentities('DiffusionReopenedInDolibarr', $this->ref);
+		$this->actionmsg = $this->actionmsg2;
 		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIFFUSION_REOPEN');
 	}
 
